@@ -52,7 +52,20 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 
 1. Connect the 12V power supply to the WarDragon
 2. Connect the power supply to AC mains
-3. The power button LED should illuminate
+3. **Press and latch the external power button** on the case exterior
+4. The power button LED should illuminate
+
+**Understanding the Power System:**
+
+| Component | Location | Function |
+|-----------|----------|----------|
+| External power button | Case exterior | Must be **depressed and latched** to supply power inside the case |
+| Exhaust fan switch | Inside case (near fan) | Controls exhaust fan only - **not the main power** |
+| PC power button | Inside case (on PC) | Standard PC power - used for shutdown |
+
+> **Note**: The PC's BIOS is configured for "power on after power applied." When you latch the external power button, the PC will automatically boot. USB ports will have power as long as the external button is latched.
+
+> **Common confusion**: The exhaust fan switch inside the case is often mistaken for a power switch. It only controls the cooling fan.
 
 **Power Requirements:**
 - Input: 12V DC, 3A minimum
@@ -95,16 +108,22 @@ Once the system boots and you see the desktop:
 3. **Configure network settings** as needed:
    - Set a static IP on "Wired connection 2" if desired (see [Network Setup](network-setup.md))
    - Configure WiFi hotspot if needed (see [Hotspot Setup](hotspot-setup.md))
-4. **Install remote access software** for headless operation:
-   - **RustDesk** - For remote desktop access
-   - **OpenSSH** - For SSH command-line access
+4. **Install and configure remote access software** for headless operation:
 
+   **OpenSSH (for command-line access):**
    ```bash
-   # Install OpenSSH server
    sudo apt update && sudo apt install openssh-server
    sudo systemctl enable ssh
    sudo systemctl start ssh
    ```
+
+   **RustDesk (for remote desktop access):**
+   - Install RustDesk from the software center or download from rustdesk.com
+   - **Important configuration in RustDesk settings:**
+     - **Set a static password** - Required for unattended access (Settings → Security → Set permanent password)
+     - **Enable "Allow LAN discovery"** - Allows direct connection via IP address
+
+   > **Tip**: You can connect to WarDragon using either the RustDesk ID *or* the kit's IP address. Both are entered in the same connection box in the RustDesk client. Using the IP address (with LAN connection enabled) often provides better performance on local networks.
 
 5. **Test remote connectivity** before disconnecting the monitor
 
@@ -134,8 +153,10 @@ ssh dragon@<wardragon-ip>
 ### Option 2: Remote Desktop (RustDesk)
 
 1. Open RustDesk on your computer
-2. Enter the WarDragon's RustDesk ID
-3. Connect using your configured password
+2. In the connection box, enter either:
+   - The WarDragon's **RustDesk ID**, or
+   - The WarDragon's **IP address** (if LAN connection is enabled - often faster on local networks)
+3. Connect using the static password you configured
 
 ### Option 3: Direct Ethernet (Network Access)
 
@@ -159,6 +180,25 @@ Once connected (via monitor/keyboard or remote access):
 # Check running services
 sudo systemctl status dragonsync
 ```
+
+## Proper Shutdown Procedure
+
+To safely shut down the WarDragon:
+
+1. **Shut down the operating system** (via SSH, remote desktop, or local console):
+   ```bash
+   sudo shutdown -h now
+   ```
+
+2. **Wait for the PC to fully power off** (LEDs will turn off)
+
+3. **Press the PC power button** (requires opening the case lid) to ensure it's off
+
+4. **Delatch the external power button** on the case exterior
+
+> **Important**: Always shut down the OS properly before delatching the external power button. Cutting power without a proper shutdown can cause filesystem corruption.
+
+> **Note**: The external power button controls power to the entire case. When latched, even after the PC is shut down, USB devices may still have power. Delatching ensures complete power isolation.
 
 ## Next Steps
 
