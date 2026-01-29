@@ -77,12 +77,12 @@ Normal boot time is 60-90 seconds. If longer:
 If you don't know the IP:
 
 ```bash
-# From your network, scan for WarDragon
-nmap -sn 192.168.1.0/24 | grep -B2 -i dragon
+# Check router DHCP leases for the assigned IP
 
-# Or check router DHCP leases
+# Or scan your subnet
+nmap -sn <your-subnet>/24 | grep -B2 -i dragon
 
-# If using hotspot, default is 192.168.50.1
+# If using hotspot, WarDragon is at 192.168.12.1
 ```
 
 ### Hotspot Not Broadcasting

@@ -13,11 +13,12 @@ The WarDragon Pro v3 has minimal visible LEDs.
 
 ## Verifying System Status
 
-Since WarDragon is a headless system, verify status via network:
+Since WarDragon is a headless system, verify status via:
 
-- **Ping** - `ping <wardragon-ip>`
-- **SSH** - `ssh dragon@<wardragon-ip>`
-- **Remote Desktop** - Connect via VNC or RDP client
+- **Monitor + Keyboard** - Direct local access
+- **Ping** - `ping <wardragon-ip>` (confirms network connectivity)
+- **SSH** - Requires OpenSSH to be installed
+- **Remote Desktop** - Requires RustDesk or similar to be installed
 
 ## Related Documentation
 

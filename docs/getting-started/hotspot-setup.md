@@ -68,7 +68,7 @@ sudo nmcli connection add \
   ssid "WarDragon" \
   mode ap \
   ipv4.method shared \
-  ipv4.addresses "192.168.50.1/24" \
+  ipv4.addresses "192.168.12.1/24" \
   wifi-sec.key-mgmt wpa-psk \
   wifi-sec.psk "YourSecurePassword"
 ```
@@ -128,8 +128,8 @@ sudo nmcli connection modify "WarDragon-Hotspot" connection.autoconnect-priority
 
 NetworkManager's "shared" mode automatically runs a DHCP server. Connected clients receive:
 
-- IP addresses in 192.168.50.0/24 range
-- Gateway: 192.168.50.1 (WarDragon)
+- IP addresses in 192.168.12.0/24 range
+- Gateway: 192.168.12.1 (WarDragon)
 - DNS: Forwarded through WarDragon
 
 ### Custom DHCP Range
@@ -143,9 +143,9 @@ sudo nano /etc/NetworkManager/dnsmasq-shared.d/wardragon.conf
 Add:
 
 ```
-dhcp-range=192.168.50.10,192.168.50.100,12h
-dhcp-option=option:router,192.168.50.1
-dhcp-option=option:dns-server,192.168.50.1
+dhcp-range=192.168.12.10,192.168.12.100,12h
+dhcp-option=option:router,192.168.12.1
+dhcp-option=option:dns-server,192.168.12.1
 ```
 
 Restart NetworkManager:
@@ -181,7 +181,7 @@ Run hotspot while maintaining Ethernet connectivity:
 
 ```bash
 # Ensure Ethernet is connected
-sudo nmcli connection up "Wired connection 1"
+sudo nmcli connection up "Wired connection 2"
 
 # Then enable hotspot
 sudo nmcli connection up "WarDragon-Hotspot"
@@ -211,7 +211,7 @@ outputs:
     multicast: true
     address: "239.2.3.1"
     port: 6969
-    interface: "192.168.50.1"  # Hotspot interface
+    interface: "192.168.12.1"  # Hotspot interface
 ```
 
 ### ATAK Configuration
@@ -221,7 +221,7 @@ On connected ATAK devices:
 1. Go to Settings → Network Preferences
 2. Set TAK Server or SA Multicast
 3. For multicast: Use `239.2.3.1:6969`
-4. For direct: Use WarDragon's IP (`192.168.50.1`)
+4. For direct: Use WarDragon's IP (`192.168.12.1`)
 
 ## Security Considerations
 

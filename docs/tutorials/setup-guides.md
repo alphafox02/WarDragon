@@ -10,7 +10,7 @@ Quick reference guides for common WarDragon setup tasks.
 - [ ] Connect power supply
 - [ ] Wait for boot (~90 seconds)
 - [ ] Connect via Ethernet or WiFi
-- [ ] Verify web interface accessible
+- [ ] Verify network connectivity (ping, etc.)
 - [ ] Check detection services running
 
 ### Field Deployment

@@ -34,14 +34,14 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 
 | Port | Antenna | Purpose |
 |------|---------|---------|
-| Left Side - Port 2 (RX E200) | Dual-band 2.4/5 GHz | DJI DroneID detection |
-| Left Side - Port 3 (RX Panda) | Dual-band 2.4/5 GHz | WiFi Remote ID |
-| Right Side - Port 2 (BT5) | 2.4 GHz | Bluetooth Remote ID |
+| Left Side - Port 3 (RX E200) | Dual-band 2.4/5 GHz | DJI DroneID detection |
+| Left Side - Port 2 (RX Panda) | Dual-band 2.4/5 GHz | WiFi Remote ID |
+| Right Side - Port 1 (BT5) | 2.4 GHz | Bluetooth Remote ID |
 
 **Optional:**
 | Port | Antenna | Purpose |
 |------|---------|---------|
-| Right Side - Port 1 (GPS) | GPS antenna | External GPS (improves accuracy) |
+| Right Side - Port 2 (GPS) | GPS antenna | External GPS (improves accuracy) |
 
 ### Step 3: Power Connection
 
@@ -62,90 +62,42 @@ On first power-up:
 2. The power button LED indicates the system is on
 3. Internal LEDs (E200, GPS) may be partially visible through the case
 
-Since WarDragon is a headless system, verify boot completion by:
-- Attempting to ping the device
-- Connecting via SSH
-- Accessing the web interface
-
 ## Connecting to WarDragon
 
 ### Option 1: Direct Ethernet Connection
 
-1. Connect an Ethernet cable between your computer and the WarDragon
-2. Configure your computer's Ethernet for DHCP or set a static IP in the 192.168.1.x range
-3. The WarDragon default IP is typically `192.168.1.10` (verify in your configuration)
+1. Connect an Ethernet cable between your computer and the WarDragon's Ethernet port
+2. The WarDragon's external Ethernet port is configured for DHCP
+3. Check your router/network for the assigned IP address
 
 ### Option 2: WiFi Hotspot
 
-If configured, WarDragon can broadcast its own WiFi network:
+If configured per the [Hotspot Setup](hotspot-setup.md) guide:
 
-1. Look for a WiFi network named `WarDragon-XXXX` (where XXXX is unique to your unit)
-2. Connect using the default password (provided with your unit)
-3. Access the web interface at `192.168.50.1`
+1. Look for a WiFi network named `WarDragon` (or your configured SSID)
+2. Connect using your configured password
+3. The WarDragon will be at `192.168.12.1`
 
-See [Hotspot Setup](hotspot-setup.md) for configuration details.
+### Option 3: Monitor + Keyboard
 
-### Option 3: Join Existing Network
+Connect a monitor and keyboard directly to the unit for local access.
 
-If WarDragon is configured to join your WiFi network:
+### Option 4: Remote Access (Post-Install)
 
-1. Check your router's DHCP leases for a device named `wardragon`
-2. Use that IP address to connect
+For remote access, you can install:
+- **RustDesk** - For remote desktop access
+- **OpenSSH** - For SSH access
 
-## Accessing the Web Interface
+These are not pre-installed and require local setup first.
 
-Once connected, open a web browser and navigate to the WarDragon's IP address:
+## Verifying System Status
 
-```
-http://<wardragon-ip>
-```
-
-You'll see the DragonOS web interface with:
-
-- System status
-- Detection feeds
-- Configuration options
-- Log viewers
-
-## Verifying Detection
-
-To verify all detection systems are working:
-
-### 1. Check Service Status
-
-SSH into the WarDragon or use the web terminal:
+Once connected (via monitor/keyboard or remote access):
 
 ```bash
-ssh dragon@<wardragon-ip>
-# Default password provided with your unit
-```
-
-Check running services:
-
-```bash
+# Check running services
 sudo systemctl status dragonsync
-sudo systemctl status dji-receiver
 ```
-
-### 2. Monitor ZMQ Streams
-
-View live detection data:
-
-```bash
-# Watch DJI DroneID detections
-zmq_monitor tcp://127.0.0.1:5556
-
-# Watch WiFi/BT Remote ID
-zmq_monitor tcp://127.0.0.1:5557
-```
-
-### 3. Check Antenna Connections
-
-If no detections appear:
-
-1. Verify antennas are firmly connected
-2. Check that antennas are on correct ports
-3. Ensure antenna types match (SMA vs RP-SMA)
 
 ## Next Steps
 
@@ -163,6 +115,6 @@ Once your WarDragon is powered on and connected:
 | Power button not lit | Power supply issue | Check connections, try different outlet |
 | Stuck in boot | Corrupted boot | Allow 5 minutes; if no progress, contact support |
 | No network | Ethernet/WiFi config | Try direct Ethernet connection |
-| No detections | Antenna issues | Verify antenna connections and types |
+| No detections | Antenna issues | Verify antenna connections |
 
 See [Troubleshooting](../troubleshooting/common-issues.md) for more help.
