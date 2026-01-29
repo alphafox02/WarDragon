@@ -11,29 +11,33 @@ This document details the physical layout, internal components, and external con
 
 ### Port Layout
 
-The WarDragon Pro v3 has antenna ports accessible from the sides of the unit. When looking at the unit with the front facing you:
+The WarDragon Pro v3 has antenna ports accessible from the sides of the unit. When the case is open and you're looking down at the unit:
 
 ```
                     ┌─────────────────────────────────────┐
                     │           WarDragon Pro v3          │
-                    │                FRONT                │
+                    │                BACK                 │
                     └─────────────────────────────────────┘
 
     LEFT SIDE                                           RIGHT SIDE
-    (Back to Front)                                     (Back to Front)
+    (Front to Back)                                     (Front to Back)
     ┌──────────┐                                        ┌──────────┐
-    │ 1. TX    │ ← Not used                             │ 1. GPS   │ ← Optional GPS Antenna
-    │          │                                        │   ANT    │
+    │ 1. ESP32 │ ← WiFi Remote ID                       │ 1. BT5   │ ← DragonTooth Dongle
+    │          │   (May be removed in future)           │   LR     │   Bluetooth Remote ID
     ├──────────┤                                        ├──────────┤
-    │ 2. RX    │ ← ANTSDR E200                          │ 2. BT5   │ ← DragonTooth Dongle
-    │ (E200)   │   DJI DroneID (Primary)                │   LR     │   Bluetooth Remote ID
+    │ 2. RX    │ ← Panda Wireless                       │ 2. GPS   │ ← Optional GPS Antenna
+    │ (Panda)  │   WiFi Remote ID                       │   ANT    │
     ├──────────┤                                        └──────────┘
-    │ 3. RX    │ ← Panda Wireless
-    │ (Panda)  │   WiFi Remote ID
+    │ 3. RX    │ ← ANTSDR E200
+    │ (E200)   │   DJI DroneID (Primary)
     ├──────────┤
-    │ 4. ESP32 │ ← WiFi Remote ID
-    │          │   (May be removed in future)
+    │ 4. TX    │ ← Not used
+    │          │
     └──────────┘
+
+                    ┌─────────────────────────────────────┐
+                    │                FRONT                │
+                    └─────────────────────────────────────┘
 ```
 
 ## Internal Components

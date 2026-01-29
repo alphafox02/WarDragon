@@ -2,7 +2,6 @@
 
 The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data integration appliance engineered for comprehensive drone detection. It combines dedicated radios, software-defined radio capability, GPS, and purpose-built software workflows in a ruggedized, portable package.
 
-**Price**: $2,200.00
 **Purchase**: [cemaxecuter.com](https://cemaxecuter.com/?product=wardragon-pro-kit)
 
 ## What's Included
@@ -57,18 +56,18 @@ The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data inte
 
 See [Hardware Overview](../hardware/pro-v3-overview.md) for detailed diagrams and [Antenna Connections](../hardware/antenna-connections.md) for port mapping.
 
-### Rear Panel (Left to Right)
-*Looking at the rear of the unit*
+### Port Layout
+*Case open, looking down at the unit*
 
-**Left Side (from back to front):**
-1. TX Port - Not currently used
-2. RX Port - ANTSDR E200 (DJI DroneID - Primary)
-3. RX Port - Panda Wireless (WiFi Remote ID)
-4. ESP32 Module - WiFi Remote ID (may be removed in future versions)
+**Left Side (front to back):**
+1. ESP32 Module - WiFi Remote ID (may be removed in future versions)
+2. RX Port - Panda Wireless (WiFi Remote ID)
+3. RX Port - ANTSDR E200 (DJI DroneID - Primary)
+4. TX Port - Not currently used
 
-**Right Side (from back to front):**
-1. GPS Antenna Port - Optional external GPS antenna connection
-2. DragonTooth Dongle - Sonoff BT5 LR for Bluetooth Remote ID
+**Right Side (front to back):**
+1. DragonTooth Dongle - Sonoff BT5 LR for Bluetooth Remote ID
+2. GPS Antenna Port - Optional external GPS antenna connection
 
 ## Software Stack
 

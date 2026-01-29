@@ -4,47 +4,51 @@ This guide details all antenna connections on the WarDragon Pro v3, their purpos
 
 ## Port Map
 
-### Left Side (Back to Front)
+When the case is open and you're looking down at the unit, the **front** is nearest to you.
+
+### Left Side (Front to Back)
 
 | Port # | Label | Connected To | Purpose | Connector | Status |
 |--------|-------|--------------|---------|-----------|--------|
-| 1 | TX | ANTSDR E200 TX | Transmit (not used) | SMA Female | Unused |
-| 2 | RX (E200) | ANTSDR E200 RX | DJI DroneID Detection | SMA Female | Primary |
-| 3 | RX (Panda) | Panda Wireless | WiFi Remote ID | RP-SMA Female | Active |
-| 4 | ESP32 | ESP32 Module | WiFi Remote ID | SMA Female | Active* |
+| 1 | ESP32 | ESP32 Module | WiFi Remote ID | SMA Female | Active* |
+| 2 | RX (Panda) | Panda Wireless | WiFi Remote ID | SMA Female | Active |
+| 3 | RX (E200) | ANTSDR E200 RX | DJI DroneID Detection | SMA Female | Primary |
+| 4 | TX | ANTSDR E200 TX | Transmit (not used) | SMA Female | Unused |
 
 *ESP32 port may be removed in future versions
 
-### Right Side (Back to Front)
+### Right Side (Front to Back)
 
 | Port # | Label | Connected To | Purpose | Connector | Status |
 |--------|-------|--------------|---------|-----------|--------|
-| 1 | GPS | GPS Module | External GPS Antenna | SMA Female | Optional |
-| 2 | BT5 | DragonTooth | Bluetooth 5 LR Remote ID | SMA Female | Active |
+| 1 | BT5 | DragonTooth | Bluetooth 5 LR Remote ID | SMA Female | Active |
+| 2 | GPS | GPS Module | External GPS Antenna | SMA Female | Optional |
 
 ## Visual Reference
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │                          WARDRAGON PRO V3                              │
-│                              TOP VIEW                                  │
+│                     TOP VIEW (Case Open, Looking Down)                 │
 ├────────────────────────────────────────────────────────────────────────┤
+│                                                                        │
+│                            ───── BACK ─────                            │
 │                                                                        │
 │   LEFT SIDE                                              RIGHT SIDE    │
 │   ─────────                                              ──────────    │
 │                                                                        │
-│   [1] TX ──────── Not Used                    GPS ANT ──────── [1]    │
+│   [4] TX ──────── Not Used                    GPS ANT ──────── [2]    │
 │       (SMA-F)                                   (SMA-F)                │
 │                                                   │                    │
-│   [2] RX ──────── ANTSDR E200                     └── Optional        │
+│   [3] RX ──────── ANTSDR E200                     └── Optional        │
 │       (SMA-F)     DJI DroneID                         External GPS    │
 │                   Primary Detection                                    │
 │                                                                        │
-│   [3] RX ──────── Panda Wireless               BT5 LR ──────── [2]    │
-│       (RP-SMA-F)  WiFi Remote ID                (SMA-F)               │
+│   [2] RX ──────── Panda Wireless               BT5 LR ──────── [1]    │
+│       (SMA-F)     WiFi Remote ID                (SMA-F)               │
 │                   2.4/5 GHz                        │                   │
 │                                                    └── DragonTooth    │
-│   [4] ESP32 ───── ESP32 Module                        Sonoff Dongle   │
+│   [1] ESP32 ───── ESP32 Module                        Sonoff Dongle   │
 │       (SMA-F)     WiFi Remote ID                      BT5 Long Range  │
 │                   (Future removal)                                     │
 │                                                                        │
@@ -65,7 +69,7 @@ This guide details all antenna connections on the WarDragon Pro v3, their purpos
 - **Frequency**: 2.4 GHz / 5 GHz dual-band
 - **Type**: Omnidirectional dual-band
 - **Gain**: 5 dBi typical
-- **Connector**: RP-SMA Male (note: reversed polarity)
+- **Connector**: SMA Male
 
 ### Bluetooth 5 LR (DragonTooth)
 - **Frequency**: 2.4 GHz
@@ -82,8 +86,8 @@ This guide details all antenna connections on the WarDragon Pro v3, their purpos
 ## Installation Notes
 
 ### Connector Types
-- **SMA Female**: Standard SMA connector on the unit; use SMA Male antenna or cable
-- **RP-SMA Female**: Reversed polarity SMA on Panda port; use RP-SMA Male antenna
+
+All external antenna ports use SMA Female pass-through adapters. Use antennas with SMA Male connectors (center pin).
 
 ### Cable Considerations
 - Use low-loss coax (LMR-240 or better) for cable runs over 3 feet
@@ -99,17 +103,17 @@ This guide details all antenna connections on the WarDragon Pro v3, their purpos
 
 For initial testing, the included antennas can be connected directly to the unit:
 
-1. Connect dual-band antenna to **RX (E200)** port - Left side, port 2
-2. Connect dual-band antenna to **RX (Panda)** port - Left side, port 3
-3. Connect 2.4 GHz antenna to **BT5** port - Right side, port 2
-4. GPS antenna (if using external) to **GPS** port - Right side, port 1
+1. Connect dual-band antenna to **RX (E200)** port - Left side, port 3
+2. Connect dual-band antenna to **RX (Panda)** port - Left side, port 2
+3. Connect 2.4 GHz antenna to **BT5** port - Right side, port 1
+4. GPS antenna (if using external) to **GPS** port - Right side, port 2
 
 ## Troubleshooting
 
 | Issue | Possible Cause | Solution |
 |-------|---------------|----------|
 | No DJI detections | Wrong port or loose connection | Verify antenna on E200 RX port |
-| No WiFi RID | RP-SMA vs SMA mismatch | Ensure RP-SMA antenna on Panda port |
+| No WiFi RID | Loose connection | Check antenna firmly connected |
 | Weak BT5 range | Low gain antenna | Use higher gain 2.4 GHz antenna |
 | No GPS lock | Internal antenna blocked | Connect external GPS antenna |
 
