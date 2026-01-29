@@ -161,31 +161,28 @@ Detects analog FPV video transmitters commonly used on racing and custom-built d
 - **Direction only** - Requires direction-finding antenna for bearing
 - **Cannot identify drone** - Only detects presence of transmission
 
-## Multi-Protocol Correlation
+## Multi-Protocol Detection
 
-DragonSync correlates detections across protocols:
+WarDragon detects drones across multiple protocols simultaneously. Each detection source feeds into DragonSync:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Same Physical Drone                      │
+│                  Detection Sources                          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  DJI DroneID ─────┐                                        │
-│  (Ocusync 3)      │                                        │
-│                   ├──► DragonSync ──► Single Merged Track  │
-│  WiFi Remote ID ──┤    Correlation                         │
-│  (if broadcasting)│                                        │
+│  (ANTSDR E200)    │                                        │
+│                   ├──► DragonSync ──► TAK / MQTT / Lattice │
+│  WiFi Remote ID ──┤                                        │
+│  (Panda/ESP32)    │                                        │
 │                   │                                        │
 │  BT5 Remote ID ───┘                                        │
-│  (if broadcasting)                                         │
+│  (DragonTooth)                                             │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Correlation is based on:
-- Position proximity (configurable distance threshold)
-- Serial number matching (if available)
-- Timing correlation
+**Note**: A DJI drone may broadcast both DJI DroneID and standard Remote ID (WiFi/BT). These currently appear as separate tracks. Future versions may correlate detections by serial number to merge them into a single track.
 
 ## Detection Coverage Map
 
