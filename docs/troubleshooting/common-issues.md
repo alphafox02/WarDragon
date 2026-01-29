@@ -23,12 +23,12 @@ ip addr show
 ### Detection Health Check
 
 ```bash
-# Verify ZMQ streams are active
+# Verify ZMQ streams are active (DJI on port 4221)
 timeout 10 python3 -c "
 import zmq
 c = zmq.Context()
 s = c.socket(zmq.SUB)
-s.connect('tcp://127.0.0.1:5556')
+s.connect('tcp://127.0.0.1:4221')
 s.setsockopt_string(zmq.SUBSCRIBE, '')
 s.setsockopt(zmq.RCVTIMEO, 5000)
 try:
@@ -36,6 +36,12 @@ try:
 except:
     print('DJI DroneID: No data')
 "
+
+# ZMQ Port Reference:
+# 4221 - DJI DroneID
+# 4222 - Bluetooth Remote ID
+# 4223 - WiFi Remote ID
+# 4224 - Unified zmq_decoder output
 ```
 
 ## Power & Boot Issues
@@ -168,20 +174,28 @@ rtl_test -t 2>/dev/null || echo "No RTL-SDR found"
 
 ### Remote ID Not Detected
 
-1. **Check DroneID service**:
+1. **Check WiFi Remote ID service**:
    ```bash
-   journalctl -u droneid -f
+   sudo systemctl status wifi-receiver
+   journalctl -u wifi-receiver -n 50
    ```
 
-2. **Verify WiFi adapter in monitor mode**:
+2. **Check Bluetooth Remote ID service**:
+   ```bash
+   sudo systemctl status sniff-receiver
+   journalctl -u sniff-receiver -n 50
+   ```
+
+3. **Verify WiFi adapter in monitor mode**:
    ```bash
    iw dev wlan1 info | grep type
    # Should show "monitor"
    ```
 
-3. **Check Bluetooth dongle**:
+4. **Check Bluetooth dongle** (DragonTooth):
    ```bash
-   hciconfig -a
+   ls /dev/sniffle*
+   # Should show /dev/sniffle0
    ```
 
 ### Weak Detection Range
@@ -229,23 +243,22 @@ rtl_test -t 2>/dev/null || echo "No RTL-SDR found"
 
 ### ATAK Plugin Not Connecting
 
-1. **Verify API enabled**:
-   ```yaml
-   # In DragonSync config
-   outputs:
-     api:
-       enabled: true
-       port: 8080
+1. **Verify API enabled** in `/home/dragon/DragonSync/config.ini`:
+   ```ini
+   [SETTINGS]
+   api_enabled = true
+   api_host = 0.0.0.0
+   api_port = 8088
    ```
 
 2. **Test API**:
    ```bash
-   curl http://localhost:8080/api/status
+   curl http://localhost:8088/status
    ```
 
 3. **Check firewall**:
    ```bash
-   sudo nft list ruleset | grep 8080
+   sudo nft list ruleset | grep 8088
    ```
 
 ## MQTT Issues
@@ -273,7 +286,11 @@ rtl_test -t 2>/dev/null || echo "No RTL-SDR found"
 
 2. **Restart Home Assistant** after first discovery
 
-3. **Verify `homeassistant_discovery: true`** in config
+3. **Verify Home Assistant discovery is enabled** in `config.ini`:
+   ```ini
+   mqtt_ha_enabled = true
+   mqtt_ha_prefix = homeassistant
+   ```
 
 ## GPS Issues
 
@@ -382,10 +399,14 @@ sudo nmcli connection add type ethernet con-name "Wired" ifname eth0
 
 ```bash
 # Backup current config
-cp /home/dragon/DragonSync/config.yaml ~/config-backup.yaml
+cp /home/dragon/DragonSync/config.ini ~/config-backup.ini
 
-# Restore default
-cp /home/dragon/DragonSync/config.yaml.default /home/dragon/DragonSync/config.yaml
+# Download fresh config from repository
+curl -o /home/dragon/DragonSync/config.ini \
+  https://raw.githubusercontent.com/alphafox02/DragonSync/main/config.ini
+
+# Or edit manually to reset specific settings
+nano /home/dragon/DragonSync/config.ini
 
 # Restart
 sudo systemctl restart dragonsync

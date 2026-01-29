@@ -133,23 +133,19 @@ DragonSync is the central orchestration application that:
    └─► dji_receiver.py decodes DroneID
            │
            ▼
-3. ZMQ publishes JSON message:
-   {
-     "type": "dji_droneid",
-     "serial": "ABC123...",
-     "lat": 40.7128,
-     "lon": -74.0060,
-     "alt": 100,
-     "speed": 15,
-     "heading": 270,
-     "pilot_lat": 40.7130,
-     "pilot_lon": -74.0055,
-     ...
-   }
+3. ZMQ publishes JSON message (ASTM F3411 format):
+   [
+     {"Basic ID": {"id": "1581F...", "id_type": "Serial Number (ANSI/CTA-2063-A)"}},
+     {"Location/Vector Message": {"latitude": 40.7128, "longitude": -74.0060,
+       "geodetic_altitude": 100, "speed": 15, "direction": 270}},
+     {"System Message": {"operator_latitude": 40.7130, "operator_longitude": -74.0055}},
+     {"Frequency Message": {"frequency_mhz": 2437.5, "rssi_dbm": -45}}
+   ]
            │
            ▼
 4. DragonSync receives message
-   └─► Checks for duplicates
+   └─► Parses ASTM F3411 message blocks
+   └─► Checks for duplicates (by serial/ID)
    └─► Updates track state
    └─► Applies rate limiting
            │
@@ -167,36 +163,40 @@ DragonSync is the central orchestration application that:
 
 ## Configuration
 
-DragonSync is configured via `config.yaml`:
+DragonSync is configured via `config.ini`:
 
-```yaml
-# Input sources
-inputs:
-  dji_droneid:
-    enabled: true
-    zmq_address: "tcp://127.0.0.1:5556"
+```ini
+[SETTINGS]
+# ────────── ZMQ Input Sources ──────────
+# DJI DroneID (ANTSDR E200) on port 4221
+# Bluetooth Remote ID (sniff-receiver) on port 4222
+# WiFi Remote ID (wifi-receiver) on port 4223
+# Unified decoder output on port 4224
+zmq_host = 127.0.0.1
+zmq_recv_timeout_ms = 500
 
-  droneid:
-    enabled: true
-    zmq_address: "tcp://127.0.0.1:5557"
+# ────────── TAK Output ──────────
+tak_enabled = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
 
-# Output destinations
-outputs:
-  tak:
-    enabled: true
-    multicast: true
-    address: "239.2.3.1"
-    port: 6969
+# ────────── MQTT Output ──────────
+mqtt_enabled = false
+mqtt_host = 192.168.1.100
+mqtt_port = 1883
+mqtt_ha_enabled = true
+mqtt_ha_prefix = homeassistant
 
-  mqtt:
-    enabled: true
-    broker: "192.168.1.100"
-    port: 1883
-    homeassistant_discovery: true
+# ────────── Lattice Output ──────────
+lattice_enabled = false
 
-  lattice:
-    enabled: false
+# ────────── HTTP API ──────────
+api_enabled = true
+api_host = 0.0.0.0
+api_port = 8088
 ```
+
+See [DragonSync Configuration](../software/dragonsync.md) for the full configuration reference.
 
 ## Extending the System
 
