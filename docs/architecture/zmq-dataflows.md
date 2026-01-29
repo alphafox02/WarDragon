@@ -273,6 +273,67 @@ DJI-specific frequency information:
 }
 ```
 
+## FPV Signal Messages
+
+FPV detection (port 4226) uses the same message block structure. FPV alerts include a custom "Signal Info" block with detection-specific data.
+
+**Repository**: [github.com/alphafox02/wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect)
+
+> **Note**: FPV detection requires additional hardware (SDR) and the optional `suscli fpvdet` plugin for signal confirmation. This feature is experimental.
+
+### FPV Message Structure
+
+```json
+[
+  {
+    "Basic ID": {
+      "id_type": "Serial Number (ANSI/CTA-2063-A)",
+      "id": "fpv-alert-5800.000MHz",
+      "description": "FPV Signal"
+    }
+  },
+  {
+    "Location/Vector Message": {
+      "latitude": 40.7128,
+      "longitude": -74.006,
+      "geodetic_altitude": 100.0,
+      "height_agl": 0.0,
+      "speed": 0.0,
+      "vert_speed": 0.0
+    }
+  },
+  {
+    "Self-ID Message": {
+      "text": "FPV alert (energy)"
+    }
+  },
+  {
+    "Frequency Message": {
+      "frequency": 5800000000
+    }
+  },
+  {
+    "Signal Info": {
+      "source": "energy",
+      "center_hz": 5800000000,
+      "bandwidth_hz": 6000000,
+      "pal_conf": 85.5,
+      "ntsc_conf": 12.3
+    }
+  }
+]
+```
+
+### FPV-Specific Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| source | string | Detection source ("energy" or "confirm") |
+| center_hz | float | Center frequency in Hz |
+| bandwidth_hz | float | Detected signal bandwidth in Hz |
+| pal_conf | float | PAL video confidence (0-100) |
+| ntsc_conf | float | NTSC video confidence (0-100) |
+
 ## Subscribing to ZMQ Streams
 
 ### Python Example
@@ -291,7 +352,10 @@ socket.setsockopt_string(zmq.SUBSCRIBE, "")  # Subscribe to all
 while True:
     message = socket.recv_string()
     data = json.loads(message)
-    print(f"Received: {data['type']} - {data['data'].get('serial_number', 'N/A')}")
+    # Data is a list of message blocks
+    for block in data:
+        if "Basic ID" in block:
+            print(f"Drone ID: {block['Basic ID'].get('id', 'unknown')}")
 ```
 
 ### Direct Source Subscription
@@ -310,6 +374,7 @@ sources = {
     "dji": ("tcp://127.0.0.1:4221", context.socket(zmq.SUB)),
     "bt5": ("tcp://127.0.0.1:4222", context.socket(zmq.SUB)),
     "wifi": ("tcp://127.0.0.1:4223", context.socket(zmq.SUB)),
+    "fpv": ("tcp://127.0.0.1:4226", context.socket(zmq.SUB)),
 }
 
 for name, (addr, sock) in sources.items():
@@ -323,7 +388,10 @@ while True:
         if sock in socks:
             message = sock.recv_string()
             data = json.loads(message)
-            print(f"[{name}] {data['type']}: {json.dumps(data['data'], indent=2)}")
+            # Extract drone ID from Basic ID block
+            for block in data:
+                if "Basic ID" in block:
+                    print(f"[{name}] ID: {block['Basic ID'].get('id')}")
 ```
 
 ## Repository References
