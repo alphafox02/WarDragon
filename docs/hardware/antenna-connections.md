@@ -56,26 +56,33 @@ When the case is open and you're looking down at the unit, the **front** is near
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Antenna Recommendations
+## Included Antennas
+
+The WarDragon Pro v3 kit includes **four dual-band 2.4/5 GHz 8 dBi omnidirectional antennas** for all RF ports (E200 RX, Panda, ESP32, DragonTooth/BT5). These antennas cover all required frequencies for DJI DroneID, WiFi Remote ID, and Bluetooth Remote ID detection.
+
+| Specification | Value |
+|---------------|-------|
+| Frequency | 2.4 GHz / 5 GHz dual-band |
+| Gain | 8 dBi |
+| Type | Omnidirectional whip |
+| Polarization | Vertical |
+| Connector | SMA Male |
+
+## Upgrade Options
+
+For extended range, consider upgrading to higher-gain or directional antennas:
 
 ### DJI DroneID (ANTSDR E200 RX)
-- **Frequency**: 2.4 GHz / 5.8 GHz dual-band
-- **Type**: Omnidirectional whip or panel antenna
-- **Polarization**: Vertical
-- **Gain**: 3-6 dBi recommended
-- **Connector**: SMA Male
+- **Upgrade**: 9+ dBi panel antenna for 2-3x range
+- **Note**: Directional antennas require aiming toward expected drone activity
 
 ### WiFi Remote ID (Panda Wireless)
-- **Frequency**: 2.4 GHz / 5 GHz dual-band
-- **Type**: Omnidirectional dual-band
-- **Gain**: 5 dBi typical
-- **Connector**: SMA Male
+- **Upgrade**: Higher gain omnidirectional (10+ dBi) for increased range
+- **Note**: Dual-band required (2.4/5 GHz)
 
 ### Bluetooth 5 LR (DragonTooth)
-- **Frequency**: 2.4 GHz
-- **Type**: High-gain omnidirectional or directional
-- **Gain**: 6-9 dBi for extended range
-- **Connector**: SMA Male
+- **Upgrade**: 9 dBi Yagi for directional long-range detection
+- **Note**: BT5 Long Range benefits significantly from high-gain antennas
 
 ### GPS (Optional External)
 - **Frequency**: 1575.42 MHz (L1)
@@ -101,12 +108,13 @@ All external antenna ports use SMA Female pass-through adapters. Use antennas wi
 
 ## Quick Setup
 
-For initial testing, the included antennas can be connected directly to the unit:
+Connect the four included dual-band 8 dBi antennas to the unit:
 
-1. Connect dual-band antenna to **RX (E200)** port - Left side, port 3
-2. Connect dual-band antenna to **RX (Panda)** port - Left side, port 2
-3. Connect 2.4 GHz antenna to **BT5** port - Right side, port 1
-4. GPS antenna (if using external) to **GPS** port - Right side, port 2
+1. Connect antenna to **RX (E200)** port - Left side, port 3
+2. Connect antenna to **RX (Panda)** port - Left side, port 2
+3. Connect antenna to **ESP32** port - Left side, port 1
+4. Connect antenna to **BT5 (DragonTooth)** port - Right side, port 1
+5. (Optional) GPS antenna to **GPS** port - Right side, port 2
 
 ## Troubleshooting
 

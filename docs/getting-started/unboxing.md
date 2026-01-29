@@ -10,8 +10,7 @@ Your WarDragon Pro v3 kit includes:
 - Protective transport case
 - Power supply (12V DC)
 - Antenna kit:
-  - Dual-band 2.4/5 GHz antennas (qty: 2-3)
-  - 2.4 GHz antenna for Bluetooth
+  - Dual-band 2.4/5 GHz 8 dBi antennas (qty: 4) - for E200 RX, Panda, ESP32, and DragonTooth
   - GPS antenna (if external GPS option included)
 - USB-C to dual USB-A adapter cable (for keyboard/mouse)
 - HDMI dummy plug (pre-installed in right-angle HDMI adapter)
@@ -36,10 +35,10 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 
 | Port | Antenna | Purpose |
 |------|---------|---------|
-| Left Side - Port 3 (RX E200) | Dual-band 2.4/5 GHz | DJI DroneID detection |
-| Left Side - Port 2 (RX Panda) | Dual-band 2.4/5 GHz | WiFi Remote ID |
-| Left Side - Port 1 (ESP32) | Dual-band 2.4/5 GHz | WiFi Remote ID (secondary)* |
-| Right Side - Port 1 (BT5) | 2.4 GHz | Bluetooth Remote ID |
+| Left Side - Port 3 (RX E200) | Dual-band 2.4/5 GHz 8 dBi | DJI DroneID detection |
+| Left Side - Port 2 (RX Panda) | Dual-band 2.4/5 GHz 8 dBi | WiFi Remote ID |
+| Left Side - Port 1 (ESP32) | Dual-band 2.4/5 GHz 8 dBi | WiFi Remote ID (secondary)* |
+| Right Side - Port 1 (BT5) | Dual-band 2.4/5 GHz 8 dBi | Bluetooth Remote ID |
 
 *ESP32 port may be removed in future versions
 
