@@ -175,9 +175,9 @@ cat /var/lib/NetworkManager/dnsmasq-wlan0.leases
 arp -a
 ```
 
-## Hybrid Mode: Hotspot + Ethernet
+## Hybrid Mode: Hotspot + Ethernet (Recommended)
 
-Run hotspot while maintaining Ethernet connectivity:
+This is the primary method shown in the video tutorial. Run hotspot on WiFi while using Ethernet for internet:
 
 ```bash
 # Ensure Ethernet is connected
@@ -194,6 +194,17 @@ Benefits:
 - Field devices connect via hotspot
 - WarDragon reaches TAK Server via Ethernet
 - NAT automatically routes between interfaces
+
+## Advanced: Hotspot + WiFi Client (Same NIC)
+
+It's also possible to use the same internal WiFi NIC to both connect to an existing WiFi network AND provide a hotspot simultaneously. This is more complex:
+
+**Requirements:**
+1. First, create a WiFi client connection via NetworkManager to your existing network
+2. In the hotspot tool, select the existing WiFi connection as the internet source
+3. The same WiFi NIC will handle both client and AP mode
+
+This method is useful when no Ethernet is available but you have an existing WiFi network to connect to. Refer to the video tutorial for guidance on using the hotspot tool for this configuration.
 
 ## Hotspot + TAK Configuration
 
