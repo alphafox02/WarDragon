@@ -82,13 +82,16 @@ The WarDragon Pro v3 has antenna ports accessible from the sides of the unit. Wh
 
 ## LED Indicators
 
-| LED | Color | Status |
-|-----|-------|--------|
-| Power | Green | System powered on |
-| Activity | Blue (blinking) | Detection activity |
-| Network | Green | Network connected |
-| GPS | Green (solid) | GPS lock acquired |
-| GPS | Green (blinking) | Searching for satellites |
+The WarDragon Pro v3 has minimal visible LEDs:
+
+| LED | Location | Meaning |
+|-----|----------|---------|
+| Power Button | PC | System powered on |
+| E200 LED | Internal | SDR operational |
+| E200 Ethernet | Internal | Network link/activity |
+| GPS LED | Internal | GPS status |
+
+See [LED Indicators](led-indicators.md) for details.
 
 ## Power Requirements
 

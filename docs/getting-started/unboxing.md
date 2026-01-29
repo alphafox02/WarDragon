@@ -47,7 +47,7 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 
 1. Connect the 12V power supply to the WarDragon
 2. Connect the power supply to AC mains
-3. The power LED should illuminate
+3. The power button LED should illuminate
 
 **Power Requirements:**
 - Input: 12V DC, 3A minimum
@@ -59,17 +59,13 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 On first power-up:
 
 1. The system takes approximately 60-90 seconds to fully boot
-2. LED indicators will show boot progress
-3. Once booted, the activity LED will begin blinking
+2. The power button LED indicates the system is on
+3. Internal LEDs (E200, GPS) may be partially visible through the case
 
-**LED Status During Boot:**
-
-| Phase | LED Behavior |
-|-------|--------------|
-| Power on | Power LED solid green |
-| Booting | Activity LED solid |
-| Ready | Activity LED slow blink |
-| Detecting | Activity LED rapid blink |
+Since WarDragon is a headless system, verify boot completion by:
+- Attempting to ping the device
+- Connecting via SSH
+- Accessing the web interface
 
 ## Connecting to WarDragon
 
@@ -164,7 +160,7 @@ Once your WarDragon is powered on and connected:
 
 | Issue | Possible Cause | Solution |
 |-------|---------------|----------|
-| No power LED | Power supply issue | Check connections, try different outlet |
+| Power button not lit | Power supply issue | Check connections, try different outlet |
 | Stuck in boot | Corrupted boot | Allow 5 minutes; if no progress, contact support |
 | No network | Ethernet/WiFi config | Try direct Ethernet connection |
 | No detections | Antenna issues | Verify antenna connections and types |
