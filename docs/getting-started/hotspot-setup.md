@@ -216,17 +216,14 @@ DragonSync's default multicast interface is `0.0.0.0`, which sends multicast on 
 
 This default behavior is useful for flexible setups - for example, you can plug an Android device directly into WarDragon's USB port and enable USB Ethernet tethering, and DragonSync will automatically start sending CoT to that interface.
 
-To restrict multicast to a specific interface (like the hotspot only):
+To restrict multicast to a specific interface (like the hotspot only), edit `/home/dragon/DragonSync/config.ini`:
 
-```yaml
-# In dragonsync config
-outputs:
-  tak:
-    enabled: true
-    multicast: true
-    address: "239.2.3.1"
-    port: 6969
-    interface: "192.168.12.1"  # Restrict to hotspot interface only
+```ini
+[SETTINGS]
+enable_multicast = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+tak_multicast_interface = 192.168.12.1  # Restrict to hotspot interface only
 ```
 
 ### ATAK Configuration
