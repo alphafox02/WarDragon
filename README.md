@@ -1,5 +1,7 @@
 # WarDragon Documentation Hub
 
+> **Work in Progress**: This documentation is actively being developed. Some information may be incomplete, outdated, or contain errors. If you find mistakes, please open an issue or submit a pull request. We appreciate your patience as we continue to improve these docs.
+
 The official documentation and user manual for WarDragon drone detection systems.
 
 ## What is WarDragon?
