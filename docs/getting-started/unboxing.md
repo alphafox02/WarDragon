@@ -183,20 +183,24 @@ sudo systemctl status dragonsync
 
 ## Proper Shutdown Procedure
 
-To safely shut down the WarDragon:
+To safely shut down the WarDragon, use **one** of these methods:
 
-1. **Shut down the operating system** (via SSH, remote desktop, or local console):
-   ```bash
-   sudo shutdown -h now
-   ```
+**Method A: Command Line (recommended for remote access)**
+```bash
+sudo shutdown -h now
+```
 
-2. **Wait for the PC to fully power off** (LEDs will turn off)
+**Method B: PC Power Button (local access)**
+- Open the case lid and briefly press the PC power button
 
-3. **Press the PC power button** (requires opening the case lid) to ensure it's off
+Then, after the PC has fully powered off:
 
-4. **Delatch the external power button** on the case exterior
+1. **Wait for the PC to fully power off** (LEDs will turn off)
+2. **Delatch the external power button** on the case exterior
 
 > **Important**: Always shut down the OS properly before delatching the external power button. Cutting power without a proper shutdown can cause filesystem corruption.
+
+> **Warning**: Do NOT press the PC power button after a command-line shutdown - this will power the system back ON (since the external button is still latched and BIOS is set to "power on after power applied").
 
 > **Note**: The external power button controls power to the entire case. When latched, even after the PC is shut down, USB devices may still have power. Delatching ensures complete power isolation.
 
