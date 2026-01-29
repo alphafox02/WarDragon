@@ -88,101 +88,96 @@ Maximum flexibility for diverse teams:
 
 ## Protocol-Specific Setup
 
+Detection sources run as separate systemd services, not via DragonSync config. To enable/disable specific protocols:
+
 ### DJI DroneID Only
 
-If focusing only on DJI detection:
+```bash
+# Enable DJI detection
+sudo systemctl enable dji-receiver
+sudo systemctl start dji-receiver
 
-```yaml
-# In DragonSync config
-inputs:
-  dji_droneid:
-    enabled: true
-  droneid_wifi:
-    enabled: false
-  droneid_bt:
-    enabled: false
+# Disable other receivers
+sudo systemctl disable sniff-receiver
+sudo systemctl stop sniff-receiver
+sudo systemctl disable wifi-receiver
+sudo systemctl stop wifi-receiver
 ```
 
 Verify ANTSDR E200 antenna connected to port 2 (left side).
 
-### Remote ID Only
+### Remote ID Only (WiFi/Bluetooth)
 
 For compliance monitoring (non-DJI):
 
-```yaml
-inputs:
-  dji_droneid:
-    enabled: false
-  droneid_wifi:
-    enabled: true
-  droneid_bt:
-    enabled: true
+```bash
+# Enable Remote ID receivers
+sudo systemctl enable sniff-receiver wifi-receiver
+sudo systemctl start sniff-receiver wifi-receiver
+
+# Disable DJI receiver
+sudo systemctl disable dji-receiver
+sudo systemctl stop dji-receiver
 ```
 
-### All Protocols
+### All Protocols (Default)
 
-Default configuration - all detection enabled:
+All receivers enabled by default on WarDragon Pro:
 
-```yaml
-inputs:
-  dji_droneid:
-    enabled: true
-  droneid_wifi:
-    enabled: true
-  droneid_bt:
-    enabled: true
+```bash
+sudo systemctl status dji-receiver sniff-receiver wifi-receiver
 ```
 
 ## Output Configuration
 
-### TAK Only
+Edit `/home/dragon/DragonSync/config.ini` to configure outputs.
+
+### TAK Only (Default)
 
 Simplest configuration for TAK users:
 
-```yaml
-outputs:
-  tak:
-    enabled: true
-    mode: multicast
-  mqtt:
-    enabled: false
-  lattice:
-    enabled: false
-  api:
-    enabled: false
+```ini
+[SETTINGS]
+# Multicast enabled by default
+enable_multicast = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+
+# Disable other outputs
+mqtt_enabled = false
+lattice_enabled = false
+api_enabled = true
 ```
 
 ### MQTT Only (Home Assistant)
 
 For smart home integration:
 
-```yaml
-outputs:
-  tak:
-    enabled: false
-  mqtt:
-    enabled: true
-    homeassistant_discovery: true
-  lattice:
-    enabled: false
-  api:
-    enabled: false
+```ini
+[SETTINGS]
+# Disable TAK multicast
+enable_multicast = false
+
+# Enable MQTT with Home Assistant discovery
+mqtt_enabled = true
+mqtt_host = 192.168.1.100
+mqtt_port = 1883
+mqtt_ha_enabled = true
+
+# Keep API for monitoring
+api_enabled = true
 ```
 
 ### Full Integration
 
 All outputs enabled:
 
-```yaml
-outputs:
-  tak:
-    enabled: true
-  mqtt:
-    enabled: true
-  lattice:
-    enabled: true
-  api:
-    enabled: true
+```ini
+[SETTINGS]
+enable_multicast = true
+mqtt_enabled = true
+lattice_enabled = true
+api_enabled = true
 ```
 
 ## Antenna Placement Guide
@@ -280,7 +275,7 @@ sudo systemctl disable dragonsync
 
 ```bash
 # Backup DragonSync config
-cp /home/dragon/DragonSync/config.yaml ~/config-backup.yaml
+cp /home/dragon/DragonSync/config.ini ~/config-backup.ini
 
 # Backup network settings
 sudo nmcli connection export "WarDragon-Hotspot" > ~/hotspot-backup.nmconnection
@@ -290,7 +285,7 @@ sudo nmcli connection export "WarDragon-Hotspot" > ~/hotspot-backup.nmconnection
 
 ```bash
 # Restore DragonSync config
-cp ~/config-backup.yaml /home/dragon/DragonSync/config.yaml
+cp ~/config-backup.ini /home/dragon/DragonSync/config.ini
 sudo systemctl restart dragonsync
 
 # Restore network settings

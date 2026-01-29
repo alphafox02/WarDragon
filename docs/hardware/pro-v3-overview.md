@@ -20,19 +20,19 @@ The WarDragon Pro v3 has antenna ports accessible from the sides of the unit. Wh
                     └─────────────────────────────────────┘
 
     LEFT SIDE                                           RIGHT SIDE
-    (Front to Back)                                     (Front to Back)
+    (Back to Front)                                     (Back to Front)
     ┌──────────┐                                        ┌──────────┐
-    │ 1. ESP32 │ ← WiFi Remote ID                       │ 1. BT5   │ ← DragonTooth Dongle
-    │          │   (May be removed in future)           │   LR     │   Bluetooth Remote ID
+    │ 4. TX    │ ← Not used                             │ 2. GPS   │ ← Optional GPS Antenna
+    │          │                                        │   ANT    │
     ├──────────┤                                        ├──────────┤
-    │ 2. RX    │ ← Panda Wireless                       │ 2. GPS   │ ← Optional GPS Antenna
-    │ (Panda)  │   WiFi Remote ID                       │   ANT    │
+    │ 3. RX    │ ← ANTSDR E200                          │ 1. BT5   │ ← DragonTooth Dongle
+    │ (E200)   │   DJI DroneID (Primary)                │   LR     │   Bluetooth Remote ID
     ├──────────┤                                        └──────────┘
-    │ 3. RX    │ ← ANTSDR E200
-    │ (E200)   │   DJI DroneID (Primary)
+    │ 2. RX    │ ← Panda Wireless
+    │ (Panda)  │   WiFi Remote ID
     ├──────────┤
-    │ 4. TX    │ ← Not used
-    │          │
+    │ 1. ESP32 │ ← WiFi Remote ID
+    │          │   (May be removed in future)
     └──────────┘
 
                     ┌─────────────────────────────────────┐
