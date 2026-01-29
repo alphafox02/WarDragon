@@ -5,45 +5,95 @@ WarDragon uses ZeroMQ (ZMQ) as the message transport layer between detection com
 ## Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         ZMQ Message Bus                                 │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│    Publishers                              Subscribers                  │
-│    ──────────                              ───────────                  │
-│                                                                         │
-│    dji_receiver.py ────┐                                               │
-│    (tcp://*:5556)      │                                               │
-│                        │                                               │
-│    DroneID ────────────┼──────────────────► DragonSync                 │
-│    (tcp://*:5557)      │                    (Subscribes to all)        │
-│                        │                                               │
-│    Sniffle/BT5 ────────┘                                               │
-│    (tcp://*:5558)                                                      │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         ZMQ Message Bus Architecture                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│    Detection Sources              Decoder                 Application       │
+│    ─────────────────              ───────                 ───────────       │
+│                                                                             │
+│    dji_receiver.py ──────┐                                                  │
+│    (tcp://*:4221)        │                                                  │
+│                          │                                                  │
+│    bluetooth_receiver ───┼──────► zmq_decoder.py ──────► DragonSync        │
+│    (tcp://*:4222)        │        (tcp://*:4224)         (subscribes)      │
+│                          │                                                  │
+│    wifi_receiver.py ─────┘                                                  │
+│    (tcp://*:4223)                                                           │
+│                                                                             │
+│                                                                             │
+│    FPV Detection ──────────────────────────────────────► DragonSync        │
+│    (tcp://*:4226)                                        (fpv input)       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## ZMQ Pattern
 
 WarDragon uses the **PUB/SUB** (Publisher/Subscriber) pattern:
 
-- **Publishers**: Detection sources (dji_receiver, DroneID, etc.)
-- **Subscribers**: DragonSync, external tools, analytics
+- **Publishers**: Detection sources (dji_receiver, bluetooth_receiver, wifi_receiver)
+- **Decoder**: zmq_decoder.py collects from all sources and republishes unified data
+- **Subscribers**: DragonSync, external tools, analytics applications
 
 This pattern allows:
 - Multiple subscribers to the same data stream
 - Decoupled components that can start/stop independently
 - Easy addition of new detection sources or consumers
 
-## Default Ports
+## Port Assignments
+
+### Detection Sources
 
 | Service | Port | Protocol | Description |
 |---------|------|----------|-------------|
-| DJI DroneID | 5556 | TCP | ANTSDR E200 DJI detections |
-| DroneID | 5557 | TCP | WiFi/BT Remote ID |
-| Sniffle BT5 | 5558 | TCP | Bluetooth 5 LR detections |
-| DragonSync API | 8080 | HTTP | REST API (when enabled) |
+| DJI DroneID | 4221 | TCP | dji_receiver.py → ANTSDR E200 DJI detections |
+| Bluetooth RID | 4222 | TCP | bluetooth_receiver.sh → DragonTooth/Sniffle BT5 LR |
+| WiFi RID | 4223 | TCP | wifi_receiver.py → Panda Wireless detections |
+
+### Decoder & Application
+
+| Service | Port | Protocol | Description |
+|---------|------|----------|-------------|
+| zmq_decoder.py | 4224 | TCP | Unified detection output (DragonSync subscribes here) |
+| DragonSync Status | 4225 | TCP | System status messages |
+| FPV Signals | 4226 | TCP | FPV drone signal detection (wardragon-fpv-detect) |
+| DragonSync API | 8088 | HTTP | Read-only REST API for ATAK plugin |
+
+## Data Flow
+
+### Standard Detection Pipeline
+
+1. **Detection Hardware** captures drone signals:
+   - ANTSDR E200 → DJI Ocusync 2/3/4
+   - Panda Wireless → WiFi Remote ID (802.11)
+   - DragonTooth → Bluetooth 5 Long Range Remote ID
+
+2. **Receiver Scripts** decode and publish raw detections:
+   ```bash
+   # DJI receiver
+   python3 dji_receiver.py
+
+   # Bluetooth receiver
+   ./bluetooth_receiver.sh -b 2000000 -s /dev/ttyUSB0 --zmqsetting 127.0.0.1:4222
+
+   # WiFi receiver
+   ./wifi_receiver.py --interface wlan0 -z --zmqsetting 127.0.0.1:4223
+   ```
+
+3. **zmq_decoder.py** aggregates all sources:
+   ```bash
+   python3 zmq_decoder.py -z --zmqsetting 127.0.0.1:4224 \
+     --zmqclients 127.0.0.1:4221,127.0.0.1:4222,127.0.0.1:4223 \
+     --dji 127.0.0.1:4221
+   ```
+
+4. **DragonSync** subscribes to port 4224 and outputs to:
+   - TAK multicast (239.2.3.1:6969)
+   - TAK Server (TCP/TLS)
+   - MQTT broker
+   - Lattice API
+   - HTTP API (port 8088)
 
 ## Message Format
 
@@ -226,9 +276,9 @@ import json
 
 context = zmq.Context()
 
-# Subscribe to DJI DroneID
+# Subscribe to unified detection output (zmq_decoder.py)
 socket = context.socket(zmq.SUB)
-socket.connect("tcp://127.0.0.1:5556")
+socket.connect("tcp://127.0.0.1:4224")
 socket.setsockopt_string(zmq.SUBSCRIBE, "")  # Subscribe to all
 
 while True:
@@ -237,7 +287,9 @@ while True:
     print(f"Received: {data['type']} - {data['data'].get('serial_number', 'N/A')}")
 ```
 
-### Multi-Source Subscription
+### Direct Source Subscription
+
+For more granular control, subscribe directly to individual sources:
 
 ```python
 import zmq
@@ -246,11 +298,11 @@ import json
 context = zmq.Context()
 poller = zmq.Poller()
 
-# Subscribe to multiple sources
+# Subscribe to individual detection sources
 sources = {
-    "dji": ("tcp://127.0.0.1:5556", context.socket(zmq.SUB)),
-    "wifi": ("tcp://127.0.0.1:5557", context.socket(zmq.SUB)),
-    "bt5": ("tcp://127.0.0.1:5558", context.socket(zmq.SUB)),
+    "dji": ("tcp://127.0.0.1:4221", context.socket(zmq.SUB)),
+    "bt5": ("tcp://127.0.0.1:4222", context.socket(zmq.SUB)),
+    "wifi": ("tcp://127.0.0.1:4223", context.socket(zmq.SUB)),
 }
 
 for name, (addr, sock) in sources.items():
@@ -266,6 +318,13 @@ while True:
             data = json.loads(message)
             print(f"[{name}] {data['type']}: {json.dumps(data['data'], indent=2)}")
 ```
+
+## Repository References
+
+- **DroneID**: [github.com/alphafox02/DroneID](https://github.com/alphafox02/DroneID) - WiFi/BT receivers and zmq_decoder
+- **antsdr_dji_droneid**: [github.com/alphafox02/antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) - DJI firmware and dji_receiver
+- **DragonSync**: [github.com/alphafox02/DragonSync](https://github.com/alphafox02/DragonSync) - Main application
+- **wardragon-fpv-detect**: [github.com/alphafox02/wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) - FPV signal detection
 
 ## Related Documentation
 

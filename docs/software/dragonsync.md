@@ -1,6 +1,6 @@
 # DragonSync
 
-DragonSync is the core application that orchestrates all detection streams on WarDragon, transforming raw drone detections into actionable intelligence for TAK, MQTT, Lattice, and other outputs.
+DragonSync (Community Edition) is a lightweight gateway that converts drone detection signals into Cursor on Target (CoT) format for TAK/ATAK systems, with optional MQTT publishing for Home Assistant integration.
 
 **Repository**: [github.com/alphafox02/DragonSync](https://github.com/alphafox02/DragonSync)
 
@@ -8,13 +8,13 @@ DragonSync is the core application that orchestrates all detection streams on Wa
 
 DragonSync performs these key functions:
 
-1. **Subscribes** to ZMQ detection sources (DJI DroneID, WiFi RID, BT5 RID)
-2. **Merges** detections from multiple sources
-3. **Deduplicates** overlapping detections of the same drone
-4. **Rate-limits** output to prevent flooding TAK networks
-5. **Transforms** data into CoT XML, MQTT JSON, Lattice format
-6. **Manages** track state, history, and aging
-7. **Serves** HTTP API for companion applications
+1. **Subscribes** to ZMQ detection sources (DJI DroneID, WiFi RID, BT5 RID, FPV signals)
+2. **Manages** drone tracking with two-tier capacity (verified vs unverified)
+3. **Queries** FAA RID database for drone registration information
+4. **Transforms** data into CoT XML for TAK, JSON for MQTT, and Lattice format
+5. **Rate-limits** output to prevent flooding TAK networks
+6. **Serves** read-only HTTP API for companion applications (ATAK plugin)
+7. **Supports** ADS-B aircraft ingestion via dump1090/readsb
 
 ## Installation
 
@@ -28,120 +28,298 @@ pip install -r requirements.txt
 
 ## Configuration
 
-DragonSync is configured via `config.yaml`. The default location is:
+DragonSync is configured via `config.ini`. The default location is:
 
 ```
-/home/dragon/DragonSync/config.yaml
+/home/dragon/DragonSync/config.ini
 ```
 
-### Configuration Structure
+### Complete Configuration Reference
 
-```yaml
-# =============================================================================
-# DragonSync Configuration
-# =============================================================================
+```ini
+[SETTINGS]
 
-# System Settings
-system:
-  log_level: INFO              # DEBUG, INFO, WARNING, ERROR
-  gps_source: gpsd             # gpsd, static, none
-  static_lat: 0.0              # If gps_source: static
-  static_lon: 0.0
+# ────────── ZMQ Configuration ──────────
+zmq_host = 127.0.0.1
+zmq_port = 4224
+zmq_status_port = 4225
 
-# =============================================================================
-# Input Sources - ZMQ Subscriptions
-# =============================================================================
+# ────────── TAK Server Configuration (optional) ──────────
+tak_host =
+tak_port =
+# TCP or UDP (leave blank to ignore if host/port unset)
+tak_protocol =
+# TLS (TCP only): set EITHER PKCS#12 OR PEM files, not both
+tak_tls_p12 =
+tak_tls_p12_pass =
+# PEM files (client cert + key; optional CA)
+tak_tls_certfile =
+tak_tls_keyfile =
+tak_tls_cafile =
+tak_tls_skip_verify = true
 
-inputs:
-  dji_droneid:
-    enabled: true
-    zmq_address: "tcp://127.0.0.1:5556"
+# ────────── Multicast Configuration (optional) ──────────
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+enable_multicast = true
+tak_multicast_interface = 0.0.0.0
+multicast_ttl = 1
 
-  droneid_wifi:
-    enabled: true
-    zmq_address: "tcp://127.0.0.1:5557"
+# ────────── Operational Parameters ──────────
+# Minimum seconds between CoT sends per drone
+rate_limit = 2.0
 
-  droneid_bt:
-    enabled: true
-    zmq_address: "tcp://127.0.0.1:5558"
+# ────────── Drone Tracking Capacity ──────────
+# Two-tier system (DEFAULT - prioritizes FAA RID-verified drones):
+# Verified drones (passed FAA RID database check) are evicted last
+# This helps filter out spoofed drone broadcasts
+max_verified_drones = 70
+max_unverified_drones = 30
 
-  # Optional: Aircraft data from readsb
-  aircraft:
-    enabled: false
-    readsb_url: "http://127.0.0.1:8080/data/aircraft.json"
-    poll_interval: 5
+# Legacy single-tier mode (uncomment to disable RID priority):
+# Use this if you want all drones treated equally (no verification priority)
+#max_drones = 60
 
-# =============================================================================
-# Output Destinations
-# =============================================================================
+# Inactivity timeout applies to both tiers
+inactivity_timeout = 60.0
+enable_receive = false
 
-outputs:
-  # TAK/ATAK Output
-  tak:
-    enabled: true
-    mode: multicast           # multicast, tcp, udp
+# ────────── DragonSync API (optional) ──────────
+# Enables the read-only HTTP API used by the ATAK plugin.
+api_enabled = true
+api_host = 0.0.0.0
+api_port = 8088
 
-    # Multicast settings
-    multicast_address: "239.2.3.1"
-    multicast_port: 6969
-    multicast_interface: ""   # Empty = default interface
+# ────────── FAA RID API Fallback (optional; local DB always used) ──────────
+# By default, only the bundled FAA RID database is used for lookups (no network).
+# Set to true to allow online FAA API fallback when a serial is not found locally.
+rid_api_enabled = false
 
-    # TAK Server settings (if mode: tcp or udp)
-    server_address: ""
-    server_port: 8089
+# ────────── MQTT Configuration (optional) ──────────
+mqtt_enabled = false
+mqtt_host = 127.0.0.1
+mqtt_port = 1883
+# Drone topics
+mqtt_topic = wardragon/drones
+mqtt_per_drone_enabled = false
+mqtt_per_drone_base = wardragon/drone
+# Aircraft topics (ADS-B)
+mqtt_aircraft_enabled = false
+mqtt_aircraft_topic = wardragon/aircraft
+# Signal alerts
+mqtt_signals_enabled = false
+mqtt_signals_topic = wardragon/signals
+# Home Assistant discovery (disabled by default)
+mqtt_ha_enabled = false
+mqtt_ha_prefix = homeassistant
+mqtt_ha_device_base = wardragon_drone
+mqtt_ha_signal_tracker = false
+mqtt_ha_signal_id = signal_latest
+# Authentication / TLS
+mqtt_username =
+mqtt_password =
+mqtt_tls = false
+mqtt_ca_file =
+mqtt_certfile =
+mqtt_keyfile =
+mqtt_tls_insecure = false
+# Retain messages by default (good for HA dashboards)
+mqtt_retain = true
 
-    # TLS settings (if using TAK Server with TLS)
-    tls_enabled: false
-    tls_cert: ""
-    tls_key: ""
-    tls_ca: ""
+# ────────── Lattice (optional) ──────────
+lattice_enabled = false
+lattice_token =
+# Either base URL, e.g. https://your.env.anduril.cloud
+lattice_base_url =
+# Or an endpoint host to build base_url (we'll prefix https://)
+lattice_endpoint =
+# Sandbox token (or set env SANDBOXES_TOKEN)
+lattice_sandbox_token =
+lattice_source_name = DragonSync
+lattice_drone_rate = 1.0
+lattice_wd_rate = 0.2
 
-    # Rate limiting
-    rate_limit: 1.0           # Seconds between updates per track
+# ────────── ADS-B / dump1090 Integration (optional) ──────────
+adsb_enabled = false
+adsb_json_url = http://127.0.0.1:8080/?all_with_pos
+adsb_uid_prefix = adsb-
+adsb_cot_stale = 15
+adsb_cache_ttl = 120
+adsb_rate_limit = 3.0
+adsb_min_alt = 0
+adsb_max_alt = 0
 
-  # MQTT Output
-  mqtt:
-    enabled: false
-    broker: "192.168.1.100"
-    port: 1883
-    username: ""
-    password: ""
+# ────────── FPV signal ingest (optional) ──────────
+fpv_enabled = false
+fpv_zmq_host = 127.0.0.1
+fpv_zmq_port = 4226
+fpv_stale = 60
+fpv_radius_m = 15
+fpv_rate_limit = 2.0
+fpv_max_signals = 200
+fpv_confirm_only = true
 
-    # Topic structure
-    base_topic: "wardragon/drones"
+# ────────── Kismet (optional) ──────────
+kismet_enabled = false
+kismet_host = http://127.0.0.1:2501
+kismet_apikey =
+```
 
-    # Home Assistant auto-discovery
-    homeassistant_discovery: true
-    discovery_prefix: "homeassistant"
+## Key Configuration Sections
 
-  # Anduril Lattice Output
-  lattice:
-    enabled: false
-    endpoint: ""
-    api_key: ""
+### ZMQ Input
 
-  # HTTP API for companion apps
-  api:
-    enabled: true
-    host: "0.0.0.0"
-    port: 8080
+DragonSync receives detection data via ZMQ:
 
-# =============================================================================
-# Track Management
-# =============================================================================
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `zmq_host` | 127.0.0.1 | Host for ZMQ subscriptions |
+| `zmq_port` | 4224 | Main detection data port |
+| `zmq_status_port` | 4225 | System status port |
 
-tracks:
-  # How long to keep a track without updates (seconds)
-  stale_timeout: 60
+### Multicast Output
 
-  # How long until track is removed entirely
-  delete_timeout: 300
+Default multicast settings for ATAK:
 
-  # Deduplication window (seconds)
-  dedup_window: 5
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `tak_multicast_addr` | 239.2.3.1 | SA multicast address |
+| `tak_multicast_port` | 6969 | SA multicast port |
+| `enable_multicast` | true | Enable multicast output |
+| `tak_multicast_interface` | 0.0.0.0 | Interface to send on (0.0.0.0 = all) |
+| `multicast_ttl` | 1 | TTL for multicast packets |
 
-  # Merge detections within this distance (meters)
-  merge_distance: 50
+**Note:** When `tak_multicast_interface` is `0.0.0.0`, DragonSync sends multicast on ALL active interfaces and checks for new interfaces approximately every 30 seconds. This is useful for dynamic setups like USB Ethernet tethering.
+
+### TAK Server (TCP/TLS)
+
+For direct TAK Server connections:
+
+```ini
+tak_host = tak.example.com
+tak_port = 8089
+tak_protocol = TCP
+
+# Using PKCS#12 certificate
+tak_tls_p12 = /path/to/client.p12
+tak_tls_p12_pass = password
+
+# OR using PEM files
+tak_tls_certfile = /path/to/client.crt
+tak_tls_keyfile = /path/to/client.key
+tak_tls_cafile = /path/to/ca.crt
+```
+
+### Drone Tracking Capacity
+
+DragonSync uses a two-tier tracking system to prioritize verified drones:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `max_verified_drones` | 70 | Capacity for FAA RID-verified drones |
+| `max_unverified_drones` | 30 | Capacity for unverified drones |
+| `inactivity_timeout` | 60.0 | Seconds before removing inactive drone |
+| `rate_limit` | 2.0 | Minimum seconds between CoT sends per drone |
+
+**Why two tiers?** Verified drones (those that pass FAA RID database lookup) are evicted last. This helps filter out spoofed drone broadcasts while preserving legitimate detections.
+
+For legacy single-tier mode (all drones treated equally):
+```ini
+# Comment out max_verified_drones and max_unverified_drones
+max_drones = 60
+```
+
+### FAA RID Database
+
+DragonSync includes a bundled FAA RID database for offline lookups:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `rid_api_enabled` | false | Enable online FAA API fallback |
+
+The local database is always used first. Online fallback only occurs if enabled AND the serial is not found locally.
+
+### HTTP API
+
+The read-only API is used by the WarDragon ATAK Plugin:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `api_enabled` | true | Enable HTTP API |
+| `api_host` | 0.0.0.0 | Listen address |
+| `api_port` | 8088 | Listen port |
+
+### MQTT / Home Assistant
+
+For home automation integration:
+
+```ini
+mqtt_enabled = true
+mqtt_host = 192.168.1.100
+mqtt_port = 1883
+mqtt_username = wardragon
+mqtt_password = yourpassword
+
+# Per-drone topics (wardragon/drone/<serial>)
+mqtt_per_drone_enabled = true
+mqtt_per_drone_base = wardragon/drone
+
+# Home Assistant auto-discovery
+mqtt_ha_enabled = true
+mqtt_ha_prefix = homeassistant
+mqtt_ha_device_base = wardragon_drone
+```
+
+### ADS-B Integration
+
+Ingest aircraft tracks from dump1090/readsb:
+
+```ini
+adsb_enabled = true
+adsb_json_url = http://127.0.0.1:8080/?all_with_pos
+adsb_uid_prefix = adsb-
+adsb_cot_stale = 15
+adsb_rate_limit = 3.0
+adsb_min_alt = 0    # 0 = no minimum
+adsb_max_alt = 0    # 0 = no maximum
+```
+
+### FPV Signal Detection
+
+Ingest FPV drone signals from wardragon-fpv-detect:
+
+```ini
+fpv_enabled = true
+fpv_zmq_host = 127.0.0.1
+fpv_zmq_port = 4226
+fpv_stale = 60
+fpv_radius_m = 15
+fpv_rate_limit = 2.0
+fpv_max_signals = 200
+fpv_confirm_only = true
+```
+
+### Lattice (Anduril)
+
+For Anduril Lattice integration:
+
+```ini
+lattice_enabled = true
+lattice_token = your_api_token
+lattice_base_url = https://your.env.anduril.cloud
+lattice_source_name = DragonSync
+lattice_drone_rate = 1.0
+lattice_wd_rate = 0.2
+```
+
+### Kismet Integration
+
+Enable Kismet device tracking:
+
+```ini
+kismet_enabled = true
+kismet_host = http://127.0.0.1:2501
+kismet_apikey = your_kismet_api_key
 ```
 
 ## Running DragonSync
@@ -165,85 +343,34 @@ journalctl -u dragonsync -f
 
 ```bash
 cd /home/dragon/DragonSync
-python dragonsync.py -c config.yaml
-```
-
-### Debug Mode
-
-```bash
-python dragonsync.py -c config.yaml --log-level DEBUG
+python dragonsync.py
 ```
 
 ## HTTP API
 
-When enabled, DragonSync provides a read-only HTTP API for companion applications like the WarDragon ATAK Plugin.
+When enabled, DragonSync provides a read-only HTTP API on port 8088.
 
 ### Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/status` | GET | System status and health |
-| `/api/tracks` | GET | Current active tracks |
-| `/api/tracks/{id}` | GET | Single track details |
-| `/api/config` | GET | Sanitized configuration |
-| `/api/stats` | GET | Detection statistics |
+| `/` | GET | API status |
+| `/drones` | GET | Current active drone tracks |
+| `/aircraft` | GET | Current ADS-B aircraft (if enabled) |
 
-### Example Responses
+## Data Attribution Fields
 
-**GET /api/status**
-```json
-{
-  "status": "running",
-  "uptime": 3600,
-  "gps": {
-    "fix": true,
-    "lat": 40.7128,
-    "lon": -74.0060,
-    "satellites": 12
-  },
-  "inputs": {
-    "dji_droneid": "connected",
-    "droneid_wifi": "connected",
-    "droneid_bt": "connected"
-  },
-  "outputs": {
-    "tak": "active",
-    "mqtt": "disabled"
-  }
-}
-```
+DragonSync adds metadata fields for multi-kit tracking scenarios:
 
-**GET /api/tracks**
-```json
-{
-  "tracks": [
-    {
-      "id": "abc123",
-      "type": "dji",
-      "drone": {
-        "serial": "ABC123DEF456",
-        "model": "Mavic 3",
-        "lat": 40.7128,
-        "lon": -74.006,
-        "alt": 100,
-        "speed": 15,
-        "heading": 270
-      },
-      "pilot": {
-        "lat": 40.713,
-        "lon": -74.0055
-      },
-      "last_seen": "2024-01-15T14:30:00Z",
-      "source": "antsdr_e200"
-    }
-  ],
-  "count": 1
-}
-```
+| Field | Description |
+|-------|-------------|
+| `observed_at` | Timestamp when kit processed the detection |
+| `rid_timestamp` | Timestamp from the airframe (if provided) |
+| `seen_by` | Identifier of the detecting kit |
 
 ## CoT Message Format
 
-DragonSync generates Cursor on Target (CoT) XML messages for TAK integration:
+DragonSync generates Cursor on Target (CoT) XML messages for TAK:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -269,66 +396,44 @@ DragonSync generates Cursor on Target (CoT) XML messages for TAK integration:
 </event>
 ```
 
-### CoT Type Codes
-
-| Drone Type | CoT Type |
-|------------|----------|
-| DJI (detected) | a-f-G-U-U-D |
-| Remote ID (unknown intent) | a-u-G-U-U-D |
-| Friendly (if tagged) | a-f-G-U-U-D |
-| Hostile (if tagged) | a-h-G-U-U-D |
-
-## Integration with Detection Sources
-
-### DJI DroneID
-
-DragonSync subscribes to `dji_receiver.py` output:
-
-```
-ANTSDR E200 → dji_receiver.py → ZMQ (5556) → DragonSync
-```
-
-### WiFi/BT Remote ID
-
-DragonSync subscribes to DroneID output:
-
-```
-Panda/ESP32 → DroneID → ZMQ (5557) → DragonSync
-DragonTooth → Sniffle → ZMQ (5558) → DragonSync
-```
-
 ## Troubleshooting
 
 ### No Detections Reaching TAK
 
-1. Check input sources:
+1. Check DragonSync is running:
    ```bash
-   # Test ZMQ connection
-   python -c "import zmq; c=zmq.Context(); s=c.socket(zmq.SUB); s.connect('tcp://127.0.0.1:5556'); s.setsockopt_string(zmq.SUBSCRIBE,''); print(s.recv_string())"
+   sudo systemctl status dragonsync
    ```
 
-2. Verify TAK output config:
+2. Check multicast is enabled:
    ```bash
-   # Test multicast
-   echo "test" | nc -u 239.2.3.1 6969
+   grep enable_multicast /home/dragon/DragonSync/config.ini
    ```
 
-3. Check DragonSync logs:
+3. Verify multicast interface:
+   ```bash
+   grep tak_multicast_interface /home/dragon/DragonSync/config.ini
+   ```
+
+4. Check logs for errors:
    ```bash
    journalctl -u dragonsync -f
    ```
 
+### Drones Not Being Tracked
+
+- Check `max_verified_drones` and `max_unverified_drones` capacity
+- Verify `inactivity_timeout` isn't too short
+- Check ZMQ connection to detection sources
+
 ### High CPU Usage
 
-- Reduce log level from DEBUG to INFO
-- Increase rate_limit for TAK output
-- Check for network issues causing retries
+- Increase `rate_limit` value (default 2.0 seconds)
+- Reduce `max_*_drones` capacity if tracking too many
 
-### Tracks Not Merging
+### MQTT Connection Issues
 
-- Increase `merge_distance` in config
-- Check GPS accuracy on WarDragon
-- Verify time synchronization
+DragonSync features async MQTT with automatic retries. If the broker is unavailable, CoT output and other features continue working normally.
 
 ## Related Documentation
 
@@ -336,3 +441,4 @@ DragonTooth → Sniffle → ZMQ (5558) → DragonSync
 - [ZMQ Data Flows](../architecture/zmq-dataflows.md)
 - [TAK Integration](../integration/tak-integration.md)
 - [MQTT Integration](../integration/mqtt-homeassistant.md)
+- [FPV Detection](https://github.com/alphafox02/wardragon-fpv-detect)

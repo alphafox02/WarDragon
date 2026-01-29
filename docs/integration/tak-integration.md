@@ -21,18 +21,22 @@ Multicast is the simplest integration method for devices on the same network.
 
 ### WarDragon Configuration
 
-In DragonSync `config.yaml`:
+In DragonSync `config.ini`:
 
-```yaml
-outputs:
-  tak:
-    enabled: true
-    mode: multicast
-    multicast_address: "239.2.3.1"
-    multicast_port: 6969
-    multicast_interface: ""  # Empty = default, or specify IP
-    rate_limit: 1.0
+```ini
+[SETTINGS]
+# Multicast is enabled by default
+enable_multicast = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+tak_multicast_interface = 0.0.0.0
+multicast_ttl = 1
+
+# Rate limiting (seconds between updates per drone)
+rate_limit = 2.0
 ```
+
+**Note:** When `tak_multicast_interface` is `0.0.0.0`, DragonSync sends multicast on ALL active interfaces and checks for new interfaces approximately every 30 seconds.
 
 ### ATAK Configuration
 
@@ -63,19 +67,25 @@ For distributed teams or persistent data, connect WarDragon to a TAK Server.
 
 ### WarDragon Configuration
 
-```yaml
-outputs:
-  tak:
-    enabled: true
-    mode: tcp                    # or udp
-    server_address: "tak.example.com"
-    server_port: 8089            # Default TAK Server port
+```ini
+[SETTINGS]
+# Disable multicast if using TAK Server only
+enable_multicast = false
 
-    # Optional TLS (recommended for production)
-    tls_enabled: false
-    tls_cert: "/path/to/client.pem"
-    tls_key: "/path/to/client.key"
-    tls_ca: "/path/to/ca.pem"
+# TAK Server connection
+tak_host = tak.example.com
+tak_port = 8089
+tak_protocol = TCP
+
+# TLS using PKCS#12 certificate
+tak_tls_p12 = /path/to/client.p12
+tak_tls_p12_pass = yourpassword
+
+# OR TLS using PEM files
+tak_tls_certfile = /path/to/client.crt
+tak_tls_keyfile = /path/to/client.key
+tak_tls_cafile = /path/to/ca.crt
+tak_tls_skip_verify = false
 ```
 
 ### TAK Server Setup
@@ -100,7 +110,31 @@ journalctl -u dragonsync -f | grep -i tak
 
 For secure connections to TAK Server:
 
-### Generate Client Certificate
+### Using PKCS#12 Certificate
+
+```ini
+[SETTINGS]
+tak_host = tak.example.com
+tak_port = 8089
+tak_protocol = TCP
+tak_tls_p12 = /home/dragon/certs/client.p12
+tak_tls_p12_pass = yourpassword
+```
+
+### Using PEM Files
+
+```ini
+[SETTINGS]
+tak_host = tak.example.com
+tak_port = 8089
+tak_protocol = TCP
+tak_tls_certfile = /home/dragon/certs/client.crt
+tak_tls_keyfile = /home/dragon/certs/client.key
+tak_tls_cafile = /home/dragon/certs/ca.crt
+tak_tls_skip_verify = false
+```
+
+### Certificate Setup
 
 If using TAK Server certificate enrollment:
 
@@ -108,18 +142,10 @@ If using TAK Server certificate enrollment:
 2. Place certificates on WarDragon:
    ```bash
    mkdir -p /home/dragon/certs
-   cp client.pem client.key ca.pem /home/dragon/certs/
-   chmod 600 /home/dragon/certs/*.key
-   ```
-
-3. Configure DragonSync:
-   ```yaml
-   outputs:
-     tak:
-       tls_enabled: true
-       tls_cert: "/home/dragon/certs/client.pem"
-       tls_key: "/home/dragon/certs/client.key"
-       tls_ca: "/home/dragon/certs/ca.pem"
+   cp client.p12 /home/dragon/certs/
+   # OR
+   cp client.crt client.key ca.crt /home/dragon/certs/
+   chmod 600 /home/dragon/certs/*
    ```
 
 ## WarDragon ATAK Plugin
@@ -150,7 +176,7 @@ The WarDragon ATAK Plugin provides enhanced integration beyond basic CoT.
 1. Open ATAK → Tools → WarDragon
 2. Configure connection:
    - **WarDragon IP**: Your WarDragon's IP address
-   - **API Port**: 8080 (default)
+   - **API Port**: 8088 (default)
 3. Connect
 
 The plugin communicates with DragonSync's HTTP API while CoT messages continue via multicast/server.
@@ -217,30 +243,17 @@ WarDragon generates CoT messages with drone-specific data:
 
 TAK uses the CoT type code to display icons. Custom drone icons can be added to ATAK's icon set for better visualization.
 
-## Pilot Location Display
-
-When pilot/operator location is available (DJI DroneID), WarDragon can send a separate CoT for the pilot:
-
-```yaml
-outputs:
-  tak:
-    pilot_cot_enabled: true
-    pilot_cot_type: "a-u-G"  # Ground unit
-```
-
-This displays both the drone and operator on the TAK map.
-
 ## Rate Limiting
 
-To prevent flooding TAK networks:
+To prevent flooding TAK networks, adjust `rate_limit` in config.ini:
 
-```yaml
-outputs:
-  tak:
-    rate_limit: 1.0  # Minimum seconds between updates per track
+```ini
+[SETTINGS]
+# Minimum seconds between CoT sends per drone (default: 2.0)
+rate_limit = 2.0
 ```
 
-Adjust based on your network capacity and update frequency needs.
+Increase this value if you need to reduce network traffic.
 
 ## Troubleshooting
 
@@ -264,6 +277,11 @@ Adjust based on your network capacity and update frequency needs.
    sudo systemctl status dragonsync
    ```
 
+5. **Check multicast interface setting**:
+   ```bash
+   grep tak_multicast_interface /home/dragon/DragonSync/config.ini
+   ```
+
 ### TAK Server Connection Failed
 
 1. **Test network connectivity**:
@@ -273,7 +291,10 @@ Adjust based on your network capacity and update frequency needs.
 
 2. **Check firewall rules** on both WarDragon and server
 
-3. **Verify certificates** if using TLS
+3. **Verify certificates** if using TLS:
+   ```bash
+   openssl s_client -connect <server>:<port> -cert client.crt -key client.key
+   ```
 
 4. **Check server logs** for authentication issues
 
@@ -290,10 +311,10 @@ Adjust based on your network capacity and update frequency needs.
 
 1. Verify WarDragon HTTP API is enabled and accessible:
    ```bash
-   curl http://<wardragon-ip>:8080/api/status
+   curl http://<wardragon-ip>:8088/
    ```
 
-2. Check firewall allows port 8080
+2. Check firewall allows port 8088
 
 3. Ensure ATAK has network permissions
 
