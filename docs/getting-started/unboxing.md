@@ -36,12 +36,16 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 |------|---------|---------|
 | Left Side - Port 3 (RX E200) | Dual-band 2.4/5 GHz | DJI DroneID detection |
 | Left Side - Port 2 (RX Panda) | Dual-band 2.4/5 GHz | WiFi Remote ID |
+| Left Side - Port 1 (ESP32) | Dual-band 2.4/5 GHz | WiFi Remote ID (secondary)* |
 | Right Side - Port 1 (BT5) | 2.4 GHz | Bluetooth Remote ID |
+
+*ESP32 port may be removed in future versions
 
 **Optional:**
 | Port | Antenna | Purpose |
 |------|---------|---------|
 | Right Side - Port 2 (GPS) | GPS antenna | External GPS (improves accuracy) |
+| Left Side - Port 4 (TX) | N/A | Unused (ANTSDR TX port) |
 
 ### Step 3: Power Connection
 
