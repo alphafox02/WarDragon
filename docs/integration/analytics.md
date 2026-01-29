@@ -29,14 +29,14 @@ WarDragon Kits (Field)     Analytics Server (Docker)      User Interfaces
 
 **Data collected from each kit:**
 - Drones via DJI DroneID (OcuSync) and Remote ID (Bluetooth, Wi-Fi)
-- Aircraft via ADS-B
-- FPV signals (5.8GHz analog video)
+- Aircraft via ADS-B (experimental, untested)
+- FPV signals (5.8GHz analog video) (experimental, untested)
 - Kit system health (CPU, memory, disk, temperature, GPS position)
 
 ## Requirements
 
 - Docker and Docker Compose
-- 2GB RAM minimum
+- 2GB RAM minimum (4GB recommended for multi-kit deployments)
 - 50GB storage (for ~1 month of data from 5 kits)
 
 ## Quick Start
@@ -138,6 +138,12 @@ curl http://localhost:8090/api/patterns/coordinated?hours=6
 
 # Operator reuse across drones
 curl http://localhost:8090/api/patterns/pilot-reuse?hours=12
+
+# Anomalous behavior
+curl http://localhost:8090/api/patterns/anomalies?hours=6
+
+# Multi-kit detections (triangulation opportunities)
+curl http://localhost:8090/api/patterns/multi-kit?hours=6
 ```
 
 ## Deployment Options
