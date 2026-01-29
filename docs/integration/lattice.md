@@ -2,269 +2,103 @@
 
 This guide covers integrating WarDragon with Anduril Lattice for enterprise-grade situational awareness.
 
+> **Note**: This documentation is based on the config.ini parameters. Actual Lattice API behavior and entity formats should be verified against the DragonSync source code.
+
 ## Overview
 
 WarDragon can export drone detection data directly to Anduril Lattice, enabling:
 
-- Real-time drone visualization in Lattice sandbox
+- Real-time drone visualization in Lattice
 - Integration with other Lattice-connected sensors
 - Unified command and control interface
-- Advanced analytics and correlation
 
 ## Prerequisites
 
 - Active Anduril Lattice instance
-- Lattice API credentials
+- Lattice API credentials (token)
 - Network connectivity to Lattice endpoint
-- DragonSync with Lattice output enabled
+- DragonSync configured with Lattice output enabled
 
 ## Configuration
 
 ### DragonSync Configuration
 
-In `config.yaml`:
+In `/home/dragon/DragonSync/config.ini`:
 
-```yaml
-outputs:
-  lattice:
-    enabled: true
-    endpoint: "https://lattice.example.com/api/v1"
-    api_key: "your-api-key-here"
+```ini
+[SETTINGS]
+# Enable Lattice integration
+lattice_enabled = true
 
-    # Optional settings
-    batch_size: 10           # Detections per batch
-    batch_interval: 1.0      # Seconds between batches
-    retry_attempts: 3
-    retry_delay: 5
+# API authentication token
+lattice_token = your_api_token
+
+# Either specify base URL directly
+lattice_base_url = https://your.env.anduril.cloud
+
+# Or specify endpoint host (https:// will be prefixed)
+lattice_endpoint = your.env.anduril.cloud
+
+# Sandbox token (can also set via SANDBOXES_TOKEN environment variable)
+lattice_sandbox_token =
+
+# Source identifier for this DragonSync instance
+lattice_source_name = DragonSync
+
+# Rate limiting (seconds between updates)
+lattice_drone_rate = 1.0    # Drone entity updates
+lattice_wd_rate = 0.2       # WarDragon status updates
 ```
 
-### Authentication
+### Configuration Parameters
 
-Lattice requires API key authentication:
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `lattice_enabled` | false | Enable/disable Lattice output |
+| `lattice_token` | (empty) | API authentication token |
+| `lattice_base_url` | (empty) | Full base URL (e.g., https://your.env.anduril.cloud) |
+| `lattice_endpoint` | (empty) | Endpoint host (https:// added automatically) |
+| `lattice_sandbox_token` | (empty) | Sandbox token (or use SANDBOXES_TOKEN env var) |
+| `lattice_source_name` | DragonSync | Identifier for this data source |
+| `lattice_drone_rate` | 1.0 | Minimum seconds between drone updates |
+| `lattice_wd_rate` | 0.2 | Minimum seconds between WarDragon status updates |
 
-1. Obtain API credentials from your Lattice administrator
-2. Store securely (consider using environment variables):
+### Environment Variables
 
-```yaml
-outputs:
-  lattice:
-    enabled: true
-    endpoint: "${LATTICE_ENDPOINT}"
-    api_key: "${LATTICE_API_KEY}"
-```
-
-Or via environment:
+The sandbox token can be set via environment variable:
 
 ```bash
-export LATTICE_ENDPOINT="https://lattice.example.com/api/v1"
-export LATTICE_API_KEY="your-api-key"
-```
-
-## Data Format
-
-DragonSync formats detections for Lattice's entity model:
-
-### Entity Structure
-
-```json
-{
-  "entityId": "wardragon-drone-ABC123",
-  "entityType": "UAS",
-  "timestamp": "2024-01-15T14:30:00Z",
-  "location": {
-    "latitude": 40.7128,
-    "longitude": -74.006,
-    "altitude": 100,
-    "altitudeReference": "MSL"
-  },
-  "velocity": {
-    "speed": 15.0,
-    "heading": 270,
-    "verticalSpeed": 0.5
-  },
-  "attributes": {
-    "serialNumber": "ABC123DEF456",
-    "model": "DJI Mavic 3",
-    "protocol": "ocusync3",
-    "pilotLocation": {
-      "latitude": 40.713,
-      "longitude": -74.0055
-    },
-    "signalStrength": -65,
-    "source": "wardragon-pro-v3"
-  },
-  "classification": "UNKNOWN",
-  "confidence": 0.95
-}
-```
-
-### Field Mapping
-
-| DragonSync Field | Lattice Field | Notes |
-|------------------|---------------|-------|
-| drone_id | entityId | Prefixed with "wardragon-drone-" |
-| drone_lat/lon | location.latitude/longitude | WGS84 |
-| drone_alt | location.altitude | MSL or AGL based on source |
-| speed | velocity.speed | m/s |
-| heading | velocity.heading | degrees |
-| serial_number | attributes.serialNumber | |
-| model | attributes.model | |
-| pilot_lat/lon | attributes.pilotLocation | When available |
-
-## Lattice Visualization
-
-### Entity Display
-
-In Lattice sandbox, WarDragon drones appear as:
-
-- UAS entity type
-- Custom icon (if configured)
-- Real-time position updates
-- Track history
-
-### Track Management
-
-Lattice maintains tracks for detected drones:
-
-- **Active**: Currently being detected
-- **Coasting**: Lost signal, estimated position
-- **Stale**: No updates, track aging out
-
-## Advanced Configuration
-
-### Filtering
-
-Control which detections go to Lattice:
-
-```yaml
-outputs:
-  lattice:
-    enabled: true
-    # Only send high-confidence detections
-    min_confidence: 0.8
-
-    # Only send specific drone types
-    include_types:
-      - dji_droneid
-      - open_drone_id
-
-    # Exclude certain protocols
-    exclude_protocols:
-      - fpv_analog
-```
-
-### Rate Limiting
-
-Prevent overwhelming the Lattice API:
-
-```yaml
-outputs:
-  lattice:
-    rate_limit:
-      max_per_second: 10
-      burst: 50
-```
-
-### Batching
-
-Optimize API calls by batching:
-
-```yaml
-outputs:
-  lattice:
-    batch:
-      enabled: true
-      size: 20           # Max entities per request
-      interval: 2.0      # Seconds
-      flush_on_change: true  # Send immediately on significant updates
+export SANDBOXES_TOKEN="your_sandbox_token"
 ```
 
 ## Multi-WarDragon Deployment
 
-When multiple WarDragon units report to the same Lattice instance:
+When multiple WarDragon units report to the same Lattice instance, use unique `lattice_source_name` values to identify each unit:
 
-### Source Identification
-
-Each WarDragon should have a unique source identifier:
-
-```yaml
-system:
-  unit_id: "wardragon-site-alpha"
-
-outputs:
-  lattice:
-    source_prefix: "site-alpha"
-```
-
-### Deconfliction
-
-Lattice correlates detections from multiple sources:
-
-- Same drone detected by multiple WarDragons
-- Track fusion in Lattice
-- Position averaging/selection
-
-## Security Considerations
-
-### API Key Protection
-
-- Never commit API keys to version control
-- Use environment variables or secrets management
-- Rotate keys periodically
-
-### Network Security
-
-- Use TLS (HTTPS) for all Lattice connections
-- Consider VPN or private network
-- Implement proper firewall rules
-
-### Data Classification
-
-Configure handling based on data sensitivity:
-
-```yaml
-outputs:
-  lattice:
-    classification: "UNCLASSIFIED"
-    handling_caveats: []
+```ini
+[SETTINGS]
+lattice_source_name = WarDragon-Site-Alpha
 ```
 
 ## Troubleshooting
 
-### Connection Failed
-
-1. **Verify endpoint URL**:
-   ```bash
-   curl -v https://lattice.example.com/api/v1/health
-   ```
-
-2. **Check API key**:
-   ```bash
-   curl -H "Authorization: Bearer $LATTICE_API_KEY" \
-        https://lattice.example.com/api/v1/entities
-   ```
-
-3. **Check firewall/network**:
-   ```bash
-   nc -zv lattice.example.com 443
-   ```
-
-### Entities Not Appearing
+### Connection Issues
 
 1. **Check DragonSync logs**:
    ```bash
    journalctl -u dragonsync | grep -i lattice
    ```
 
-2. **Verify data format** matches Lattice schema
+2. **Verify network connectivity** to your Lattice endpoint
 
-3. **Check Lattice filters** aren't excluding WarDragon data
+3. **Confirm token is valid** and has appropriate permissions
 
-### High Latency
+### Entities Not Appearing
 
-1. Reduce batch interval
-2. Check network latency to Lattice endpoint
-3. Enable flush_on_change for critical updates
+1. Verify `lattice_enabled = true` in config.ini
+2. Check that either `lattice_base_url` or `lattice_endpoint` is set
+3. Confirm `lattice_token` is configured
+4. Review DragonSync logs for errors
 
 ## Related Documentation
 
