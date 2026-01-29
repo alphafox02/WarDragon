@@ -4,6 +4,8 @@ DragonSync (Community Edition) is a lightweight gateway that converts drone dete
 
 **Repository**: [github.com/alphafox02/DragonSync](https://github.com/alphafox02/DragonSync)
 
+> **Note**: For the most complete and up-to-date documentation, see the [DragonSync README](https://github.com/alphafox02/DragonSync/blob/main/README.md) in the official repository. This page provides a summary and quick reference.
+
 ## Overview
 
 DragonSync performs these key functions:
