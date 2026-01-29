@@ -2,6 +2,8 @@
 
 This guide explains how to configure WarDragon Pro v3 as a WiFi hotspot for field deployments where no existing network infrastructure is available.
 
+> **Prerequisite**: Hotspot configuration requires local console access (monitor + keyboard) during initial setup. See [Unboxing & First Boot](unboxing.md) for instructions on connecting a monitor and keyboard.
+
 ## Overview
 
 When configured as a hotspot, WarDragon:

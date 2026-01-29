@@ -124,6 +124,40 @@ echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 sudo iptables -t nat -L
 ```
 
+## Remote Access Issues
+
+### Can't SSH to WarDragon
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| Connection refused | SSH not installed | Requires initial local setup - see [Unboxing](../getting-started/unboxing.md) |
+| Connection timeout | Wrong IP or firewall | Verify IP address and network connectivity |
+| Permission denied | Wrong credentials | Check username/password |
+
+> **Note**: WarDragon ships without SSH enabled for security. You must complete the [initial local setup](../getting-started/unboxing.md#initial-local-setup-required) with a monitor and keyboard to install and configure OpenSSH.
+
+### Remote Desktop Not Working (RustDesk)
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| Can't connect | RustDesk not installed | Requires initial local setup |
+| Black/blank screen | HDMI dummy plug missing | Reinstall the dummy plug in the right-angle HDMI adapter |
+| No desktop rendered | Display not detected | Verify dummy plug is firmly seated |
+
+> **Critical**: The HDMI dummy plug must be installed in the right-angle HDMI adapter for remote desktop to work. The plug simulates a connected display, allowing the system to render a desktop session. See [Unboxing](../getting-started/unboxing.md#step-7-restore-hdmi-dummy-plug) for details.
+
+### First-Time Remote Access Checklist
+
+If you cannot access WarDragon remotely, verify these were completed during initial setup:
+
+1. ☐ OpenSSH server installed and enabled
+2. ☐ RustDesk installed and configured (for remote desktop)
+3. ☐ HDMI dummy plug reinstalled after initial setup
+4. ☐ Network configured (static IP or DHCP)
+5. ☐ Firewall allows SSH (port 22) and/or RustDesk
+
+If any of these were not completed, you will need to reconnect a monitor and keyboard to complete the setup. See [Unboxing & First Boot](../getting-started/unboxing.md).
+
 ## Detection Issues
 
 ### No Drones Detected

@@ -2,6 +2,8 @@
 
 This guide covers network configuration options for your WarDragon Pro v3.
 
+> **Prerequisite**: Network configuration requires local console access (monitor + keyboard) during initial setup. See [Unboxing & First Boot](unboxing.md) for instructions on connecting a monitor and keyboard. After configuring remote access, you can make network changes via SSH or remote desktop.
+
 ## Important: Internal Network Interfaces
 
 **Do NOT modify "Wired connection 1"** - This interface is used internally for communication with the ANTSDR E200 and has a static IP configuration.

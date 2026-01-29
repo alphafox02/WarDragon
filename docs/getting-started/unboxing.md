@@ -13,6 +13,8 @@ Your WarDragon Pro v3 kit includes:
   - Dual-band 2.4/5 GHz antennas (qty: 2-3)
   - 2.4 GHz antenna for Bluetooth
   - GPS antenna (if external GPS option included)
+- USB-C to dual USB-A adapter cable (for keyboard/mouse)
+- HDMI dummy plug (pre-installed in right-angle HDMI adapter)
 - Quick start card
 
 ## Initial Setup
@@ -66,33 +68,89 @@ On first power-up:
 2. The power button LED indicates the system is on
 3. Internal LEDs (E200, GPS) may be partially visible through the case
 
-## Connecting to WarDragon
+## Initial Local Setup (Required)
 
-### Option 1: Direct Ethernet Connection
+> **Important**: WarDragon ships without remote access enabled for security. You must complete this initial local setup before you can access the unit remotely via SSH or remote desktop.
+
+### Step 5: Connect Monitor and Keyboard
+
+**HDMI Connection:**
+
+1. Locate the **right-angle HDMI adapter** on the right side of the PC (when looking down at the unit)
+2. Remove the **HDMI dummy plug** that is pre-installed in the adapter
+3. Connect an HDMI cable from the adapter to your monitor
+4. **Keep the dummy plug safe** - you will need to reinstall it after setup
+
+**USB Connection (Keyboard/Mouse):**
+
+1. Locate the **USB-C port** on the right side of the case exterior (under a protective cap)
+2. Remove the cap and insert the included **USB-C to dual USB-A adapter cable**
+3. Connect a USB keyboard and mouse to the adapter
+
+### Step 6: Initial Login and Configuration
+
+Once the system boots and you see the desktop:
+
+1. **Log in** with the default credentials (provided separately)
+2. **Change the default password** for security
+3. **Configure network settings** as needed:
+   - Set a static IP on "Wired connection 2" if desired (see [Network Setup](network-setup.md))
+   - Configure WiFi hotspot if needed (see [Hotspot Setup](hotspot-setup.md))
+4. **Install remote access software** for headless operation:
+   - **RustDesk** - For remote desktop access
+   - **OpenSSH** - For SSH command-line access
+
+   ```bash
+   # Install OpenSSH server
+   sudo apt update && sudo apt install openssh-server
+   sudo systemctl enable ssh
+   sudo systemctl start ssh
+   ```
+
+5. **Test remote connectivity** before disconnecting the monitor
+
+### Step 7: Restore HDMI Dummy Plug
+
+> **Critical**: The HDMI dummy plug must be reinstalled for remote desktop to work properly.
+
+After verifying remote access works:
+
+1. Disconnect the HDMI cable from the right-angle adapter
+2. **Reinstall the HDMI dummy plug** into the adapter
+3. Disconnect the USB-C adapter cable and replace the protective cap
+4. The unit is now configured for headless operation
+
+**Why the dummy plug?** The dummy plug simulates a connected display, which is required for remote desktop software (like RustDesk) to render a desktop session. Without it, remote desktop connections will fail or show a blank screen.
+
+## Connecting to WarDragon (After Initial Setup)
+
+Once you have completed the initial local setup above, you can connect remotely:
+
+### Option 1: SSH (Command Line)
+
+```bash
+ssh dragon@<wardragon-ip>
+```
+
+### Option 2: Remote Desktop (RustDesk)
+
+1. Open RustDesk on your computer
+2. Enter the WarDragon's RustDesk ID
+3. Connect using your configured password
+
+### Option 3: Direct Ethernet (Network Access)
 
 1. Connect an Ethernet cable between your computer and the WarDragon's Ethernet port
-2. The WarDragon's external Ethernet port is configured for DHCP
+2. The external Ethernet port ("Wired connection 2") is configured for DHCP by default
 3. Check your router/network for the assigned IP address
 
-### Option 2: WiFi Hotspot
+### Option 4: WiFi Hotspot
 
 If configured per the [Hotspot Setup](hotspot-setup.md) guide:
 
 1. Look for a WiFi network named `WarDragon` (or your configured SSID)
 2. Connect using your configured password
 3. The WarDragon will be at `192.168.12.1`
-
-### Option 3: Monitor + Keyboard
-
-Connect a monitor and keyboard directly to the unit for local access.
-
-### Option 4: Remote Access (Post-Install)
-
-For remote access, you can install:
-- **RustDesk** - For remote desktop access
-- **OpenSSH** - For SSH access
-
-These are not pre-installed and require local setup first.
 
 ## Verifying System Status
 
