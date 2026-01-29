@@ -64,6 +64,3 @@ secrets/
 site/
 _build/
 .doctrees/
-
-# Claude settings (keep this ignored as it's user-specific)
-.claude/
