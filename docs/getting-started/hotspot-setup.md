@@ -212,7 +212,11 @@ When using hotspot with ATAK:
 
 ### DragonSync CoT Output
 
-Configure DragonSync to multicast on the hotspot interface:
+DragonSync's default multicast interface is `0.0.0.0`, which sends multicast on ALL active interfaces. DragonSync checks for new active interfaces approximately every 30 seconds, so new connections are automatically picked up.
+
+This default behavior is useful for flexible setups - for example, you can plug an Android device directly into WarDragon's USB port and enable USB Ethernet tethering, and DragonSync will automatically start sending CoT to that interface.
+
+To restrict multicast to a specific interface (like the hotspot only):
 
 ```yaml
 # In dragonsync config
@@ -222,7 +226,7 @@ outputs:
     multicast: true
     address: "239.2.3.1"
     port: 6969
-    interface: "192.168.12.1"  # Hotspot interface
+    interface: "192.168.12.1"  # Restrict to hotspot interface only
 ```
 
 ### ATAK Configuration
