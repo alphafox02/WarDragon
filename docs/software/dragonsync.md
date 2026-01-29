@@ -348,15 +348,21 @@ python dragonsync.py
 
 ## HTTP API
 
-When enabled, DragonSync provides a read-only HTTP API on port 8088.
+When enabled, DragonSync provides a read-only HTTP API on port 8088. This API is used by the WarDragon ATAK Plugin and WarDragonAnalytics.
 
 ### Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | API status |
-| `/drones` | GET | Current active drone tracks |
-| `/aircraft` | GET | Current ADS-B aircraft (if enabled) |
+| `/status` | GET | System health and kit info |
+| `/drones` | GET | Current active drone/aircraft tracks |
+| `/signals` | GET | Current signal alerts (FPV, etc.) |
+| `/config` | GET | Sanitized configuration |
+| `/update/check` | GET | Git update availability |
+
+### Rate Limiting
+
+The API implements rate limiting (100 requests per 60 seconds per IP address) to prevent abuse.
 
 ## Data Attribution Fields
 
