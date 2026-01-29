@@ -132,34 +132,43 @@ Bluetooth 5 Long Range significantly extends detection:
 
 ### Overview
 
-Detects analog FPV video transmitters commonly used on racing and custom-built drones. This is an optional capability requiring additional SDR hardware.
+Detects analog FPV video transmitters commonly used on racing and custom-built drones. This is an optional capability requiring additional SDR hardware and software.
+
+> **Note**: The `suscli fpvdet` detector plugin used for signal confirmation is **not open source** and is not included in the public repository. WarDragon kits ship with it installed; other systems need their own licensed build. Energy detection works without it, but confirmation is skipped.
 
 ### Supported Frequencies
 
-| Band | Frequency Range | Common Use |
-|------|-----------------|------------|
-| 5.8 GHz | 5645-5945 MHz | Most FPV |
-| 2.4 GHz | 2400-2483 MHz | Long range FPV |
-| 1.2 GHz | 1240-1300 MHz | Rare, long range |
+The scanner covers standard FPV race bands in the 5 GHz range:
+
+| Band | Frequency Range | Channels |
+|------|-----------------|----------|
+| A | 5725-5865 MHz | 8 |
+| B | 5733-5866 MHz | 8 |
+| E | 5645-5945 MHz | 8 |
+| F | 5740-5880 MHz | 8 |
+| R (Race) | 5658-5917 MHz | 8 |
+| L | 5333-5613 MHz | 8 |
+| X | 4990-5200 MHz | 8 |
 
 ### Requirements
 
-- Second SDR (RTL-SDR, HackRF, etc.)
-- Appropriate antenna for target band
-- Additional software configuration
+- GNU Radio 3.10.x with gr-inspector and gr-osmosdr
+- SDR hardware (Pluto SDR default, HackRF/RTL-SDR supported)
+- Appropriate 5 GHz antenna
+- Optional: `suscli fpvdet` for PAL/NTSC video confirmation
 
 ### Detection Method
 
-1. Scans known FPV frequencies
-2. Detects video carrier signal characteristics
-3. Identifies active transmitters
-4. Reports frequency, signal strength, and modulation type
+1. Tunes across known FPV center frequencies using gr-inspector energy detector
+2. Detects signals wider than minimum bandwidth threshold (~4 MHz for typical FPV)
+3. Optionally confirms with `suscli fpvdet` for PAL/NTSC confidence scoring
+4. Publishes alerts via ZMQ (port 4226) in DroneID-compatible format
 
 ### Limitations
 
-- **No position data** - Analog FPV doesn't broadcast location
-- **Direction only** - Requires direction-finding antenna for bearing
-- **Cannot identify drone** - Only detects presence of transmission
+- **No position data** - Analog FPV doesn't broadcast location (uses WarDragon GPS)
+- **Detection only** - Cannot identify specific drone, only presence of transmission
+- **Shares SDR with DJI detection** - Service wrapper stops DJI receiver during FPV scan
 
 ## Multi-Protocol Detection
 
