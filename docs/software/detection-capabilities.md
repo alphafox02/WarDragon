@@ -182,7 +182,7 @@ WarDragon detects drones across multiple protocols simultaneously. Each detectio
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Note**: A DJI drone may broadcast both DJI DroneID and standard Remote ID (WiFi/BT). These currently appear as separate tracks. Future versions may correlate detections by serial number to merge them into a single track.
+**Note**: DragonSync tracks drones by their serial number (ID). If a DJI drone broadcasts both DJI DroneID and standard Remote ID using the **same serial number**, they will be merged into a single track. However, if the serial numbers differ between protocols (which can happen), they will appear as separate tracks.
 
 ## Detection Coverage Map
 
