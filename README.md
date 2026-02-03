@@ -69,8 +69,10 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 | Repository | Description |
 |------------|-------------|
 | [WarDragon-ATAK-Plugin](https://github.com/alphafox02/WarDragon-ATAK-Plugin) | Native ATAK plugin for WarDragon integration |
-| [DragonSync-iOS](https://github.com/Root-Down-Digital/DragonSync-iOS) | iOS companion app |
-| [DragonSync-Android](https://github.com/lukeswitz/DragonSync-Android) | Android companion app |
+| [DragonSync-iOS](https://github.com/Root-Down-Digital/DragonSync-iOS) | iOS companion app (third-party) |
+| [DragonSync-Android](https://github.com/lukeswitz/DragonSync-Android) | Android companion app (third-party) |
+
+> **Note**: The iOS and Android companion apps are developed by third-party contributors. Features and compatibility may vary.
 
 ### Analytics & Visualization
 | Repository | Description |
@@ -81,12 +83,6 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 | Repository | Description |
 |------------|-------------|
 | [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) | FPV analog drone detection (optional, requires second SDR) |
-
-### Related Tools
-| Repository | Description |
-|------------|-------------|
-| [flightview_gui](https://github.com/alphafox02/flightview_gui) | GUI for aircraft info and ADS-B visualization |
-| [dumphfdl-grafana-stack](https://github.com/alphafox02/dumphfdl-grafana-stack) | Grafana-based aviation data visualization |
 
 ## Data Flow Overview
 
