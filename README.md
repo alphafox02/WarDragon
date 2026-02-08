@@ -62,7 +62,7 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 | Repository | Description |
 |------------|-------------|
 | [DragonSync](https://github.com/alphafox02/DragonSync) | Main application - merges detection streams, outputs CoT to TAK, MQTT, and Lattice |
-| [DroneID](https://github.com/alphafox02/DroneID) | OpenDroneID sniffer for Bluetooth + WiFi Remote ID with ZMQ output |
+| [droneid-go](https://github.com/alphafox02/droneid-go) | High-performance Open Drone ID receiver (WiFi + BLE Remote ID) with ZMQ output |
 | [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) | ANTSDR E200 firmware for DJI DroneID detection |
 
 ### Mobile & Companion Apps
