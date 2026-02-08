@@ -40,7 +40,7 @@ The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data inte
 - **Hardware**: DragonTooth Dongle (Sonoff-based)
 - **Protocol**: Bluetooth 5 Long Range (LR)
 - **Range**: Extended via BT5 LR specification
-- **Software**: Sniffle-based detection via [DroneID](https://github.com/alphafox02/DroneID)
+- **Software**: Sniffle-based detection via [droneid-go](https://github.com/alphafox02/droneid-go)
 
 ### WiFi Remote ID
 - **Hardware**: Panda Wireless dual-band adapter + ESP32 module
@@ -75,7 +75,7 @@ The Pro v3 comes pre-configured with:
 
 - **DragonOS** - Base operating system
 - **[DragonSync](https://github.com/alphafox02/DragonSync)** - Core application managing all detection streams
-- **[DroneID](https://github.com/alphafox02/DroneID)** - OpenDroneID sniffer
+- **[droneid-go](https://github.com/alphafox02/droneid-go)** - Open Drone ID receiver
 - **Kismet** - Wireless network detection
 - **Aircrack-NG** - Wireless analysis tools
 - **Sparrow-WiFi** - WiFi analysis support

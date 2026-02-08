@@ -107,7 +107,7 @@ Same as WiFi Remote ID (ASTM F3411 specification)
 
 Based on Sonoff hardware with Sniffle-compatible firmware:
 
-**Repository**: DroneID integration via [DroneID](https://github.com/alphafox02/DroneID)
+**Repository**: [droneid-go](https://github.com/alphafox02/droneid-go)
 
 | Feature | Specification |
 |---------|---------------|

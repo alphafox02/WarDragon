@@ -16,7 +16,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 │  │  Ocusync 2/3/4  │  │  2.4/5 GHz      │  │  Bluetooth 5    │             │
 │  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘             │
 │           │                    │                    │                       │
-│           │ dji_receiver.py    │ DroneID            │ Sniffle               │
+│           │ dji_receiver.py    │ droneid-go         │ Sniffle               │
 │           │                    │                    │                       │
 │           ▼                    ▼                    ▼                       │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
@@ -73,9 +73,9 @@ The WarDragon system is built on a modular, message-driven architecture that all
 - **Output**: Decoded drone telemetry via `dji_receiver.py`
 - **Transport**: ZMQ Publisher
 
-#### 2. DroneID (WiFi/BT Remote ID)
-- **Repository**: [DroneID](https://github.com/alphafox02/DroneID)
-- **Function**: OpenDroneID sniffer for Bluetooth and WiFi broadcasts
+#### 2. droneid-go (WiFi/BT Remote ID)
+- **Repository**: [droneid-go](https://github.com/alphafox02/droneid-go)
+- **Function**: High-performance Open Drone ID receiver for WiFi and Bluetooth Remote ID
 - **Output**: JSON-formatted Remote ID data
 - **Transport**: ZMQ Publisher
 
