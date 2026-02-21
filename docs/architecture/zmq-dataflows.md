@@ -9,17 +9,15 @@ WarDragon uses ZeroMQ (ZMQ) as the message transport layer between detection com
 │                         ZMQ Message Bus Architecture                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│    Detection Sources              Decoder                 Application       │
-│    ─────────────────              ───────                 ───────────       │
+│    Detection Sources                                      Application       │
+│    ─────────────────                                      ───────────       │
 │                                                                             │
-│    dji_receiver.py ──────┐                                                  │
-│    (tcp://*:4221)        │                                                  │
-│                          │                                                  │
-│    bluetooth_receiver ───┼──────► zmq_decoder.py ──────► DragonSync        │
-│    (tcp://*:4222)        │        (tcp://*:4224)         (subscribes)      │
-│                          │                                                  │
-│    wifi_receiver.py ─────┘                                                  │
-│    (tcp://*:4223)                                                           │
+│    ANTSDR E200 ──► dji_receiver.py ──┐                                     │
+│                    (tcp://*:4221)     │                                     │
+│                                      ├──► droneid-go ──► DragonSync        │
+│    Panda Wireless ──► droneid-go ────┘    (tcp://*:4224)  (subscribes)     │
+│    DragonTooth   ──► (native BLE)                                          │
+│    ESP32 UART    ──► (native UART)                                         │
 │                                                                             │
 │                                                                             │
 │    FPV Detection ──────────────────────────────────────► DragonSync        │
@@ -32,8 +30,8 @@ WarDragon uses ZeroMQ (ZMQ) as the message transport layer between detection com
 
 WarDragon uses the **PUB/SUB** (Publisher/Subscriber) pattern:
 
-- **Publishers**: Detection sources (dji_receiver, bluetooth_receiver, wifi_receiver)
-- **Decoder**: zmq_decoder.py collects from all sources and republishes unified data
+- **Publishers**: Detection sources (dji_receiver.py, droneid-go)
+- **Unified receiver**: droneid-go consolidates WiFi, BLE, UART, and DJI inputs into a single ZMQ output
 - **Subscribers**: DragonSync, external tools, analytics applications
 
 This pattern allows:
@@ -43,22 +41,22 @@ This pattern allows:
 
 ## Port Assignments
 
-### Detection Sources
+### Active Ports
 
 | Service | Port | Protocol | Description |
 |---------|------|----------|-------------|
 | DJI DroneID | 4221 | TCP | dji_receiver.py → ANTSDR E200 DJI detections |
-| Bluetooth RID | 4222 | TCP | bluetooth_receiver.sh → DragonTooth/Sniffle BT5 LR |
-| WiFi RID | 4223 | TCP | wifi_receiver.py → Panda Wireless detections |
-
-### Decoder & Application
-
-| Service | Port | Protocol | Description |
-|---------|------|----------|-------------|
-| zmq_decoder.py | 4224 | TCP | Unified detection output (DragonSync subscribes here) |
-| DragonSync Status | 4225 | TCP | System status messages |
+| droneid-go | 4224 | TCP | Unified detection output — WiFi, BLE, UART, DJI (DragonSync subscribes here) |
+| WarDragon Monitor | 4225 | TCP | GPS and system status messages |
 | FPV Signals | 4226 | TCP | FPV drone signal detection (wardragon-fpv-detect) |
 | DragonSync API | 8088 | HTTP | Read-only REST API for ATAK plugin |
+
+### Deprecated Ports
+
+| Port | Former Service | Status |
+|------|---------------|--------|
+| 4222 | sniff-receiver (Python sniffle BLE) | Replaced by droneid-go native BLE (`-ble auto`) |
+| 4223 | wifi-receiver (Python WiFi RID) | Replaced by droneid-go native WiFi (`-g`) |
 
 ## Data Flow
 
@@ -69,26 +67,16 @@ This pattern allows:
    - Panda Wireless → WiFi Remote ID (802.11)
    - DragonTooth → Bluetooth 5 Long Range Remote ID
 
-2. **Receiver Scripts** decode and publish raw detections:
+2. **droneid-go** receives and decodes all Remote ID sources natively, while **dji_receiver.py** handles the ANTSDR:
    ```bash
-   # DJI receiver
+   # DJI receiver (AntSDR E200) — publishes on port 4221
    python3 dji_receiver.py
 
-   # Bluetooth receiver
-   ./bluetooth_receiver.sh -b 2000000 -s /dev/ttyUSB0 --zmqsetting 127.0.0.1:4222
-
-   # WiFi receiver
-   ./wifi_receiver.py --interface wlan0 -z --zmqsetting 127.0.0.1:4223
+   # droneid-go (systemd service: zmq-decoder) — unified receiver, publishes on port 4224
+   droneid -g -ble auto -uart /dev/esp0 -dji 127.0.0.1:4221 -z -zmqsetting 0.0.0.0:4224
    ```
 
-3. **zmq_decoder.py** aggregates all sources:
-   ```bash
-   python3 zmq_decoder.py -z --zmqsetting 127.0.0.1:4224 \
-     --zmqclients 127.0.0.1:4221,127.0.0.1:4222,127.0.0.1:4223 \
-     --dji 127.0.0.1:4221
-   ```
-
-4. **DragonSync** subscribes to port 4224 and outputs to:
+3. **DragonSync** subscribes to port 4224 and outputs to:
    - TAK multicast (239.2.3.1:6969)
    - TAK Server (TCP/TLS)
    - MQTT broker
@@ -344,7 +332,7 @@ import json
 
 context = zmq.Context()
 
-# Subscribe to unified detection output (zmq_decoder.py)
+# Subscribe to unified detection output (droneid-go on port 4224)
 socket = context.socket(zmq.SUB)
 socket.connect("tcp://127.0.0.1:4224")
 socket.setsockopt_string(zmq.SUBSCRIBE, "")  # Subscribe to all
@@ -358,9 +346,9 @@ while True:
             print(f"Drone ID: {block['Basic ID'].get('id', 'unknown')}")
 ```
 
-### Direct Source Subscription
+### Multi-Source Subscription
 
-For more granular control, subscribe directly to individual sources:
+Subscribe to multiple ZMQ streams for different data types:
 
 ```python
 import zmq
@@ -369,12 +357,10 @@ import json
 context = zmq.Context()
 poller = zmq.Poller()
 
-# Subscribe to individual detection sources
+# Active ZMQ sources
 sources = {
-    "dji": ("tcp://127.0.0.1:4221", context.socket(zmq.SUB)),
-    "bt5": ("tcp://127.0.0.1:4222", context.socket(zmq.SUB)),
-    "wifi": ("tcp://127.0.0.1:4223", context.socket(zmq.SUB)),
-    "fpv": ("tcp://127.0.0.1:4226", context.socket(zmq.SUB)),
+    "droneid": ("tcp://127.0.0.1:4224", context.socket(zmq.SUB)),  # Unified RID + DJI
+    "fpv":     ("tcp://127.0.0.1:4226", context.socket(zmq.SUB)),  # FPV detection
 }
 
 for name, (addr, sock) in sources.items():
@@ -389,7 +375,7 @@ while True:
             message = sock.recv_string()
             data = json.loads(message)
             # Extract drone ID from Basic ID block
-            for block in data:
+            for block in (data if isinstance(data, list) else [data]):
                 if "Basic ID" in block:
                     print(f"[{name}] ID: {block['Basic ID'].get('id')}")
 ```

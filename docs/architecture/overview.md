@@ -168,10 +168,8 @@ DragonSync is configured via `config.ini`:
 ```ini
 [SETTINGS]
 # ────────── ZMQ Input Sources ──────────
-# DJI DroneID (ANTSDR E200) on port 4221
-# Bluetooth Remote ID (sniff-receiver) on port 4222
-# WiFi Remote ID (wifi-receiver) on port 4223
-# Unified decoder output on port 4224
+# droneid-go unified output (WiFi + BLE + UART + DJI) on port 4224
+# DJI DroneID (dji_receiver.py / ANTSDR E200) on port 4221
 zmq_host = 127.0.0.1
 zmq_recv_timeout_ms = 500
 

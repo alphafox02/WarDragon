@@ -8,7 +8,7 @@ This guide covers common issues and their solutions for WarDragon Pro v3.
 
 ```bash
 # Check all critical services
-sudo systemctl status dragonsync dji-receiver
+sudo systemctl status zmq-decoder dragonsync dji-receiver
 
 # Check system resources
 htop
@@ -38,10 +38,10 @@ except:
 "
 
 # ZMQ Port Reference:
-# 4221 - DJI DroneID
-# 4222 - Bluetooth Remote ID
-# 4223 - WiFi Remote ID
-# 4224 - Unified zmq_decoder output
+# 4221 - DJI DroneID (dji_receiver.py)
+# 4224 - Unified droneid-go output (WiFi + BLE + UART + DJI)
+# 4225 - WarDragon Monitor (GPS/system)
+# 4222, 4223 - Deprecated (old Python sniff-receiver and wifi-receiver)
 ```
 
 ## Power & Boot Issues
@@ -208,19 +208,13 @@ rtl_test -t 2>/dev/null || echo "No RTL-SDR found"
 
 ### Remote ID Not Detected
 
-1. **Check WiFi Remote ID service**:
+1. **Check droneid-go service** (handles both WiFi and BLE Remote ID):
    ```bash
-   sudo systemctl status wifi-receiver
-   journalctl -u wifi-receiver -n 50
+   sudo systemctl status zmq-decoder
+   journalctl -u zmq-decoder -n 50
    ```
 
-2. **Check Bluetooth Remote ID service**:
-   ```bash
-   sudo systemctl status sniff-receiver
-   journalctl -u sniff-receiver -n 50
-   ```
-
-3. **Verify WiFi adapter in monitor mode**:
+2. **Verify WiFi adapter in monitor mode**:
    ```bash
    iw dev wlan1 info | grep type
    # Should show "monitor"
@@ -397,6 +391,7 @@ ps aux --sort=-%mem | head -10
 
 | Log | Location | Command |
 |-----|----------|---------|
+| droneid-go | journald | `journalctl -u zmq-decoder` |
 | DragonSync | journald | `journalctl -u dragonsync` |
 | DJI Receiver | journald | `journalctl -u dji-receiver` |
 | System | journald | `journalctl -b` |
