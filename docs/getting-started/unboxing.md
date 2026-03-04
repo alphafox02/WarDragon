@@ -177,9 +177,11 @@ If configured per the [Hotspot Setup](hotspot-setup.md) guide:
 Once connected (via monitor/keyboard or remote access):
 
 ```bash
-# Check running services
-sudo systemctl status dragonsync
+# Check all detection services
+sudo systemctl status zmq-decoder dji-receiver dragonsync
 ```
+
+All three should show `active (running)`. The `zmq-decoder` service (droneid-go) handles WiFi Remote ID, Bluetooth Remote ID, and ESP32 UART — no manual configuration needed on first boot.
 
 ## Proper Shutdown Procedure
 

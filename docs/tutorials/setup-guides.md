@@ -86,47 +86,39 @@ Maximum flexibility for diverse teams:
 4. Field devices use hotspot
 5. Server access via Ethernet
 
-## Protocol-Specific Setup
+## Detection Services
 
-Detection sources run as separate systemd services, not via DragonSync config. To enable/disable specific protocols:
+All Remote ID protocols (WiFi, Bluetooth, UART/ESP32) are handled by a single unified service — `zmq-decoder` (droneid-go). DJI DroneID runs separately via `dji-receiver`.
 
-### DJI DroneID Only
+### Service Overview
+
+| Service | Role | ZMQ Output |
+|---------|------|-----------|
+| `zmq-decoder` | WiFi RID + BLE + UART/ESP32 (droneid-go) | 4224 |
+| `dji-receiver` | DJI DroneID via AntSDR E200 | 4221 → 4224 |
+| `dragonsync` | Aggregates 4224/4225, outputs TAK/MQTT | — |
+
+### Check All Detection Services
 
 ```bash
-# Enable DJI detection
-sudo systemctl enable dji-receiver
-sudo systemctl start dji-receiver
-
-# Disable other receivers
-sudo systemctl disable sniff-receiver
-sudo systemctl stop sniff-receiver
-sudo systemctl disable wifi-receiver
-sudo systemctl stop wifi-receiver
+sudo systemctl status zmq-decoder dji-receiver dragonsync
 ```
 
-Verify ANTSDR E200 antenna connected to port 2 (left side).
-
-### Remote ID Only (WiFi/Bluetooth)
-
-For compliance monitoring (non-DJI):
+### Restart Detection
 
 ```bash
-# Enable Remote ID receivers
-sudo systemctl enable sniff-receiver wifi-receiver
-sudo systemctl start sniff-receiver wifi-receiver
+sudo systemctl restart zmq-decoder
+sudo systemctl restart dji-receiver
+```
 
-# Disable DJI receiver
+### Disable DJI Detection (if no AntSDR)
+
+```bash
 sudo systemctl disable dji-receiver
 sudo systemctl stop dji-receiver
 ```
 
-### All Protocols (Default)
-
-All receivers enabled by default on WarDragon Pro:
-
-```bash
-sudo systemctl status dji-receiver sniff-receiver wifi-receiver
-```
+Verify ANTSDR E200 antenna connected to Left Side - Port 3 (RX E200).
 
 ## Output Configuration
 
@@ -236,27 +228,28 @@ api_enabled = true
 ### Check All Services
 
 ```bash
-sudo systemctl status dragonsync
-sudo systemctl status dji-receiver
+sudo systemctl status zmq-decoder dji-receiver dragonsync
 ```
 
 ### Restart Services
 
 ```bash
+sudo systemctl restart zmq-decoder
+sudo systemctl restart dji-receiver
 sudo systemctl restart dragonsync
 ```
 
 ### View Logs
 
 ```bash
-# DragonSync logs
-journalctl -u dragonsync -f
+# All drone detection (WiFi + BLE + UART)
+journalctl -u zmq-decoder -f
 
-# System logs
-journalctl -f
-
-# Detection-specific
+# DJI DroneID
 journalctl -u dji-receiver -f
+
+# DragonSync
+journalctl -u dragonsync -f
 ```
 
 ### Enable/Disable Autostart
