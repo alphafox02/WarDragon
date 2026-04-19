@@ -1,0 +1,2631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WarDragon Documentation Hub</title>
+<style>
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #1c2128;
+  --bg-hover: #1f262d;
+  --bg-active: #252d38;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --accent: #f0883e;
+  --accent-dim: #d2691e;
+  --accent-glow: rgba(240,136,62,0.15);
+  --border: #30363d;
+  --link: #58a6ff;
+  --code-bg: #0d1117;
+  --green: #3fb950;
+  --red: #f85149;
+  --yellow: #d29922;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Layout */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-tertiary);
+}
+
+.sidebar-header h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-header .dragon-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.sidebar-header .subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.sidebar-nav::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.nav-section {
+  margin-bottom: 4px;
+}
+
+.nav-section-title {
+  padding: 10px 20px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-section-title:hover { color: var(--text-secondary); }
+
+.nav-section-title .chevron {
+  font-size: 9px;
+  transition: transform 0.2s;
+}
+
+.nav-section.collapsed .chevron { transform: rotate(-90deg); }
+.nav-section.collapsed .nav-items { display: none; }
+
+.nav-item {
+  display: block;
+  padding: 6px 20px 6px 32px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.nav-item.active {
+  color: var(--accent);
+  background: var(--accent-glow);
+  border-left-color: var(--accent);
+}
+
+/* Status bar */
+.sidebar-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+}
+
+.sidebar-footer a {
+  color: var(--link);
+  text-decoration: none;
+}
+.sidebar-footer a:hover { text-decoration: underline; }
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-right: 4px;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.breadcrumb span { color: var(--text-secondary); }
+
+.search-box {
+  margin-left: auto;
+  position: relative;
+}
+
+.search-box input {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px 6px 32px;
+  color: var(--text-primary);
+  font-size: 13px;
+  width: 240px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus { border-color: var(--accent); }
+
+.search-box::before {
+  content: '\1F50D';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 360px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 4px;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.search-results.visible { display: block; }
+
+.search-result-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-result-item:hover { background: var(--bg-hover); }
+.search-result-item:last-child { border-bottom: none; }
+
+.search-result-item .title {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.search-result-item .section {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.search-result-item .snippet {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.search-result-item .snippet mark {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 48px 64px;
+  max-width: 900px;
+}
+
+.content::-webkit-scrollbar { width: 8px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.content::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Markdown rendered content */
+.content h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.content h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 32px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.content h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 20px;
+  margin-bottom: 6px;
+}
+
+.content p { margin-bottom: 12px; color: var(--text-primary); }
+
+.content a { color: var(--link); text-decoration: none; }
+.content a:hover { text-decoration: underline; }
+
+.content strong { color: var(--text-primary); font-weight: 600; }
+.content em { color: var(--text-secondary); }
+
+.content ul, .content ol {
+  margin-bottom: 12px;
+  padding-left: 24px;
+}
+
+.content li {
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.content li input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.content code {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--accent);
+}
+
+.content pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  position: relative;
+}
+
+.content pre code {
+  background: none;
+  padding: 0;
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.content blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 8px 16px;
+  margin-bottom: 12px;
+  background: var(--accent-glow);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-secondary);
+}
+
+.content blockquote strong { color: var(--accent); }
+
+.content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.content thead th {
+  background: var(--bg-tertiary);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border);
+  font-size: 13px;
+}
+
+.content tbody td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.content tbody tr:hover { background: var(--bg-hover); }
+
+.content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+.content img {
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Home page */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.home-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.home-card:hover {
+  border-color: var(--accent);
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.home-card .card-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.home-card h3 {
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.home-card p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Data flow diagram styling */
+.content pre code {
+  white-space: pre;
+  word-wrap: normal;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .sidebar.mobile-open { display: flex; position: fixed; z-index: 50; height: 100vh; }
+  .content { padding: 20px; }
+  .search-box input { width: 160px; }
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .mobile-toggle { display: block; }
+}
+
+/* Splash / hero */
+.hero {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  font-size: 32px;
+  border: none;
+  padding: 0;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--accent), #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero .tagline {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.hero .wip-badge {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--yellow);
+  background: rgba(210,153,34,0.1);
+  border: 1px solid rgba(210,153,34,0.3);
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.detection-table { margin-top: 24px; }
+
+.ecosystem-section { margin-top: 32px; }
+.ecosystem-section h2 { font-size: 18px; margin-bottom: 12px; }
+
+/* Print */
+@media print {
+  .sidebar, .topbar { display: none; }
+  .content { max-width: 100%; padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>
+        <span class="dragon-icon">W</span>
+        WarDragon
+      </h1>
+      <div class="subtitle">Documentation Hub</div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-item active" data-page="home" onclick="navigate('home')">
+        Home
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Products
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="wardragon-pro-v3" onclick="navigate('wardragon-pro-v3')">WarDragon Pro v3</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Getting Started
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="unboxing" onclick="navigate('unboxing')">Unboxing & First Boot</div>
+          <div class="nav-item" data-page="network-setup" onclick="navigate('network-setup')">Network Configuration</div>
+          <div class="nav-item" data-page="hotspot-setup" onclick="navigate('hotspot-setup')">Hotspot Setup</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Hardware
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="pro-v3-overview" onclick="navigate('pro-v3-overview')">Pro v3 Hardware Overview</div>
+          <div class="nav-item" data-page="antenna-connections" onclick="navigate('antenna-connections')">Antenna Connections</div>
+          <div class="nav-item" data-page="led-indicators" onclick="navigate('led-indicators')">LED Indicators</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Architecture
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="architecture-overview" onclick="navigate('architecture-overview')">System Architecture</div>
+          <div class="nav-item" data-page="zmq-dataflows" onclick="navigate('zmq-dataflows')">ZMQ Data Flows</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Software
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="dragonsync" onclick="navigate('dragonsync')">DragonSync</div>
+          <div class="nav-item" data-page="detection-capabilities" onclick="navigate('detection-capabilities')">Detection Capabilities</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Integration
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="tak-integration" onclick="navigate('tak-integration')">TAK Integration</div>
+          <div class="nav-item" data-page="mqtt-homeassistant" onclick="navigate('mqtt-homeassistant')">MQTT & Home Assistant</div>
+          <div class="nav-item" data-page="lattice" onclick="navigate('lattice')">Lattice Export</div>
+          <div class="nav-item" data-page="analytics" onclick="navigate('analytics')">Analytics Dashboard</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Tutorials
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="video-index" onclick="navigate('video-index')">Video Tutorials</div>
+          <div class="nav-item" data-page="setup-guides" onclick="navigate('setup-guides')">Setup Guides</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title" onclick="toggleSection(this)">
+          <span class="chevron">&#9660;</span> Troubleshooting
+        </div>
+        <div class="nav-items">
+          <div class="nav-item" data-page="common-issues" onclick="navigate('common-issues')">Common Issues</div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="status-dot"></span> Offline Documentation<br>
+      <a href="https://cemaxecuter.com" target="_blank">cemaxecuter.com</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">&#9776;</button>
+      <div class="breadcrumb" id="breadcrumb">
+        WarDragon &rsaquo; <span>Home</span>
+      </div>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search docs..." oninput="handleSearch(this.value)" onfocus="handleSearch(this.value)" />
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <div class="content" id="content">
+      <!-- Content loaded by JS -->
+    </div>
+  </main>
+</div>
+
+<script>
+// ── Minimal Markdown Parser ──
+// No external dependencies needed
+const MD = {
+  parse(src) {
+    // Normalize line endings
+    src = src.replace(/\r\n/g, '\n');
+    // Escape HTML
+    const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const escAttr = s => s.replace(/"/g,'&quot;');
+
+    let html = '';
+    const lines = src.split('\n');
+    let i = 0;
+    let inList = false, listType = '';
+    let inTable = false;
+    let tableAlign = [];
+
+    const closeList = () => { if (inList) { html += listType === 'ul' ? '</ul>\n' : '</ol>\n'; inList = false; } };
+    const closeTable = () => { if (inTable) { html += '</tbody></table>\n'; inTable = false; } };
+
+    const inline = (text) => {
+      // Code spans first
+      text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Bold+Italic
+      text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+      // Bold
+      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Italic
+      text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // Links
+      text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, u) => {
+        const target = u.startsWith('http') ? ' target="_blank" rel="noopener"' : '';
+        return `<a href="${escAttr(u)}"${target}>${t}</a>`;
+      });
+      // Images
+      text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">');
+      return text;
+    };
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      // Fenced code block
+      if (line.match(/^```/)) {
+        closeList(); closeTable();
+        const lang = line.slice(3).trim();
+        let code = '';
+        i++;
+        while (i < lines.length && !lines[i].match(/^```/)) {
+          code += esc(lines[i]) + '\n';
+          i++;
+        }
+        html += `<pre><code class="language-${lang}">${code.replace(/\n$/, '')}</code></pre>\n`;
+        i++;
+        continue;
+      }
+
+      // Heading
+      const hMatch = line.match(/^(#{1,6})\s+(.+)/);
+      if (hMatch) {
+        closeList(); closeTable();
+        const level = hMatch[1].length;
+        const id = hMatch[2].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        html += `<h${level} id="${id}">${inline(hMatch[2])}</h${level}>\n`;
+        i++; continue;
+      }
+
+      // HR
+      if (line.match(/^(-{3,}|\*{3,}|_{3,})\s*$/)) {
+        closeList(); closeTable();
+        html += '<hr>\n';
+        i++; continue;
+      }
+
+      // Blockquote
+      if (line.match(/^>\s?/)) {
+        closeList(); closeTable();
+        let bq = '';
+        while (i < lines.length && lines[i].match(/^>\s?/)) {
+          bq += lines[i].replace(/^>\s?/, '') + '\n';
+          i++;
+        }
+        html += `<blockquote>${MD.parse(bq.trim())}</blockquote>\n`;
+        continue;
+      }
+
+      // Table
+      if (line.match(/^\|/) && i + 1 < lines.length && lines[i+1].match(/^\|[\s:|-]+\|/)) {
+        closeList(); closeTable();
+        const headers = line.split('|').filter(c => c.trim()).map(c => c.trim());
+        const aligns = lines[i+1].split('|').filter(c => c.trim()).map(c => {
+          c = c.trim();
+          if (c.startsWith(':') && c.endsWith(':')) return 'center';
+          if (c.endsWith(':')) return 'right';
+          return 'left';
+        });
+        html += '<table><thead><tr>';
+        headers.forEach((h, idx) => {
+          html += `<th style="text-align:${aligns[idx]||'left'}">${inline(h)}</th>`;
+        });
+        html += '</tr></thead><tbody>\n';
+        inTable = true;
+        tableAlign = aligns;
+        i += 2;
+        while (i < lines.length && lines[i].match(/^\|/)) {
+          const cells = lines[i].split('|').filter(c => c.trim() !== '' || c.includes(' ')).map(c => c.trim()).filter((_, idx) => idx < headers.length || true);
+          const cleaned = lines[i].split('|').slice(1, -1).map(c => c.trim());
+          html += '<tr>';
+          cleaned.forEach((c, idx) => {
+            html += `<td style="text-align:${tableAlign[idx]||'left'}">${inline(c)}</td>`;
+          });
+          html += '</tr>\n';
+          i++;
+        }
+        closeTable();
+        continue;
+      }
+
+      // Unordered list
+      if (line.match(/^(\s*)[-*+]\s+/)) {
+        closeTable();
+        if (!inList || listType !== 'ul') { closeList(); html += '<ul>\n'; inList = true; listType = 'ul'; }
+        const content = line.replace(/^(\s*)[-*+]\s+/, '');
+        // Checkbox
+        let item = content;
+        if (item.startsWith('[ ] ')) item = '<input type="checkbox" disabled> ' + inline(item.slice(4));
+        else if (item.startsWith('[x] ') || item.startsWith('[X] ')) item = '<input type="checkbox" checked disabled> ' + inline(item.slice(4));
+        else item = inline(item);
+        html += `<li>${item}</li>\n`;
+        i++; continue;
+      }
+
+      // Ordered list
+      if (line.match(/^\s*\d+\.\s+/)) {
+        closeTable();
+        if (!inList || listType !== 'ol') { closeList(); html += '<ol>\n'; inList = true; listType = 'ol'; }
+        const content = line.replace(/^\s*\d+\.\s+/, '');
+        html += `<li>${inline(content)}</li>\n`;
+        i++; continue;
+      }
+
+      // Empty line
+      if (line.trim() === '') {
+        closeList(); closeTable();
+        i++; continue;
+      }
+
+      // Paragraph
+      closeList(); closeTable();
+      let para = line;
+      i++;
+      while (i < lines.length && lines[i].trim() !== '' && !lines[i].match(/^(#{1,6}\s|```|>\s?|\||-{3,}|\*{3,}|_{3,}|\s*[-*+]\s|\s*\d+\.\s)/) ) {
+        para += ' ' + lines[i];
+        i++;
+      }
+      html += `<p>${inline(para)}</p>\n`;
+    }
+
+    closeList(); closeTable();
+    return html;
+  }
+};
+
+// ── Page Content (embedded markdown) ──
+const pages = {};
+
+pages['home'] = null; // Special: rendered as custom HTML
+
+pages['wardragon-pro-v3'] = `# WarDragon Pro v3
+
+The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data integration appliance engineered for comprehensive drone detection. It combines dedicated radios, software-defined radio capability, GPS, and purpose-built software workflows in a ruggedized, portable package.
+
+**Purchase**: [cemaxecuter.com](https://cemaxecuter.com/?product=wardragon-pro-kit)
+
+## What's Included
+
+- WarDragon Pro v3 unit with all internal components
+- DragonSDR (internal)
+- Panda Wireless dual-band adapter (internal)
+- ESP32 WiFi Remote ID module (internal)
+- DragonTooth (Sonoff) BT5 LR dongle (internal)
+- GPS module (internal)
+- Pre-installed DragonOS with all software configured
+- Protective transport case
+- Antennas and necessary cables
+
+## Hardware Specifications
+
+| Component | Specification |
+|-----------|---------------|
+| Processor | Intel N150 |
+| Memory | 16 GB RAM |
+| Storage | 512 GB NVMe |
+| WiFi | WiFi 6 |
+| Bluetooth | Bluetooth 5.2 |
+| GPS | Integrated module |
+| Construction | Machined base plate, ACM top plate |
+
+## Detection Capabilities
+
+### DJI DroneID Detection
+- **Hardware**: DragonSDR
+- **Protocols**: Ocusync 2, Ocusync 3, Ocusync 4 (activity detection)
+- **Frequency**: 2.4 GHz / 5.8 GHz
+- **Software**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+
+### Bluetooth Remote ID
+- **Hardware**: DragonTooth Dongle (Sonoff-based, CC2652P)
+- **Protocol**: Bluetooth 5 Long Range (LR)
+- **Range**: Extended via BT5 LR specification
+- **Software**: Native BLE via [droneid-go](https://github.com/alphafox02/droneid-go)
+
+### WiFi Remote ID
+- **Hardware**: Panda Wireless dual-band adapter + ESP32 module
+- **Frequencies**: 2.4 GHz and 5 GHz
+
+### Additional Capabilities
+- FPV analog drone detection (in testing)
+- RF spectrum monitoring from ~70 MHz to 6 GHz
+- Extensible architecture for external SDRs (KrakenSDR integration)
+
+## Software Stack
+
+The Pro v3 comes pre-configured with:
+
+- **DragonOS** - Base operating system
+- **[droneid-go](https://github.com/alphafox02/droneid-go)** - Unified Open Drone ID receiver
+- **[antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)** - DJI DroneID receiver
+- **[DragonSync](https://github.com/alphafox02/DragonSync)** - Gateway aggregating all detection streams
+
+## Output & Integration
+
+| Output | Description |
+|--------|-------------|
+| TAK Ecosystem | CoT via multicast or TAK Server (TCP/UDP, TLS) |
+| MQTT | Per-drone JSON + Home Assistant discovery |
+| Lattice | Anduril Lattice integration |
+| HTTP API | Read-only API for companion apps |`;
+
+pages['unboxing'] = `# Unboxing & First Boot
+
+This guide walks you through setting up your WarDragon Pro v3 for the first time.
+
+## What's in the Box
+
+Your WarDragon Pro v3 kit includes:
+
+- WarDragon Pro v3 unit
+- Protective transport case
+- Power supply (12V DC)
+- Antenna kit:
+  - Dual-band 2.4/5 GHz 8 dBi antennas (qty: 4) - for DragonSDR RX, Panda, ESP32, and DragonTooth
+  - GPS antenna (if external GPS option included)
+- USB-C to dual USB-A adapter cable (for keyboard/mouse)
+- HDMI dummy plug (pre-installed in right-angle HDMI adapter)
+- Quick start card
+
+## Initial Setup
+
+### Step 1: Inspect the Unit
+
+Before powering on:
+
+1. Remove the unit from the transport case
+2. Check for any shipping damage
+3. Verify all antenna ports are intact
+4. Ensure the case ventilation is unobstructed
+
+### Step 2: Connect Antennas
+
+Connect antennas to the appropriate ports. See Antenna Connections for the full port map.
+
+**Minimum required connections:**
+
+| Port | Antenna | Purpose |
+|------|---------|---------|
+| Left Side - Port 3 (RX DragonSDR) | Dual-band 2.4/5 GHz 8 dBi | DJI DroneID detection |
+| Left Side - Port 2 (RX Panda) | Dual-band 2.4/5 GHz 8 dBi | WiFi Remote ID |
+| Left Side - Port 1 (ESP32) | Dual-band 2.4/5 GHz 8 dBi | WiFi Remote ID (secondary)* |
+| Right Side - Port 1 (BT5) | Dual-band 2.4/5 GHz 8 dBi | Bluetooth Remote ID |
+
+*ESP32 port may be removed in future versions
+
+### Step 3: Power Connection
+
+1. Connect the 12V power supply to the WarDragon
+2. Connect the power supply to AC mains
+3. **Press and latch the external power button** on the case exterior
+4. The power button LED should illuminate
+
+**Understanding the Power System:**
+
+| Component | Location | Function |
+|-----------|----------|----------|
+| External power button | Case exterior | Must be **depressed and latched** to supply power inside the case |
+| Exhaust fan switch | Inside case (near fan) | Controls exhaust fan only - **not the main power** |
+| PC power button | Inside case (on PC) | Standard PC power - used for shutdown |
+
+> **Note**: The PC's BIOS is configured for "power on after power applied." When you latch the external power button, the PC will automatically boot.
+
+> **Common confusion**: The exhaust fan switch inside the case is often mistaken for a power switch. It only controls the cooling fan.
+
+### Step 4: First Boot
+
+On first power-up:
+
+1. The system takes approximately 60-90 seconds to fully boot
+2. The power button LED indicates the system is on
+3. Internal LEDs (DragonSDR, GPS) may be partially visible through the case
+
+## Initial Local Setup (Required)
+
+> **Important**: WarDragon ships without remote access enabled for security. You must complete this initial local setup before you can access the unit remotely via SSH or remote desktop.
+
+### Step 5: Connect Monitor and Keyboard
+
+**HDMI Connection:**
+
+1. Locate the **right-angle HDMI adapter** on the right side of the PC
+2. Remove the **HDMI dummy plug** that is pre-installed in the adapter
+3. Connect an HDMI cable from the adapter to your monitor
+4. **Keep the dummy plug safe** - you will need to reinstall it after setup
+
+**USB Connection (Keyboard/Mouse):**
+
+1. Locate the **USB-C port** on the right side of the case exterior
+2. Remove the cap and insert the included **USB-C to dual USB-A adapter cable**
+3. Connect a USB keyboard and mouse to the adapter
+
+### Step 6: Initial Login and Configuration
+
+Once the system boots and you see the desktop:
+
+1. **Log in** with the default credentials (provided separately)
+2. **Change the default password** for security
+3. **Configure network settings** as needed
+4. **Install and configure remote access software** for headless operation:
+
+   **OpenSSH (for command-line access):**
+\`\`\`bash
+sudo apt update && sudo apt install openssh-server
+sudo systemctl enable ssh
+sudo systemctl start ssh
+\`\`\`
+
+   **RustDesk (for remote desktop access):**
+   - Install RustDesk from the software center or download from rustdesk.com
+   - Set a static password for unattended access
+   - Enable "Allow LAN discovery"
+
+5. **Test remote connectivity** before disconnecting the monitor
+
+### Step 7: Restore HDMI Dummy Plug
+
+> **Critical**: The HDMI dummy plug must be reinstalled for remote desktop to work properly.
+
+After verifying remote access works:
+
+1. Disconnect the HDMI cable from the right-angle adapter
+2. **Reinstall the HDMI dummy plug** into the adapter
+3. Disconnect the USB-C adapter cable and replace the protective cap
+
+## Connecting to WarDragon (After Initial Setup)
+
+### Option 1: SSH (Command Line)
+
+\`\`\`bash
+ssh dragon@<wardragon-ip>
+\`\`\`
+
+### Option 2: Remote Desktop (RustDesk)
+
+1. Open RustDesk on your computer
+2. Enter the WarDragon's RustDesk ID or IP address
+3. Connect using the static password you configured
+
+### Option 3: WiFi Hotspot
+
+If configured, connect to the \`WarDragon\` WiFi network. The WarDragon will be at \`192.168.12.1\`.
+
+## Verifying System Status
+
+\`\`\`bash
+# Check all detection services
+sudo systemctl status zmq-decoder dji-receiver dragonsync
+\`\`\`
+
+All three should show \`active (running)\`.
+
+## Proper Shutdown Procedure
+
+\`\`\`bash
+sudo shutdown -h now
+\`\`\`
+
+Then delatch the external power button after the PC powers off.
+
+> **Warning**: Do NOT press the PC power button after a command-line shutdown - this will power the system back ON.
+
+## Troubleshooting First Boot
+
+| Issue | Possible Cause | Solution |
+|-------|---------------|----------|
+| Power button not lit | Power supply issue | Check connections, try different outlet |
+| Stuck in boot | Corrupted boot | Allow 5 minutes; if no progress, contact support |
+| No network | Ethernet/WiFi config | Try direct Ethernet connection |
+| No detections | Antenna issues | Verify antenna connections |`;
+
+pages['network-setup'] = `# Network Configuration
+
+This guide covers network configuration options for your WarDragon Pro v3.
+
+> **Prerequisite**: Network configuration requires local console access (monitor + keyboard) during initial setup.
+
+## Important: Internal Network Interfaces
+
+**Do NOT modify "Wired connection 1"** - This interface is used internally for communication with the DragonSDR and has a static IP configuration.
+
+### DragonSDR Internal Network
+
+| Device | IP Address | Notes |
+|--------|------------|-------|
+| WarDragon (Wired connection 1) | 172.31.100.1 | Internal interface to DragonSDR |
+| DragonSDR | 172.31.100.2 | With boot switch in SD card mode |
+
+> **Warning**: Modifying these addresses will break DJI DroneID detection.
+
+## Network Modes
+
+| Mode | Use Case | Description |
+|------|----------|-------------|
+| Hotspot | Field deployment | WarDragon creates its own WiFi network |
+| Client | Home/office | WarDragon joins existing WiFi network |
+| Ethernet | Fixed installation | Wired connection to network |
+| Hybrid | Flexible | Hotspot + Ethernet simultaneously |
+
+## Ethernet Configuration (Wired connection 2)
+
+### DHCP (Default)
+
+The external Ethernet port requests an IP address via DHCP.
+
+### Static IP
+
+\`\`\`bash
+sudo nmcli connection modify "Wired connection 2" \\
+  ipv4.addresses "<your-ip>/<prefix>" \\
+  ipv4.gateway "<your-gateway>" \\
+  ipv4.dns "<dns-server>" \\
+  ipv4.method manual
+
+sudo nmcli connection down "Wired connection 2"
+sudo nmcli connection up "Wired connection 2"
+\`\`\`
+
+## WiFi Client Mode
+
+\`\`\`bash
+# List available networks
+nmcli device wifi list
+
+# Connect to a network
+sudo nmcli device wifi connect "YourNetworkSSID" password "YourPassword"
+\`\`\`
+
+## Hybrid Mode (Hotspot + Ethernet)
+
+\`\`\`bash
+# Ensure Ethernet is connected
+nmcli device status
+
+# Enable hotspot on WiFi
+sudo nmcli connection up <your-hotspot-connection>
+
+# Both interfaces now active
+ip addr show
+\`\`\`
+
+## TAK Server Connectivity
+
+Ensure required ports are open:
+- TCP 8089 (default TAK server)
+- TCP 8443 (TLS)
+- UDP 6969 (multicast)
+
+## Troubleshooting
+
+| Issue | Diagnosis | Solution |
+|-------|-----------|----------|
+| No IP address | \`ip addr show\` | Check cable/DHCP server |
+| Can't reach gateway | \`ping <gateway>\` | Check IP/subnet config |
+| DNS not working | \`ping 8.8.8.8\` works but names don't | Check DNS configuration |
+| DragonSDR not working | Modified Wired connection 1 | Restore default static config |`;
+
+pages['hotspot-setup'] = `# Hotspot Setup
+
+This guide explains how to configure WarDragon Pro v3 as a WiFi hotspot for field deployments.
+
+## Overview
+
+When configured as a hotspot, WarDragon:
+
+- Creates its own WiFi access point
+- Provides DHCP to connected clients
+- Allows ATAK/TAK devices to connect directly
+- Can simultaneously maintain Ethernet connectivity
+
+## Video Tutorial
+
+**[WarDragon Internal Hotspot Setup](https://www.youtube.com/watch?v=H_VsW9bqTkQ)** - Step-by-step video walkthrough
+
+## Quick Setup
+
+### Enable Pre-configured Hotspot
+
+\`\`\`bash
+# Check if hotspot connection exists
+nmcli connection show | grep -i hotspot
+
+# Enable the hotspot
+sudo nmcli connection up WarDragon-Hotspot
+
+# Verify it's running
+nmcli device status
+\`\`\`
+
+### Create New Hotspot
+
+\`\`\`bash
+sudo nmcli device wifi hotspot \\
+  ifname wlan0 \\
+  ssid "WarDragon-Field" \\
+  password "SecurePassword123"
+\`\`\`
+
+## Detailed Configuration
+
+### Create Hotspot Connection
+
+\`\`\`bash
+sudo nmcli connection add \\
+  type wifi \\
+  ifname wlan0 \\
+  con-name "WarDragon-Hotspot" \\
+  autoconnect no \\
+  ssid "WarDragon" \\
+  mode ap \\
+  ipv4.method shared \\
+  ipv4.addresses "192.168.12.1/24" \\
+  wifi-sec.key-mgmt wpa-psk \\
+  wifi-sec.psk "YourSecurePassword"
+\`\`\`
+
+## Auto-Start on Boot
+
+\`\`\`bash
+sudo nmcli connection modify "WarDragon-Hotspot" connection.autoconnect yes
+sudo nmcli connection modify "WarDragon-Hotspot" connection.autoconnect-priority 100
+\`\`\`
+
+## DHCP Configuration
+
+Connected clients receive:
+- IP addresses in 192.168.12.0/24 range
+- Gateway: 192.168.12.1 (WarDragon)
+- DNS: Forwarded through WarDragon
+
+## Hybrid Mode: Hotspot + Ethernet (Recommended)
+
+\`\`\`bash
+# Ensure Ethernet is connected
+sudo nmcli connection up "Wired connection 2"
+
+# Then enable hotspot
+sudo nmcli connection up "WarDragon-Hotspot"
+\`\`\`
+
+## Hotspot + TAK Configuration
+
+### DragonSync CoT Output
+
+DragonSync's default multicast interface is \`0.0.0.0\`, which sends multicast on ALL active interfaces. DragonSync checks for new interfaces approximately every 30 seconds.
+
+To restrict multicast to hotspot only, edit \`/home/dragon/DragonSync/config.ini\`:
+
+\`\`\`ini
+[SETTINGS]
+enable_multicast = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+tak_multicast_interface = 192.168.12.1
+\`\`\`
+
+## Security Considerations
+
+### Change Default Password
+
+\`\`\`bash
+sudo nmcli connection modify "WarDragon-Hotspot" \\
+  wifi-sec.psk "NewSecurePassword"
+\`\`\`
+
+### Hide SSID (Optional)
+
+\`\`\`bash
+sudo nmcli connection modify "WarDragon-Hotspot" \\
+  wifi.hidden yes
+\`\`\`
+
+## Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Hotspot won't start | Interface busy | Stop other WiFi connections first |
+| Clients can't connect | Wrong password | Verify password |
+| No IP assigned | DHCP not running | Restart NetworkManager |
+| No internet | NAT not enabled | Check ip_forward and iptables |`;
+
+pages['pro-v3-overview'] = `# WarDragon Pro v3 Hardware Overview
+
+This document details the physical layout, internal components, and external connections of the WarDragon Pro v3.
+
+## Port Layout
+
+\`\`\`
+                    +-------------------------------------+
+                    |           WarDragon Pro v3          |
+                    |                BACK                 |
+                    +-------------------------------------+
+
+    LEFT SIDE                                           RIGHT SIDE
+    (Back to Front)                                     (Back to Front)
+    +----------+                                        +----------+
+    | 4. TX    | <- Not used                            | 2. GPS   | <- Optional GPS
+    +----------+                                        +----------+
+    | 3. RX    | <- DragonSDR                         | 1. BT5   | <- DragonTooth
+    |(DrgnSDR) |   DJI DroneID (Primary)                |   LR     |   BT Remote ID
+    +----------+                                        +----------+
+    | 2. RX    | <- Panda Wireless
+    | (Panda)  |   WiFi Remote ID
+    +----------+
+    | 1. ESP32 | <- WiFi Remote ID
+    +----------+
+
+                    +-------------------------------------+
+                    |                FRONT                |
+                    +-------------------------------------+
+\`\`\`
+
+## Internal Components
+
+### Compute Platform
+
+| Component | Specification |
+|-----------|---------------|
+| Processor | Intel N150 |
+| Memory | 16 GB DDR5 RAM |
+| Storage | 512 GB NVMe SSD |
+| WiFi | WiFi 6 (802.11ax) |
+| Bluetooth | Bluetooth 5.2 |
+
+### Detection Hardware
+
+#### DragonSDR
+- **Purpose**: DJI DroneID detection (Ocusync 2/3/4)
+- **Frequency Range**: ~70 MHz to 6 GHz
+- **Connection**: Internal USB, external SMA antenna port
+
+#### Panda Wireless PAU0D
+- **Purpose**: WiFi Remote ID detection
+- **Bands**: Dual-band 2.4 GHz / 5 GHz
+
+#### DragonTooth Dongle (Sonoff)
+- **Purpose**: Bluetooth 5 Long Range Remote ID
+- **Firmware**: Sniffle-compatible
+
+#### GPS Module
+- **Purpose**: Unit position/timing
+- **Connection**: Internal, optional external antenna port
+
+## Power Requirements
+
+- **Input**: 12V DC
+- **Consumption**: ~25W typical
+- **Connector**: Barrel jack (5.5mm x 2.1mm)
+
+## Thermal Management
+
+The machined aluminum base plate serves as a passive heatsink. **Operating Temperature**: 0C to 40C (32F to 104F)
+
+## Mounting Options
+
+The base plate includes mounting holes compatible with:
+- Standard RAM mounts
+- AMPS pattern
+- Custom vehicle mounts`;
+
+pages['antenna-connections'] = `# Antenna Connections
+
+This guide details all antenna connections on the WarDragon Pro v3.
+
+## Port Map
+
+### Left Side (Front to Back)
+
+| Port # | Label | Connected To | Purpose | Connector | Status |
+|--------|-------|--------------|---------|-----------|--------|
+| 1 | ESP32 | ESP32 Module | WiFi Remote ID | SMA Female | Active* |
+| 2 | RX (Panda) | Panda Wireless | WiFi Remote ID | SMA Female | Active |
+| 3 | RX (DragonSDR) | DragonSDR RX | DJI DroneID Detection | SMA Female | Primary |
+| 4 | TX | DragonSDR TX | Transmit (not used) | SMA Female | Unused |
+
+*ESP32 port may be removed in future versions
+
+### Right Side (Front to Back)
+
+| Port # | Label | Connected To | Purpose | Connector | Status |
+|--------|-------|--------------|---------|-----------|--------|
+| 1 | BT5 | DragonTooth | Bluetooth 5 LR Remote ID | SMA Female | Active |
+| 2 | GPS | GPS Module | External GPS Antenna | SMA Female | Optional |
+
+## Included Antennas
+
+Four dual-band 2.4/5 GHz 8 dBi omnidirectional antennas.
+
+| Specification | Value |
+|---------------|-------|
+| Frequency | 2.4 GHz / 5 GHz dual-band |
+| Gain | 8 dBi |
+| Type | Omnidirectional whip |
+| Polarization | Vertical |
+| Connector | SMA Male |
+
+## Upgrade Options
+
+### DJI DroneID (DragonSDR RX)
+- **Upgrade**: 9+ dBi panel antenna for 2-3x range
+
+### WiFi Remote ID (Panda Wireless)
+- **Upgrade**: Higher gain omnidirectional (10+ dBi) for increased range
+
+### Bluetooth 5 LR (DragonTooth)
+- **Upgrade**: 9 dBi Yagi for directional long-range detection
+
+## Installation Notes
+
+### Connector Types
+All external antenna ports use SMA Female pass-through adapters. Use antennas with SMA Male connectors (center pin).
+
+### Antenna Placement
+- Mount antennas with clear line of sight to sky
+- Separate antennas by at least one wavelength (~12 cm at 2.4 GHz)
+- Avoid metal surfaces directly behind antennas
+
+## Quick Setup
+
+1. Connect antenna to **RX (DragonSDR)** port - Left side, port 3
+2. Connect antenna to **RX (Panda)** port - Left side, port 2
+3. Connect antenna to **ESP32** port - Left side, port 1
+4. Connect antenna to **BT5 (DragonTooth)** port - Right side, port 1
+5. (Optional) GPS antenna to **GPS** port - Right side, port 2`;
+
+pages['led-indicators'] = `# LED Indicators
+
+The WarDragon Pro v3 has minimal visible LEDs.
+
+## Visible Indicators
+
+| LED | Location |
+|-----|----------|
+| Power Button | PC power button - indicates system is on |
+| DragonSDR | Internal, may be partially visible |
+| DragonSDR Ethernet | Internal, standard link/activity lights |
+| GPS Module | Internal, indicates GPS status |
+
+## Verifying System Status
+
+Since WarDragon is a headless system, verify status via:
+
+- **Monitor + Keyboard** - Direct local access
+- **Ping** - \`ping <wardragon-ip>\` (confirms network connectivity)
+- **SSH** - Requires OpenSSH to be installed
+- **Remote Desktop** - Requires RustDesk or similar to be installed`;
+
+pages['architecture-overview'] = `# System Architecture Overview
+
+The WarDragon system is built on a modular, message-driven architecture that allows flexible integration with multiple detection sources and output destinations.
+
+## High-Level Architecture
+
+\`\`\`
++-----------------------------------------------------------------------------+
+|                            DETECTION LAYER                                  |
+|                                                                             |
+|  +------------------+  +------------------+  +------------------+           |
+|  |   DragonSDR    |  |  Panda Wireless  |  |   DragonTooth    |           |
+|  |   DJI DroneID    |  |  WiFi Remote ID  |  |  BT5 LR RID     |           |
+|  +--------+---------+  +--------+---------+  +--------+---------+           |
+|           |                     |                     |                     |
+|           v                     v                     v                     |
+|  +--------------------------------------------------------------+          |
+|  |                      ZMQ MESSAGE BUS                          |          |
+|  |  - JSON-formatted messages                                    |          |
+|  |  - Publisher/Subscriber pattern                               |          |
+|  +------------------------------+-------------------------------+          |
++----------------------------------+--------------------------------------+
+                                   |
+                                   v
++-----------------------------------------------------------------------------+
+|                           PROCESSING LAYER                                  |
+|                       +---------------------+                               |
+|                       |     DragonSync      |                               |
+|                       |  - Stream Merging   |                               |
+|                       |  - Deduplication    |                               |
+|                       |  - Rate Limiting    |                               |
+|                       |  - Data Transform   |                               |
+|                       +----------+----------+                               |
++---------------------------+------+------+------+----------------------------+
+                            |             |
+                            v             v
++-----------------------------------------------------------------------------+
+|                            OUTPUT LAYER                                     |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
+|  | TAK/ATAK  |  |   MQTT    |  |  Lattice  |  | HTTP API  |                 |
+|  | CoT Msgs  |  | JSON+HA   |  |  Anduril  |  | Companion |                 |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
++-----------------------------------------------------------------------------+
+\`\`\`
+
+## Core Components
+
+### Detection Sources
+
+#### 1. DragonSDR - DJI DroneID
+- **Repository**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- **Function**: Detects DJI proprietary DroneID signals (Ocusync 2, 3, 4)
+- **Transport**: ZMQ Publisher
+
+#### 2. droneid-go (WiFi/BT Remote ID)
+- **Repository**: [droneid-go](https://github.com/alphafox02/droneid-go)
+- **Function**: High-performance Open Drone ID receiver
+- **Transport**: ZMQ Publisher
+
+#### 3. DragonTooth (Sniffle)
+- **Function**: Bluetooth 5 Long Range detection
+- **Transport**: ZMQ Publisher
+
+### Processing - DragonSync
+
+**Repository**: [DragonSync](https://github.com/alphafox02/DragonSync)
+
+DragonSync is the central orchestration application that:
+
+1. **Subscribes** to all ZMQ detection sources
+2. **Merges** detections from multiple sources
+3. **Deduplicates** overlapping detections
+4. **Rate-limits** output to prevent flooding
+5. **Transforms** data into output formats
+6. **Manages** track state and history
+
+### Output Destinations
+
+#### TAK Ecosystem
+- CoT via UDP Multicast (default: 239.2.3.1:6969)
+- TCP to TAK Server
+- TLS encrypted connections
+
+#### MQTT
+- JSON per drone
+- Home Assistant auto-discovery
+
+#### Lattice
+- Anduril Lattice protocol
+
+#### HTTP API
+- Read-only REST API for companion apps
+
+## Configuration
+
+DragonSync is configured via \`config.ini\`:
+
+\`\`\`ini
+[SETTINGS]
+zmq_host = 127.0.0.1
+zmq_recv_timeout_ms = 500
+tak_enabled = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+mqtt_enabled = false
+lattice_enabled = false
+api_enabled = true
+api_host = 0.0.0.0
+api_port = 8088
+\`\`\``;
+
+pages['zmq-dataflows'] = `# ZMQ Data Flows
+
+WarDragon uses ZeroMQ (ZMQ) as the message transport layer between detection components and DragonSync.
+
+## ZMQ Pattern
+
+WarDragon uses the **PUB/SUB** (Publisher/Subscriber) pattern.
+
+## Port Assignments
+
+### Active Ports
+
+| Service | Port | Protocol | Description |
+|---------|------|----------|-------------|
+| DJI DroneID | 4221 | TCP | dji_receiver.py output |
+| droneid-go | 4224 | TCP | Unified detection output (WiFi, BLE, UART, DJI) |
+| WarDragon Monitor | 4225 | TCP | GPS and system status |
+| FPV Signals | 4226 | TCP | FPV drone signal detection |
+| DragonSync API | 8088 | HTTP | Read-only REST API |
+
+### Deprecated Ports
+
+| Port | Former Service | Status |
+|------|---------------|--------|
+| 4222 | sniff-receiver (Python BLE) | Replaced by droneid-go |
+| 4223 | wifi-receiver (Python WiFi) | Replaced by droneid-go |
+
+## Message Format
+
+All ZMQ messages are JSON-encoded following the **ASTM F3411 Open Drone ID** structure.
+
+### Message Blocks
+
+#### Basic ID
+\`\`\`json
+{
+  "Basic ID": {
+    "id_type": "Serial Number (ANSI/CTA-2063-A)",
+    "id": "ABC123DEF456",
+    "ua_type": 2,
+    "MAC": "AA:BB:CC:DD:EE:FF",
+    "RSSI": -65
+  }
+}
+\`\`\`
+
+#### Location/Vector Message
+\`\`\`json
+{
+  "Location/Vector Message": {
+    "latitude": 40.7128,
+    "longitude": -74.006,
+    "geodetic_altitude": 100.5,
+    "height_agl": 50.0,
+    "speed": 15.2,
+    "direction": 270
+  }
+}
+\`\`\`
+
+#### System Message
+\`\`\`json
+{
+  "System Message": {
+    "operator_lat": 40.713,
+    "operator_lon": -74.0055,
+    "home_lat": 40.713,
+    "home_lon": -74.0055
+  }
+}
+\`\`\`
+
+## Subscribing to ZMQ Streams
+
+### Python Example
+
+\`\`\`python
+import zmq
+import json
+
+context = zmq.Context()
+socket = context.socket(zmq.SUB)
+socket.connect("tcp://127.0.0.1:4224")
+socket.setsockopt_string(zmq.SUBSCRIBE, "")
+
+while True:
+    message = socket.recv_string()
+    data = json.loads(message)
+    for block in data:
+        if "Basic ID" in block:
+            print(f"Drone ID: {block['Basic ID'].get('id', 'unknown')}")
+\`\`\``;
+
+pages['dragonsync'] = `# DragonSync
+
+DragonSync (Community Edition) is a lightweight gateway that converts drone detection signals into Cursor on Target (CoT) format for TAK/ATAK systems, with optional MQTT publishing for Home Assistant integration.
+
+**Repository**: [github.com/alphafox02/DragonSync](https://github.com/alphafox02/DragonSync)
+
+## Overview
+
+DragonSync performs these key functions:
+
+1. **Subscribes** to ZMQ detection sources
+2. **Manages** drone tracking with two-tier capacity (verified vs unverified)
+3. **Queries** FAA RID database for registration information
+4. **Transforms** data into CoT XML for TAK, JSON for MQTT, and Lattice format
+5. **Rate-limits** output to prevent flooding TAK networks
+6. **Serves** read-only HTTP API for companion applications
+7. **Supports** ADS-B aircraft ingestion via dump1090/readsb
+
+## Configuration
+
+DragonSync is configured via \`config.ini\` at \`/home/dragon/DragonSync/config.ini\`.
+
+### Key Configuration Sections
+
+#### ZMQ Input
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| zmq_host | 127.0.0.1 | Host for ZMQ subscriptions |
+| zmq_port | 4224 | Main detection data port |
+| zmq_status_port | 4225 | System status port |
+
+#### Multicast Output
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| tak_multicast_addr | 239.2.3.1 | SA multicast address |
+| tak_multicast_port | 6969 | SA multicast port |
+| enable_multicast | true | Enable multicast output |
+| tak_multicast_interface | 0.0.0.0 | Interface (0.0.0.0 = all) |
+
+#### Drone Tracking Capacity
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| max_verified_drones | 70 | Capacity for FAA RID-verified drones |
+| max_unverified_drones | 30 | Capacity for unverified drones |
+| inactivity_timeout | 60.0 | Seconds before removing inactive drone |
+| rate_limit | 2.0 | Minimum seconds between CoT sends |
+
+**Why two tiers?** Verified drones are evicted last, helping filter out spoofed drone broadcasts.
+
+## Running DragonSync
+
+### As a Service (Default)
+
+\`\`\`bash
+sudo systemctl status dragonsync
+sudo systemctl start dragonsync
+sudo systemctl stop dragonsync
+sudo systemctl restart dragonsync
+journalctl -u dragonsync -f
+\`\`\`
+
+## HTTP API
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| /status | GET | System health and kit info |
+| /drones | GET | Current active drone tracks |
+| /signals | GET | Current signal alerts |
+| /config | GET | Sanitized configuration |
+| /update/check | GET | Git update availability |
+
+## CoT Message Format
+
+\`\`\`xml
+<?xml version="1.0" encoding="UTF-8"?>
+<event version="2.0"
+       uid="drone-ABC123DEF456"
+       type="a-f-G-U-U-D"
+       time="2024-01-15T14:30:00Z"
+       stale="2024-01-15T14:31:00Z"
+       how="m-g">
+  <point lat="40.7128" lon="-74.006" hae="100" ce="10" le="10"/>
+  <detail>
+    <contact callsign="DJI-ABC123"/>
+    <track course="270" speed="15"/>
+  </detail>
+</event>
+\`\`\``;
+
+pages['detection-capabilities'] = `# Detection Capabilities
+
+## Detection Overview
+
+| Technology | Protocol | Hardware | Range | Best For |
+|------------|----------|----------|-------|----------|
+| DJI DroneID | Ocusync 2/3/4 | DragonSDR | 1-5+ km | DJI drones |
+| WiFi Remote ID | IEEE 802.11 | Panda Wireless | 100-500m | Compliant drones |
+| Bluetooth Remote ID | BT5 LR | DragonTooth | 500m-1+ km | Compliant drones |
+| FPV Detection | Analog video | Optional SDR | Varies | Racing/custom drones |
+
+## DJI DroneID Detection
+
+### Supported Protocols
+
+| Protocol | DJI Models | Frequency | Status |
+|----------|------------|-----------|--------|
+| Ocusync 2 | Mavic Air 2, Mini 2, etc. | 2.4/5.8 GHz | Full support |
+| Ocusync 3 | Mavic 3, Mini 3/Pro, Air 3 | 2.4/5.8 GHz | Full support |
+| Ocusync 4 | Recent DJI models | 2.4/5.8 GHz | Activity detection |
+
+### Data Extracted
+
+- **Drone Position**: Latitude, longitude, altitude
+- **Drone Velocity**: Speed, heading, vertical speed
+- **Pilot Position**: Latitude, longitude (operator location)
+- **Home Point**: Takeoff/return location
+- **Identification**: Serial number, drone type
+- **Signal Data**: Frequency, RSSI
+
+## WiFi Remote ID Detection
+
+### Standards
+- **ASTM F3411** - Remote ID standard
+- **ASD-STAN 4709-002** - EU standard
+
+### Range Expectations
+
+| Environment | Typical Range |
+|-------------|---------------|
+| Open field | 300-500m |
+| Suburban | 150-300m |
+| Urban | 50-150m |
+
+## Bluetooth 5 Long Range Remote ID
+
+### Range Expectations
+
+| PHY Mode | Typical Range | Notes |
+|----------|---------------|-------|
+| LE 1M | 100-200m | Standard BT range |
+| LE Coded S2 | 300-500m | 2x range vs 1M |
+| LE Coded S8 | 500m-1+ km | 4x range, slower |
+
+## FPV Analog Detection (Experimental)
+
+Detects analog FPV video transmitters on racing and custom-built drones. Requires additional SDR hardware.
+
+### Supported Frequencies
+
+| Band | Frequency Range | Channels |
+|------|-----------------|----------|
+| A | 5725-5865 MHz | 8 |
+| B | 5733-5866 MHz | 8 |
+| E | 5645-5945 MHz | 8 |
+| R (Race) | 5658-5917 MHz | 8 |
+
+### Limitations
+
+- **No position data** - Analog FPV doesn't broadcast location
+- **Detection only** - Cannot identify specific drone
+- **Shares SDR with DJI detection** - Service wrapper stops DJI receiver during FPV scan
+
+## Improving Detection Range
+
+### Antenna Upgrades
+
+| Protocol | Upgrade | Expected Improvement |
+|----------|---------|---------------------|
+| DJI DroneID | 9 dBi panel antenna | 2-3x range |
+| WiFi RID | 6 dBi omni | 1.5-2x range |
+| BT5 LR | 9 dBi Yagi | 2-3x range |`;
+
+pages['tak-integration'] = `# TAK Integration
+
+This guide covers integrating WarDragon with the TAK ecosystem (ATAK, iTAK, WinTAK, and TAK Server).
+
+## Integration Options
+
+| Method | Use Case | Complexity | Requirements |
+|--------|----------|------------|--------------|
+| Multicast | Local network, no server | Simple | Same network segment |
+| TAK Server | Distributed teams | Medium | TAK Server infrastructure |
+| Direct TCP/UDP | Point-to-point | Simple | Network connectivity |
+| ATAK Plugin | Enhanced features | Simple | ATAK + Plugin |
+
+## Multicast Configuration (Default)
+
+\`\`\`ini
+[SETTINGS]
+enable_multicast = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+tak_multicast_interface = 0.0.0.0
+multicast_ttl = 1
+rate_limit = 2.0
+\`\`\`
+
+### ATAK Configuration
+
+1. Open ATAK > Settings > Network Preferences
+2. Select **SA Multicast**
+3. Configure input/output: \`239.2.3.1:6969\`
+
+## TAK Server Configuration
+
+\`\`\`ini
+[SETTINGS]
+enable_multicast = false
+tak_host = tak.example.com
+tak_port = 8089
+tak_protocol = TCP
+tak_tls_p12 = /path/to/client.p12
+tak_tls_p12_pass = yourpassword
+\`\`\`
+
+## WarDragon ATAK Plugin
+
+**Repository**: [WarDragon-ATAK-Plugin](https://github.com/alphafox02/WarDragon-ATAK-Plugin)
+
+### Features
+
+- Native ATAK UI for WarDragon status
+- Enhanced drone track visualization
+- Pilot location display
+- System health monitoring
+
+### Installation
+
+1. Download the plugin APK from GitHub releases
+2. Install on ATAK: Settings > Tool Preferences > Manage Plugins > Import Plugin
+3. Configure with WarDragon IP and API port 8088
+
+## CoT Type Codes
+
+| Type Code | Meaning | Display |
+|-----------|---------|---------|
+| a-u-G-U-U-D | Unknown UAS | Yellow drone icon |
+| a-f-G-U-U-D | Friendly UAS | Blue drone icon |
+| a-h-G-U-U-D | Hostile UAS | Red drone icon |
+| a-n-G-U-U-D | Neutral UAS | Green drone icon |
+
+## Troubleshooting
+
+### Drones Not Appearing in ATAK
+
+1. Check network connectivity
+2. Verify multicast routing: \`sudo tcpdump -i any host 239.2.3.1\`
+3. Check ATAK multicast settings
+4. Verify DragonSync is running: \`sudo systemctl status dragonsync\``;
+
+pages['mqtt-homeassistant'] = `# MQTT & Home Assistant Integration
+
+## Overview
+
+WarDragon can publish drone detections to MQTT in multiple formats:
+
+1. **Standard Topics** - All drones published to a single topic
+2. **Per-Drone Topics** - Individual topic per drone serial
+3. **Home Assistant Discovery** - Auto-configured entities
+4. **Aircraft Topics** - ADS-B aircraft data (if enabled)
+5. **Signal Topics** - FPV/signal alerts (if enabled)
+
+## MQTT Configuration
+
+\`\`\`ini
+[SETTINGS]
+mqtt_enabled = true
+mqtt_host = 192.168.1.100
+mqtt_port = 1883
+mqtt_username = wardragon
+mqtt_password = yourpassword
+mqtt_topic = wardragon/drones
+mqtt_per_drone_enabled = true
+mqtt_per_drone_base = wardragon/drone
+mqtt_ha_enabled = true
+mqtt_ha_prefix = homeassistant
+mqtt_retain = true
+\`\`\`
+
+## Message Format
+
+\`\`\`json
+{
+  "serial_number": "ABC123DEF456",
+  "model": "Mavic 3",
+  "drone_lat": 40.7128,
+  "drone_lon": -74.006,
+  "drone_alt": 100,
+  "speed": 15,
+  "heading": 270,
+  "pilot_lat": 40.713,
+  "pilot_lon": -74.0055,
+  "detection_source": "dji_droneid",
+  "rssi": -65,
+  "last_seen": "2024-01-15T14:30:00Z",
+  "rid_verified": true
+}
+\`\`\`
+
+## Home Assistant Integration
+
+### Auto-Discovery Entities
+
+| Entity | Type | Description |
+|--------|------|-------------|
+| device_tracker.wardragon_drone_<id> | Device Tracker | Drone location on map |
+| sensor.wardragon_drone_<id>_altitude | Sensor | Current altitude |
+| sensor.wardragon_drone_<id>_speed | Sensor | Current speed |
+| sensor.wardragon_drone_<id>_rssi | Sensor | Signal strength |
+
+## Automation Examples
+
+### Alert on Drone Detection
+
+\`\`\`yaml
+automation:
+  - alias: "Drone Detected Alert"
+    trigger:
+      - platform: mqtt
+        topic: "wardragon/drones"
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Drone Detected!"
+          message: >
+            {{ trigger.payload_json.model }} detected
+            ({{ trigger.payload_json.serial_number }})
+\`\`\`
+
+### Geofence Alert
+
+\`\`\`yaml
+automation:
+  - alias: "Drone in Restricted Zone"
+    trigger:
+      - platform: mqtt
+        topic: "wardragon/drones"
+    condition:
+      - condition: template
+        value_template: >
+          {{ trigger.payload_json.drone_lat | float > 40.710 and
+             trigger.payload_json.drone_lat | float < 40.715 }}
+    action:
+      - service: notify.all
+        data:
+          title: "ALERT: Drone in Restricted Zone"
+\`\`\`
+
+## Connection Resilience
+
+DragonSync features async MQTT with automatic retries. If the broker is unavailable, CoT output and other features continue working normally.`;
+
+pages['lattice'] = `# Lattice Integration
+
+This guide covers integrating WarDragon with Anduril Lattice for enterprise-grade situational awareness.
+
+## Overview
+
+WarDragon can export drone detection data directly to Anduril Lattice, enabling:
+
+- Real-time drone visualization in Lattice
+- Integration with other Lattice-connected sensors
+- Unified command and control interface
+
+## Configuration
+
+\`\`\`ini
+[SETTINGS]
+lattice_enabled = true
+lattice_token = your_api_token
+lattice_base_url = https://your.env.anduril.cloud
+lattice_source_name = DragonSync
+lattice_drone_rate = 1.0
+lattice_wd_rate = 0.2
+\`\`\`
+
+### Configuration Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| lattice_enabled | false | Enable/disable Lattice output |
+| lattice_token | (empty) | API authentication token |
+| lattice_base_url | (empty) | Full base URL |
+| lattice_endpoint | (empty) | Endpoint host (https:// added auto) |
+| lattice_sandbox_token | (empty) | Sandbox token |
+| lattice_source_name | DragonSync | Identifier for this data source |
+| lattice_drone_rate | 1.0 | Min seconds between drone updates |
+| lattice_wd_rate | 0.2 | Min seconds between status updates |
+
+## Multi-WarDragon Deployment
+
+Use unique \`lattice_source_name\` values to identify each unit:
+
+\`\`\`ini
+lattice_source_name = WarDragon-Site-Alpha
+\`\`\``;
+
+pages['analytics'] = `# WarDragonAnalytics
+
+Centralized logging, analysis, and visualization platform for drone detection data.
+
+**Repository**: [github.com/alphafox02/WarDragonAnalytics](https://github.com/alphafox02/WarDragonAnalytics)
+
+> **Important**: WarDragonAnalytics is designed to run on a separate server, not on the WarDragon kit itself.
+
+## Overview
+
+WarDragonAnalytics aggregates detections from multiple WarDragon field kits into a single interface:
+
+- **Real-time map display** of all drone and aircraft tracks
+- **Time-series database** (TimescaleDB) with 30-day retention and 1-year aggregates
+- **Pattern detection** for surveillance behavior, swarms, and anomalies
+- **Pre-built Grafana dashboards** for tactical operations
+- **REST API** for integration
+- **CSV export** for reporting
+
+## Quick Start
+
+\`\`\`bash
+git clone https://github.com/alphafox02/WarDragonAnalytics.git
+cd WarDragonAnalytics
+./quickstart.sh
+\`\`\`
+
+## Access Interfaces
+
+| Interface | URL | Purpose |
+|-----------|-----|---------|
+| Web UI | http://localhost:8090 | Interactive map, kit management |
+| Grafana | http://localhost:3000 | Dashboards and analysis |
+
+## Grafana Dashboards
+
+### Tactical Overview
+- Active drone count and kit status grid
+- Kit health (CPU, memory, disk, temperature)
+- Drone detection timeline
+
+### Pattern Analysis
+- Repeated drone detections (surveillance indicators)
+- Operator reuse across multiple drones
+- Coordinated activity (potential swarms)
+
+### Multi-Kit Correlation
+- Drones detected by multiple kits (triangulation)
+- Kit coverage data
+- Detection density heatmap
+
+### Anomaly Detection
+- Altitude and speed anomalies
+- Signal strength variations
+- Out-of-pattern behavior
+
+## Pattern Detection API
+
+\`\`\`bash
+curl http://localhost:8090/api/patterns/repeated-drones?hours=24
+curl http://localhost:8090/api/patterns/coordinated?hours=6
+curl http://localhost:8090/api/patterns/pilot-reuse?hours=12
+curl http://localhost:8090/api/patterns/anomalies?hours=6
+\`\`\``;
+
+pages['video-index'] = `# Video Tutorials
+
+## Official Tutorials
+
+### Getting Started
+
+| Video | Description | Link |
+|-------|-------------|------|
+| Internal Hotspot Setup | Configure WarDragon as a WiFi access point | [YouTube](https://www.youtube.com/watch?v=H_VsW9bqTkQ) |
+
+## Setup & Configuration
+
+### Network Configuration
+
+- **[Internal Hotspot Setup](https://www.youtube.com/watch?v=H_VsW9bqTkQ)**
+  - Creating a WiFi hotspot on WarDragon
+  - Connecting ATAK devices in the field
+  - Hybrid mode (hotspot + Ethernet)
+  - Troubleshooting connectivity
+
+### TAK Integration
+
+*Coming soon*
+
+### Detection Setup
+
+*Coming soon*
+
+## DragonOS Tutorials
+
+For general DragonOS tutorials, visit the [DragonOS Media Page](https://cemaxecuter.com/?page_id=115).
+
+## Community Tutorials
+
+Have you created a WarDragon tutorial? Submit a pull request to add it here!`;
+
+pages['setup-guides'] = `# Setup Guides
+
+Quick reference guides for common WarDragon setup tasks.
+
+## Quick Setup Checklist
+
+### First Boot
+
+- [ ] Connect antennas to correct ports
+- [ ] Connect power supply
+- [ ] Wait for boot (~90 seconds)
+- [ ] Connect via Ethernet or WiFi
+- [ ] Verify network connectivity
+- [ ] Check detection services running
+
+### Field Deployment
+
+- [ ] Charge/verify power source
+- [ ] Pack transport case with unit
+- [ ] Verify all antennas included
+- [ ] Configure hotspot if needed
+- [ ] Test ATAK connectivity
+- [ ] Verify GPS lock capability
+
+## Common Configurations
+
+### Standalone Operation (Hotspot Mode)
+
+1. Enable WiFi hotspot
+2. Connect ATAK devices to WarDragon WiFi
+3. Configure ATAK for multicast (239.2.3.1:6969)
+4. Verify detections appear in ATAK
+
+### Network Connected (Client Mode)
+
+1. Connect WarDragon to network
+2. Configure DragonSync for TAK Server
+3. Optionally enable MQTT for Home Assistant
+4. Configure analytics dashboard
+
+## Detection Services
+
+| Service | Role | ZMQ Output |
+|---------|------|-----------|
+| zmq-decoder | WiFi RID + BLE + UART/ESP32 (droneid-go) | 4224 |
+| dji-receiver | DJI DroneID via DragonSDR | 4221 > 4224 |
+| dragonsync | Aggregates 4224/4225, outputs TAK/MQTT | -- |
+
+### Check All Detection Services
+
+\`\`\`bash
+sudo systemctl status zmq-decoder dji-receiver dragonsync
+\`\`\`
+
+### Restart Detection
+
+\`\`\`bash
+sudo systemctl restart zmq-decoder
+sudo systemctl restart dji-receiver
+\`\`\`
+
+## Output Configuration
+
+### TAK Only (Default)
+
+\`\`\`ini
+[SETTINGS]
+enable_multicast = true
+tak_multicast_addr = 239.2.3.1
+tak_multicast_port = 6969
+mqtt_enabled = false
+lattice_enabled = false
+\`\`\`
+
+### MQTT Only (Home Assistant)
+
+\`\`\`ini
+[SETTINGS]
+enable_multicast = false
+mqtt_enabled = true
+mqtt_host = 192.168.1.100
+mqtt_ha_enabled = true
+\`\`\`
+
+## Service Management
+
+\`\`\`bash
+# Check status
+sudo systemctl status zmq-decoder dji-receiver dragonsync
+
+# Restart
+sudo systemctl restart zmq-decoder dji-receiver dragonsync
+
+# View logs
+journalctl -u zmq-decoder -f
+journalctl -u dji-receiver -f
+journalctl -u dragonsync -f
+\`\`\`
+
+## Backup Configuration
+
+\`\`\`bash
+# Backup
+cp /home/dragon/DragonSync/config.ini ~/config-backup.ini
+
+# Restore
+cp ~/config-backup.ini /home/dragon/DragonSync/config.ini
+sudo systemctl restart dragonsync
+\`\`\``;
+
+pages['common-issues'] = `# Troubleshooting Guide
+
+## Quick Diagnostics
+
+\`\`\`bash
+# Check all critical services
+sudo systemctl status zmq-decoder dragonsync dji-receiver
+
+# Check system resources
+htop
+
+# Check disk space
+df -h
+
+# Check network interfaces
+ip addr show
+\`\`\`
+
+## Power & Boot Issues
+
+| Symptom | Possible Cause | Solution |
+|---------|---------------|----------|
+| No LEDs | Power supply issue | Check power adapter, try different outlet |
+| Brief flash then off | Overcurrent protection | Disconnect peripherals |
+| Power LED on, no boot | Boot failure | Wait 5 minutes; re-flash if needed |
+
+## Network Issues
+
+### Can't Connect
+
+| Method | Diagnosis | Solution |
+|--------|-----------|----------|
+| Ethernet | Check link light | Try different cable/port |
+| WiFi Hotspot | Scan for SSID | Verify hotspot enabled |
+| WiFi Client | Check router DHCP | Verify WiFi credentials |
+
+### Find WarDragon IP
+
+\`\`\`bash
+# Scan your subnet
+nmap -sn <your-subnet>/24 | grep -B2 -i dragon
+
+# If using hotspot, WarDragon is at 192.168.12.1
+\`\`\`
+
+## Remote Access Issues
+
+### Can't SSH
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| Connection refused | SSH not installed | Complete initial local setup |
+| Connection timeout | Wrong IP or firewall | Verify IP address |
+| Permission denied | Wrong credentials | Check username/password |
+
+> **Note**: WarDragon ships without SSH enabled. Complete initial local setup first.
+
+### Remote Desktop Not Working
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| Can't connect | RustDesk not installed | Complete initial local setup |
+| Black/blank screen | HDMI dummy plug missing | Reinstall the dummy plug |
+
+> **Critical**: The HDMI dummy plug must be installed for remote desktop.
+
+## Detection Issues
+
+### No Drones Detected
+
+1. Verify antennas are firmly connected to correct ports
+2. Check detection services:
+
+\`\`\`bash
+sudo systemctl status dji-receiver
+sudo systemctl status zmq-decoder
+sudo systemctl status dragonsync
+\`\`\`
+
+3. List USB devices:
+
+\`\`\`bash
+lsusb
+\`\`\`
+
+### DJI Drones Not Detected
+
+1. Verify DragonSDR is connected: \`lsusb | grep -i dragonsdr\`
+2. Check dji_receiver service
+3. Verify antenna on correct port (Port 3, left side)
+
+### Remote ID Not Detected
+
+1. Check droneid-go service: \`sudo systemctl status zmq-decoder\`
+2. Verify WiFi adapter in monitor mode: \`iw dev wlan1 info | grep type\`
+3. Check Bluetooth dongle: \`ls /dev/sniffle*\`
+
+## TAK Integration Issues
+
+1. Verify multicast traffic: \`sudo tcpdump -i any host 239.2.3.1 and port 6969\`
+2. Check DragonSync status: \`journalctl -u dragonsync | grep -i tak\`
+3. Test TAK Server: \`nc -zv tak-server.example.com 8089\`
+
+## Log Locations
+
+| Log | Command |
+|-----|---------|
+| droneid-go | \`journalctl -u zmq-decoder\` |
+| DragonSync | \`journalctl -u dragonsync\` |
+| DJI Receiver | \`journalctl -u dji-receiver\` |
+| System | \`journalctl -b\` |
+| Network | \`journalctl -u NetworkManager\` |
+
+## Getting Help
+
+1. Gather diagnostic info
+2. Join DragonOS Discord for community support
+3. Contact cemaxecuter for hardware issues`;
+
+// ── Section/breadcrumb mapping ──
+const sectionMap = {
+  'home': ['Home'],
+  'wardragon-pro-v3': ['Products', 'WarDragon Pro v3'],
+  'unboxing': ['Getting Started', 'Unboxing & First Boot'],
+  'network-setup': ['Getting Started', 'Network Configuration'],
+  'hotspot-setup': ['Getting Started', 'Hotspot Setup'],
+  'pro-v3-overview': ['Hardware', 'Pro v3 Hardware Overview'],
+  'antenna-connections': ['Hardware', 'Antenna Connections'],
+  'led-indicators': ['Hardware', 'LED Indicators'],
+  'architecture-overview': ['Architecture', 'System Architecture'],
+  'zmq-dataflows': ['Architecture', 'ZMQ Data Flows'],
+  'dragonsync': ['Software', 'DragonSync'],
+  'detection-capabilities': ['Software', 'Detection Capabilities'],
+  'tak-integration': ['Integration', 'TAK Integration'],
+  'mqtt-homeassistant': ['Integration', 'MQTT & Home Assistant'],
+  'lattice': ['Integration', 'Lattice Export'],
+  'analytics': ['Integration', 'Analytics Dashboard'],
+  'video-index': ['Tutorials', 'Video Tutorials'],
+  'setup-guides': ['Tutorials', 'Setup Guides'],
+  'common-issues': ['Troubleshooting', 'Common Issues'],
+};
+
+// ── Navigation ──
+let currentPage = 'home';
+
+function navigate(page) {
+  currentPage = page;
+  const contentEl = document.getElementById('content');
+
+  // Update active nav item
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+
+  // Update breadcrumb
+  const parts = sectionMap[page] || [page];
+  document.getElementById('breadcrumb').innerHTML =
+    'WarDragon &rsaquo; ' + parts.map(p => `<span>${p}</span>`).join(' &rsaquo; ');
+
+  // Render content
+  if (page === 'home') {
+    contentEl.innerHTML = renderHome();
+  } else if (pages[page]) {
+    contentEl.innerHTML = MD.parse(pages[page]);
+  } else {
+    contentEl.innerHTML = '<p>Page not found.</p>';
+  }
+
+  contentEl.scrollTop = 0;
+
+  // Update URL hash
+  history.replaceState(null, '', '#' + page);
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('mobile-open');
+}
+
+function renderHome() {
+  return `
+    <div class="hero">
+      <h1>WarDragon Documentation Hub</h1>
+      <p class="tagline">Compact, headless, SDR-driven RF sensing and data integration appliance for comprehensive drone detection and situational awareness.</p>
+      <span class="wip-badge">Work in Progress</span>
+    </div>
+
+    <h2 style="border:none;margin-top:0">Quick Navigation</h2>
+    <div class="home-grid">
+      <div class="home-card" onclick="navigate('unboxing')">
+        <div class="card-icon">&#128230;</div>
+        <h3>Unboxing & First Boot</h3>
+        <p>Set up your WarDragon Pro v3 for the first time</p>
+      </div>
+      <div class="home-card" onclick="navigate('network-setup')">
+        <div class="card-icon">&#127760;</div>
+        <h3>Network Configuration</h3>
+        <p>Configure Ethernet, WiFi, and hybrid modes</p>
+      </div>
+      <div class="home-card" onclick="navigate('hotspot-setup')">
+        <div class="card-icon">&#128225;</div>
+        <h3>Hotspot Setup</h3>
+        <p>Create a WiFi hotspot for field deployments</p>
+      </div>
+      <div class="home-card" onclick="navigate('pro-v3-overview')">
+        <div class="card-icon">&#128295;</div>
+        <h3>Hardware Overview</h3>
+        <p>Physical layout, components, and specifications</p>
+      </div>
+      <div class="home-card" onclick="navigate('architecture-overview')">
+        <div class="card-icon">&#9881;</div>
+        <h3>System Architecture</h3>
+        <p>Detection layer, processing, and output destinations</p>
+      </div>
+      <div class="home-card" onclick="navigate('dragonsync')">
+        <div class="card-icon">&#128257;</div>
+        <h3>DragonSync</h3>
+        <p>Central gateway: ZMQ to TAK/MQTT/Lattice</p>
+      </div>
+      <div class="home-card" onclick="navigate('detection-capabilities')">
+        <div class="card-icon">&#128225;</div>
+        <h3>Detection Capabilities</h3>
+        <p>DJI DroneID, WiFi RID, BT5 LR, FPV detection</p>
+      </div>
+      <div class="home-card" onclick="navigate('tak-integration')">
+        <div class="card-icon">&#127919;</div>
+        <h3>TAK Integration</h3>
+        <p>Connect to ATAK, iTAK, WinTAK, and TAK Server</p>
+      </div>
+      <div class="home-card" onclick="navigate('mqtt-homeassistant')">
+        <div class="card-icon">&#127968;</div>
+        <h3>MQTT & Home Assistant</h3>
+        <p>Smart home dashboards and automation</p>
+      </div>
+      <div class="home-card" onclick="navigate('analytics')">
+        <div class="card-icon">&#128200;</div>
+        <h3>Analytics Dashboard</h3>
+        <p>Multi-kit logging, Grafana dashboards, pattern detection</p>
+      </div>
+      <div class="home-card" onclick="navigate('common-issues')">
+        <div class="card-icon">&#128736;</div>
+        <h3>Troubleshooting</h3>
+        <p>Common issues and diagnostic commands</p>
+      </div>
+      <div class="home-card" onclick="navigate('video-index')">
+        <div class="card-icon">&#127909;</div>
+        <h3>Video Tutorials</h3>
+        <p>Step-by-step video walkthroughs</p>
+      </div>
+    </div>
+
+    <div class="detection-table">
+      <h2>Detection Capabilities</h2>
+      <table>
+        <thead>
+          <tr><th>Protocol</th><th>Hardware</th><th>Frequency</th><th>Range</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>DJI DroneID (Ocusync 2/3/4)</td><td>DragonSDR</td><td>2.4/5.8 GHz</td><td>1-5+ km</td></tr>
+          <tr><td>Bluetooth Remote ID</td><td>DragonTooth Dongle</td><td>2.4 GHz</td><td>500m-1+ km</td></tr>
+          <tr><td>WiFi Remote ID</td><td>Panda Wireless + ESP32</td><td>2.4/5 GHz</td><td>100-500m</td></tr>
+          <tr><td>FPV Analog</td><td>DragonSDR</td><td>Various</td><td>In Testing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ecosystem-section">
+      <h2>Ecosystem & Related Projects</h2>
+      <table>
+        <thead><tr><th>Repository</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/alphafox02/DragonSync" target="_blank">DragonSync</a></td><td>Main application - merges detection streams, outputs CoT to TAK, MQTT, and Lattice</td></tr>
+          <tr><td><a href="https://github.com/alphafox02/droneid-go" target="_blank">droneid-go</a></td><td>High-performance Open Drone ID receiver (WiFi + BLE Remote ID)</td></tr>
+          <tr><td><a href="https://github.com/alphafox02/antsdr_dji_droneid" target="_blank">antsdr_dji_droneid</a></td><td>DragonSDR firmware for DJI DroneID detection</td></tr>
+          <tr><td><a href="https://github.com/alphafox02/WarDragon-ATAK-Plugin" target="_blank">WarDragon ATAK Plugin</a></td><td>Native ATAK plugin for WarDragon integration</td></tr>
+          <tr><td><a href="https://github.com/alphafox02/WarDragonAnalytics" target="_blank">WarDragonAnalytics</a></td><td>Analytics dashboard and visualization stack</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:32px;padding:16px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px">
+      <p style="margin:0;font-size:13px"><strong>Support:</strong>
+        <a href="https://cemaxecuter.com/?product=wardragon-pro-kit" target="_blank">Purchase</a> &middot;
+        <a href="https://cemaxecuter.com" target="_blank">DragonOS</a> &middot;
+        Join the DragonOS Discord for community support
+      </p>
+    </div>
+  `;
+}
+
+function toggleSection(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+
+// ── Search ──
+function handleSearch(query) {
+  const resultsEl = document.getElementById('searchResults');
+  if (!query || query.length < 2) {
+    resultsEl.classList.remove('visible');
+    return;
+  }
+
+  const q = query.toLowerCase();
+  const results = [];
+
+  for (const [key, content] of Object.entries(pages)) {
+    if (key === 'home' || !content) continue;
+    const text = content.toLowerCase();
+    const idx = text.indexOf(q);
+    if (idx !== -1) {
+      const start = Math.max(0, idx - 30);
+      const end = Math.min(text.length, idx + q.length + 50);
+      let snippet = content.substring(start, end).replace(/\n/g, ' ');
+      if (start > 0) snippet = '...' + snippet;
+      if (end < text.length) snippet += '...';
+      // Highlight
+      const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      snippet = snippet.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      snippet = snippet.replace(re, '<mark>$1</mark>');
+
+      const section = (sectionMap[key] || [key]).join(' > ');
+      const title = (sectionMap[key] || [key]).slice(-1)[0];
+      results.push({ key, title, section, snippet });
+    }
+  }
+
+  if (results.length === 0) {
+    resultsEl.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:13px">No results found</div>';
+  } else {
+    resultsEl.innerHTML = results.slice(0, 10).map(r => `
+      <div class="search-result-item" onclick="navigate('${r.key}');document.getElementById('searchResults').classList.remove('visible');document.getElementById('searchInput').value='';">
+        <div class="title">${r.title}</div>
+        <div class="section">${r.section}</div>
+        <div class="snippet">${r.snippet}</div>
+      </div>
+    `).join('');
+  }
+  resultsEl.classList.add('visible');
+}
+
+// Close search on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-box')) {
+    document.getElementById('searchResults').classList.remove('visible');
+  }
+});
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash.slice(1);
+  if (hash && pages.hasOwnProperty(hash)) {
+    navigate(hash);
+  } else {
+    navigate('home');
+  }
+});
+
+// Handle back/forward
+window.addEventListener('hashchange', () => {
+  const hash = location.hash.slice(1);
+  if (hash && pages.hasOwnProperty(hash)) navigate(hash);
+});
+</script>
+
+</body>
+</html>

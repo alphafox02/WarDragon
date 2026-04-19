@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=WarDragon Docs
+Comment=WarDragon Documentation Hub
+Exec=bash /home/dragon/Downloads/WarDragon/wardragon-docs.sh
+Icon=text-html
+Terminal=false
+Categories=Documentation;
+StartupNotify=false
