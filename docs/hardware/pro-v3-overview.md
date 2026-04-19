@@ -25,8 +25,8 @@ The WarDragon Pro v3 has antenna ports accessible from the sides of the unit. Wh
     │ 4. TX    │ ← Not used                             │ 2. GPS   │ ← Optional GPS Antenna
     │          │                                        │   ANT    │
     ├──────────┤                                        ├──────────┤
-    │ 3. RX    │ ← ANTSDR E200                          │ 1. BT5   │ ← DragonTooth Dongle
-    │ (E200)   │   DJI DroneID (Primary)                │   LR     │   Bluetooth Remote ID
+    │ 3. RX    │ ← DragonSDR                             │ 1. BT5   │ ← DragonTooth Dongle
+    │(DrgnSDR) │   DJI DroneID (Primary)                │   LR     │   Bluetooth Remote ID
     ├──────────┤                                        └──────────┘
     │ 2. RX    │ ← Panda Wireless
     │ (Panda)  │   WiFi Remote ID
@@ -53,7 +53,7 @@ The WarDragon Pro v3 has antenna ports accessible from the sides of the unit. Wh
 
 ### Detection Hardware
 
-#### ANTSDR E200
+#### DragonSDR
 - **Purpose**: DJI DroneID detection (Ocusync 2/3/4)
 - **Frequency Range**: ~70 MHz to 6 GHz
 - **Connection**: Internal USB, external SMA antenna port
@@ -87,8 +87,8 @@ The WarDragon Pro v3 has minimal visible LEDs:
 | LED | Location | Meaning |
 |-----|----------|---------|
 | Power Button | PC | System powered on |
-| E200 LED | Internal | SDR operational |
-| E200 Ethernet | Internal | Network link/activity |
+| DragonSDR LED | Internal | SDR operational |
+| DragonSDR Ethernet | Internal | Network link/activity |
 | GPS LED | Internal | GPS status |
 
 See [LED Indicators](led-indicators.md) for details.

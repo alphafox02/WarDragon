@@ -183,7 +183,7 @@ journalctl -u dragonsync -n 50
 #### Test Detection Hardware
 
 ```bash
-# List USB devices (should see ANTSDR, Panda, etc.)
+# List USB devices (should see DragonSDR, Panda, etc.)
 lsusb
 
 # Check for SDR
@@ -192,9 +192,9 @@ rtl_test -t 2>/dev/null || echo "No RTL-SDR found"
 
 ### DJI Drones Not Detected
 
-1. **Verify ANTSDR E200 connected**:
+1. **Verify DragonSDR connected**:
    ```bash
-   lsusb | grep -i antsdr
+   lsusb | grep -i dragonsdr
    ```
 
 2. **Check dji_receiver service**:

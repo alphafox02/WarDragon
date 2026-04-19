@@ -10,7 +10,7 @@ Your WarDragon Pro v3 kit includes:
 - Protective transport case
 - Power supply (12V DC)
 - Antenna kit:
-  - Dual-band 2.4/5 GHz 8 dBi antennas (qty: 4) - for E200 RX, Panda, ESP32, and DragonTooth
+  - Dual-band 2.4/5 GHz 8 dBi antennas (qty: 4) - for DragonSDR RX, Panda, ESP32, and DragonTooth
   - GPS antenna (if external GPS option included)
 - USB-C to dual USB-A adapter cable (for keyboard/mouse)
 - HDMI dummy plug (pre-installed in right-angle HDMI adapter)
@@ -35,7 +35,7 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 
 | Port | Antenna | Purpose |
 |------|---------|---------|
-| Left Side - Port 3 (RX E200) | Dual-band 2.4/5 GHz 8 dBi | DJI DroneID detection |
+| Left Side - Port 3 (RX DragonSDR) | Dual-band 2.4/5 GHz 8 dBi | DJI DroneID detection |
 | Left Side - Port 2 (RX Panda) | Dual-band 2.4/5 GHz 8 dBi | WiFi Remote ID |
 | Left Side - Port 1 (ESP32) | Dual-band 2.4/5 GHz 8 dBi | WiFi Remote ID (secondary)* |
 | Right Side - Port 1 (BT5) | Dual-band 2.4/5 GHz 8 dBi | Bluetooth Remote ID |
@@ -46,7 +46,7 @@ Connect antennas to the appropriate ports. See [Antenna Connections](../hardware
 | Port | Antenna | Purpose |
 |------|---------|---------|
 | Right Side - Port 2 (GPS) | GPS antenna | External GPS (improves accuracy) |
-| Left Side - Port 4 (TX) | N/A | Unused (ANTSDR TX port) |
+| Left Side - Port 4 (TX) | N/A | Unused (DragonSDR TX port) |
 
 ### Step 3: Power Connection
 
@@ -78,7 +78,7 @@ On first power-up:
 
 1. The system takes approximately 60-90 seconds to fully boot
 2. The power button LED indicates the system is on
-3. Internal LEDs (E200, GPS) may be partially visible through the case
+3. Internal LEDs (DragonSDR, GPS) may be partially visible through the case
 
 ## Initial Local Setup (Required)
 

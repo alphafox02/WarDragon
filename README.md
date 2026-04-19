@@ -49,10 +49,10 @@ WarDragon detects drones through multiple protocols:
 
 | Protocol | Hardware | Frequency | Range |
 |----------|----------|-----------|-------|
-| DJI DroneID (Ocusync 2/3/4) | ANTSDR E200 | 2.4/5.8 GHz | Extended |
+| DJI DroneID (Ocusync 2/3/4) | DragonSDR | 2.4/5.8 GHz | Extended |
 | Bluetooth Remote ID | DragonTooth Dongle | 2.4 GHz | Bluetooth 5 LR |
 | WiFi Remote ID | Panda Wireless + ESP32 | 2.4/5 GHz | Standard WiFi |
-| FPV Analog | ANTSDR E200 | Various | In Testing |
+| FPV Analog | DragonSDR | Various | In Testing |
 
 ## Ecosystem & Related Projects
 
@@ -63,7 +63,7 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 |------------|-------------|
 | [DragonSync](https://github.com/alphafox02/DragonSync) | Main application - merges detection streams, outputs CoT to TAK, MQTT, and Lattice |
 | [droneid-go](https://github.com/alphafox02/droneid-go) | High-performance Open Drone ID receiver (WiFi + BLE Remote ID) with ZMQ output |
-| [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) | ANTSDR E200 firmware for DJI DroneID detection |
+| [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) | DragonSDR firmware for DJI DroneID detection |
 
 ### Mobile & Companion Apps
 | Repository | Description |
@@ -92,8 +92,8 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
-│  │  ANTSDR     │  │   Panda     │  │   ESP32     │  │ DragonTooth │   │
-│  │   E200      │  │  Wireless   │  │   Module    │  │   Dongle    │   │
+│  │ DragonSDR   │  │   Panda     │  │   ESP32     │  │ DragonTooth │   │
+│  │             │  │  Wireless   │  │   Module    │  │   Dongle    │   │
 │  │             │  │             │  │             │  │             │   │
 │  │ DJI DroneID │  │ WiFi RID    │  │ WiFi RID    │  │  BT5 LR RID │   │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘   │

@@ -7,8 +7,8 @@ The WarDragon Pro v3 has minimal visible LEDs.
 | LED | Location |
 |-----|----------|
 | Power Button | PC power button - indicates system is on |
-| ANTSDR E200 | Internal, may be partially visible |
-| E200 Ethernet | Internal, standard link/activity lights |
+| DragonSDR | Internal, may be partially visible |
+| DragonSDR Ethernet | Internal, standard link/activity lights |
 | GPS Module | Internal, indicates GPS status |
 
 ## Verifying System Status

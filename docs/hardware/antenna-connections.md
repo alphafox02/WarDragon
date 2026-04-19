@@ -12,8 +12,8 @@ When the case is open and you're looking down at the unit, the **front** is near
 |--------|-------|--------------|---------|-----------|--------|
 | 1 | ESP32 | ESP32 Module | WiFi Remote ID | SMA Female | Active* |
 | 2 | RX (Panda) | Panda Wireless | WiFi Remote ID | SMA Female | Active |
-| 3 | RX (E200) | ANTSDR E200 RX | DJI DroneID Detection | SMA Female | Primary |
-| 4 | TX | ANTSDR E200 TX | Transmit (not used) | SMA Female | Unused |
+| 3 | RX (DragonSDR) | DragonSDR RX | DJI DroneID Detection | SMA Female | Primary |
+| 4 | TX | DragonSDR TX | Transmit (not used) | SMA Female | Unused |
 
 *ESP32 port may be removed in future versions
 
@@ -40,7 +40,7 @@ When the case is open and you're looking down at the unit, the **front** is near
 │   [4] TX ──────── Not Used                    GPS ANT ──────── [2]    │
 │       (SMA-F)                                   (SMA-F)                │
 │                                                   │                    │
-│   [3] RX ──────── ANTSDR E200                     └── Optional        │
+│   [3] RX ──────── DragonSDR                     └── Optional        │
 │       (SMA-F)     DJI DroneID                         External GPS    │
 │                   Primary Detection                                    │
 │                                                                        │
@@ -58,7 +58,7 @@ When the case is open and you're looking down at the unit, the **front** is near
 
 ## Included Antennas
 
-The WarDragon Pro v3 kit includes **four dual-band 2.4/5 GHz 8 dBi omnidirectional antennas** for all RF ports (E200 RX, Panda, ESP32, DragonTooth/BT5). These antennas cover all required frequencies for DJI DroneID, WiFi Remote ID, and Bluetooth Remote ID detection.
+The WarDragon Pro v3 kit includes **four dual-band 2.4/5 GHz 8 dBi omnidirectional antennas** for all RF ports (DragonSDR RX, Panda, ESP32, DragonTooth/BT5). These antennas cover all required frequencies for DJI DroneID, WiFi Remote ID, and Bluetooth Remote ID detection.
 
 | Specification | Value |
 |---------------|-------|
@@ -72,7 +72,7 @@ The WarDragon Pro v3 kit includes **four dual-band 2.4/5 GHz 8 dBi omnidirection
 
 For extended range, consider upgrading to higher-gain or directional antennas:
 
-### DJI DroneID (ANTSDR E200 RX)
+### DJI DroneID (DragonSDR RX)
 - **Upgrade**: 9+ dBi panel antenna for 2-3x range
 - **Note**: Directional antennas require aiming toward expected drone activity
 
@@ -110,7 +110,7 @@ All external antenna ports use SMA Female pass-through adapters. Use antennas wi
 
 Connect the four included dual-band 8 dBi antennas to the unit:
 
-1. Connect antenna to **RX (E200)** port - Left side, port 3
+1. Connect antenna to **RX (DragonSDR)** port - Left side, port 3
 2. Connect antenna to **RX (Panda)** port - Left side, port 2
 3. Connect antenna to **ESP32** port - Left side, port 1
 4. Connect antenna to **BT5 (DragonTooth)** port - Right side, port 1
@@ -120,7 +120,7 @@ Connect the four included dual-band 8 dBi antennas to the unit:
 
 | Issue | Possible Cause | Solution |
 |-------|---------------|----------|
-| No DJI detections | Wrong port or loose connection | Verify antenna on E200 RX port |
+| No DJI detections | Wrong port or loose connection | Verify antenna on DragonSDR RX port |
 | No WiFi RID | Loose connection | Check antenna firmly connected |
 | Weak BT5 range | Low gain antenna | Use higher gain 2.4 GHz antenna |
 | No GPS lock | Internal antenna blocked | Connect external GPS antenna |

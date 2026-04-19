@@ -10,7 +10,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐             │
-│  │   ANTSDR E200   │  │  Panda Wireless │  │   DragonTooth   │             │
+│  │   DragonSDR     │  │  Panda Wireless │  │   DragonTooth   │             │
 │  │                 │  │                 │  │                 │             │
 │  │  DJI DroneID    │  │  WiFi Remote ID │  │  BT5 LR RID     │             │
 │  │  Ocusync 2/3/4  │  │  2.4/5 GHz      │  │  Bluetooth 5    │             │
@@ -67,7 +67,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 
 ### Detection Sources
 
-#### 1. ANTSDR E200 - DJI DroneID
+#### 1. DragonSDR - DJI DroneID
 - **Repository**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
 - **Function**: Detects DJI proprietary DroneID signals (Ocusync 2, 3, 4)
 - **Output**: Decoded drone telemetry via `dji_receiver.py`
@@ -129,7 +129,7 @@ DragonSync is the central orchestration application that:
 1. DJI Mavic 3 flies within range
            │
            ▼
-2. ANTSDR E200 detects Ocusync 3 signal
+2. DragonSDR detects Ocusync 3 signal
    └─► dji_receiver.py decodes DroneID
            │
            ▼
@@ -169,7 +169,7 @@ DragonSync is configured via `config.ini`:
 [SETTINGS]
 # ────────── ZMQ Input Sources ──────────
 # droneid-go unified output (WiFi + BLE + UART + DJI) on port 4224
-# DJI DroneID (dji_receiver.py / ANTSDR E200) on port 4221
+# DJI DroneID (dji_receiver.py / DragonSDR) on port 4221
 zmq_host = 127.0.0.1
 zmq_recv_timeout_ms = 500
 

@@ -12,7 +12,7 @@ WarDragon uses ZeroMQ (ZMQ) as the message transport layer between detection com
 │    Detection Sources                                      Application       │
 │    ─────────────────                                      ───────────       │
 │                                                                             │
-│    ANTSDR E200 ──► dji_receiver.py ──┐                                     │
+│    DragonSDR ────► dji_receiver.py ──┐                                     │
 │                    (tcp://*:4221)     │                                     │
 │                                      ├──► droneid-go ──► DragonSync        │
 │    Panda Wireless ──► droneid-go ────┘    (tcp://*:4224)  (subscribes)     │
@@ -45,7 +45,7 @@ This pattern allows:
 
 | Service | Port | Protocol | Description |
 |---------|------|----------|-------------|
-| DJI DroneID | 4221 | TCP | dji_receiver.py → ANTSDR E200 DJI detections |
+| DJI DroneID | 4221 | TCP | dji_receiver.py → DragonSDR DJI detections |
 | droneid-go | 4224 | TCP | Unified detection output — WiFi, BLE, UART, DJI (DragonSync subscribes here) |
 | WarDragon Monitor | 4225 | TCP | GPS and system status messages |
 | FPV Signals | 4226 | TCP | FPV drone signal detection (wardragon-fpv-detect) |
@@ -63,13 +63,13 @@ This pattern allows:
 ### Standard Detection Pipeline
 
 1. **Detection Hardware** captures drone signals:
-   - ANTSDR E200 → DJI Ocusync 2/3/4
+   - DragonSDR → DJI Ocusync 2/3/4
    - Panda Wireless → WiFi Remote ID (802.11)
    - DragonTooth → Bluetooth 5 Long Range Remote ID
 
-2. **droneid-go** receives and decodes all Remote ID sources natively, while **dji_receiver.py** handles the ANTSDR:
+2. **droneid-go** receives and decodes all Remote ID sources natively, while **dji_receiver.py** handles the DragonSDR:
    ```bash
-   # DJI receiver (AntSDR E200) — publishes on port 4221
+   # DJI receiver (DragonSDR) — publishes on port 4221
    python3 dji_receiver.py
 
    # droneid-go (systemd service: zmq-decoder) — unified receiver, publishes on port 4224
@@ -93,7 +93,7 @@ All ZMQ messages are JSON-encoded. Messages follow the **ASTM F3411 Open Drone I
 
 DragonSync's parser handles two formats:
 
-1. **List format** (DJI/AntSDR): Array of message block dicts
+1. **List format** (DJI/DragonSDR): Array of message block dicts
 2. **Dict format** (ESP32/Sniffle): Single dict with message blocks
 
 ## Message Blocks

@@ -8,7 +8,7 @@ WarDragon detects drones through multiple complementary technologies:
 
 | Technology | Protocol | Hardware | Range | Best For |
 |------------|----------|----------|-------|----------|
-| DJI DroneID | Ocusync 2/3/4 | ANTSDR E200 | 1-5+ km | DJI drones |
+| DJI DroneID | Ocusync 2/3/4 | DragonSDR | 1-5+ km | DJI drones |
 | WiFi Remote ID | IEEE 802.11 | Panda Wireless | 100-500m | Compliant drones |
 | Bluetooth Remote ID | BT5 LR | DragonTooth | 500m-1+ km | Compliant drones |
 | FPV Detection | Analog video | Optional SDR | Varies | Racing/custom drones |
@@ -34,11 +34,11 @@ From DJI DroneID signals, WarDragon extracts:
 - **Identification**: Serial number, drone type
 - **Signal Data**: Frequency, RSSI
 
-### Hardware: ANTSDR E200
+### Hardware: DragonSDR
 
 **Repository**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
 
-The ANTSDR E200 runs custom firmware optimized for DJI DroneID detection:
+The DragonSDR runs custom firmware optimized for DJI DroneID detection:
 
 - Frequency range: ~70 MHz to 6 GHz
 - Dual-channel reception
@@ -180,7 +180,7 @@ WarDragon detects drones across multiple protocols simultaneously. Each detectio
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  DJI DroneID ─────┐                                        │
-│  (ANTSDR E200)    │                                        │
+│  (DragonSDR)       │                                        │
 │                   ├──► DragonSync ──► TAK / MQTT / Lattice │
 │  WiFi Remote ID ──┤                                        │
 │  (Panda/ESP32)    │                                        │

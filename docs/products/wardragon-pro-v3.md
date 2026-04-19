@@ -7,7 +7,7 @@ The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data inte
 ## What's Included
 
 - WarDragon Pro v3 unit with all internal components
-- ANTSDR E200 (internal)
+- DragonSDR (internal)
 - Panda Wireless dual-band adapter (internal)
 - ESP32 WiFi Remote ID module (internal)
 - DragonTooth (Sonoff) BT5 LR dongle (internal)
@@ -31,7 +31,7 @@ The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data inte
 ## Detection Capabilities
 
 ### DJI DroneID Detection
-- **Hardware**: ANTSDR E200
+- **Hardware**: DragonSDR
 - **Protocols**: Ocusync 2, Ocusync 3, Ocusync 4 (activity detection)
 - **Frequency**: 2.4 GHz / 5.8 GHz
 - **Software**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
@@ -62,7 +62,7 @@ See [Hardware Overview](../hardware/pro-v3-overview.md) for detailed diagrams an
 **Left Side (front to back):**
 1. ESP32 Module - WiFi Remote ID (may be removed in future versions)
 2. RX Port - Panda Wireless (WiFi Remote ID)
-3. RX Port - ANTSDR E200 (DJI DroneID - Primary)
+3. RX Port - DragonSDR (DJI DroneID - Primary)
 4. TX Port - Not currently used
 
 **Right Side (front to back):**
@@ -75,7 +75,7 @@ The Pro v3 comes pre-configured with:
 
 - **DragonOS** - Base operating system
 - **[droneid-go](https://github.com/alphafox02/droneid-go)** - Unified Open Drone ID receiver (WiFi + BLE + UART, runs as `zmq-decoder` service)
-- **[antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)** - DJI DroneID receiver via AntSDR E200 (runs as `dji-receiver` service)
+- **[antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)** - DJI DroneID receiver via DragonSDR (runs as `dji-receiver` service)
 - **[DragonSync](https://github.com/alphafox02/DragonSync)** - Gateway aggregating all detection streams to TAK/MQTT/Lattice
 
 ## Output & Integration

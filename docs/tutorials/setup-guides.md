@@ -95,7 +95,7 @@ All Remote ID protocols (WiFi, Bluetooth, UART/ESP32) are handled by a single un
 | Service | Role | ZMQ Output |
 |---------|------|-----------|
 | `zmq-decoder` | WiFi RID + BLE + UART/ESP32 (droneid-go) | 4224 |
-| `dji-receiver` | DJI DroneID via AntSDR E200 | 4221 → 4224 |
+| `dji-receiver` | DJI DroneID via DragonSDR | 4221 → 4224 |
 | `dragonsync` | Aggregates 4224/4225, outputs TAK/MQTT | — |
 
 ### Check All Detection Services
@@ -111,14 +111,14 @@ sudo systemctl restart zmq-decoder
 sudo systemctl restart dji-receiver
 ```
 
-### Disable DJI Detection (if no AntSDR)
+### Disable DJI Detection (if no DragonSDR)
 
 ```bash
 sudo systemctl disable dji-receiver
 sudo systemctl stop dji-receiver
 ```
 
-Verify ANTSDR E200 antenna connected to Left Side - Port 3 (RX E200).
+Verify DragonSDR antenna connected to Left Side - Port 3 (RX DragonSDR).
 
 ## Output Configuration
 

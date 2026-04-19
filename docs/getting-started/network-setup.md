@@ -6,18 +6,18 @@ This guide covers network configuration options for your WarDragon Pro v3.
 
 ## Important: Internal Network Interfaces
 
-**Do NOT modify "Wired connection 1"** - This interface is used internally for communication with the ANTSDR E200 and has a static IP configuration.
+**Do NOT modify "Wired connection 1"** - This interface is used internally for communication with the DragonSDR and has a static IP configuration.
 
-### E200 Internal Network
+### DragonSDR Internal Network
 
-The ANTSDR E200 and WarDragon communicate over a dedicated internal Ethernet connection:
+The DragonSDR and WarDragon communicate over a dedicated internal Ethernet connection:
 
 | Device | IP Address | Notes |
 |--------|------------|-------|
-| WarDragon (Wired connection 1) | 172.31.100.1 | Internal interface to E200 |
-| ANTSDR E200 | 172.31.100.2 | With boot switch in SD card mode |
+| WarDragon (Wired connection 1) | 172.31.100.1 | Internal interface to DragonSDR |
+| DragonSDR | 172.31.100.2 | With boot switch in SD card mode |
 
-> **Warning**: Modifying these addresses will break DJI DroneID detection. The E200's IP is configured in its firmware (SD card mode). Advanced users can change this, but it requires coordinated changes to both the E200 and WarDragon network configuration.
+> **Warning**: Modifying these addresses will break DJI DroneID detection. The DragonSDR's IP is configured in its firmware (SD card mode). Advanced users can change this, but it requires coordinated changes to both the DragonSDR and WarDragon network configuration.
 
 ### External Network
 
@@ -40,7 +40,7 @@ Out of the box:
 
 | Interface | Configuration |
 |-----------|--------------|
-| Wired connection 1 | Static 172.31.100.1 (internal E200 link) - DO NOT MODIFY |
+| Wired connection 1 | Static 172.31.100.1 (internal DragonSDR link) - DO NOT MODIFY |
 | Wired connection 2 | DHCP (external Ethernet port) |
 | WiFi | Available for hotspot or client mode |
 
@@ -165,7 +165,7 @@ nc -zv <tak-server> <port>
 | No IP address | `ip addr show` | Check cable/DHCP server |
 | Can't reach gateway | `ping <gateway>` | Check IP/subnet config |
 | DNS not working | `ping 8.8.8.8` works but names don't | Check DNS configuration |
-| E200 not working | Modified Wired connection 1 | Restore default static config |
+| DragonSDR not working | Modified Wired connection 1 | Restore default static config |
 
 ## Related Documentation
 
