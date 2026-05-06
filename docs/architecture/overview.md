@@ -67,25 +67,38 @@ The WarDragon system is built on a modular, message-driven architecture that all
 
 ### Detection Sources
 
-#### 1. DragonSDR - DJI DroneID
+#### 1. DragonSDR — DJI DroneID
 - **Repository**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
-- **Function**: Detects DJI proprietary DroneID signals (Ocusync 2, 3, 4)
+- **Function**: Detects DJI proprietary DroneID signals (OcuSync 2, 3, 4)
 - **Output**: Decoded drone telemetry via `dji_receiver.py`
-- **Transport**: ZMQ Publisher
+- **Transport**: ZMQ Publisher (port 4221)
+- **Coverage**: O2 / O3 fully decoded out of the box; O4 is detection-only by default. Extended to full O4 telemetry via [DragonScope](../software/dragonscope.md).
 
-#### 2. droneid-go (WiFi/BT Remote ID)
+#### 2. droneid-go (WiFi / BLE / UART Remote ID)
 - **Repository**: [droneid-go](https://github.com/alphafox02/droneid-go)
-- **Function**: High-performance Open Drone ID receiver for WiFi and Bluetooth Remote ID
+- **Function**: Unified Open Drone ID receiver for WiFi, Bluetooth, and UART/ESP32 inputs
 - **Output**: JSON-formatted Remote ID data
-- **Transport**: ZMQ Publisher
+- **Transport**: ZMQ Publisher (port 4224 — also subscribes to dji-receiver and republishes)
 
-#### 3. DragonTooth (Sniffle)
-- **Function**: Bluetooth 5 Long Range detection
+#### 3. DragonTooth (TI Sniffle Board)
+- **Function**: Bluetooth 5 Long Range Remote ID detection
 - **Firmware**: Sniffle-compatible
-- **Output**: BT5 LR Remote ID packets
-- **Transport**: ZMQ Publisher
+- **Output**: BT5 LR Remote ID packets, ingested by droneid-go
+- **Transport**: Native BLE input to droneid-go
 
-### Processing - DragonSync
+#### 4. DragonSig — FPV / 900 MHz *(x86_64 variants of Pro v5 / Drop-In)*
+- **Function**: Analog FPV video detection (5.x GHz) **or** RFD900 / 900 MHz monitoring. Software-switchable between missions on a single SDR — additional mission profiles can be added over time.
+- **Hardware**: **Wideband 70 MHz – 6 GHz 2nd SDR built into the x86_64 variant** of Pro v5 / Drop-In kits
+- **Output**: ZMQ Publisher (port 4226), same JSON envelope as the legacy FPV detector
+- **See**: [DragonSig](../software/dragonsig.md)
+
+### Processing Layer
+
+#### DragonScope *(optional subscription)*
+
+[DragonScope](../software/dragonscope.md) is an annual subscription service that extends DJI DroneID coverage to all current OcuSync generations including OcuSync 4+. It runs alongside dji-receiver, decodes the additional telemetry stream, and feeds resolved positions back into the same ZMQ pipeline. From DragonSync's perspective downstream, an OcuSync 4 drone is just a drone — same CoT type, same MQTT format. Requires data connectivity. $2,500 / yr.
+
+#### DragonSync
 
 **Repository**: [DragonSync](https://github.com/alphafox02/DragonSync)
 

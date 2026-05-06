@@ -103,7 +103,7 @@ Both topics carry **identical JSON**. The aggregate topic (`wardragon/drones`) e
 | Field | Type | Always present | Notes |
 |-------|------|-----------------|-------|
 | `id` | string | yes | Drone identifier (e.g. `drone-F6Q8D244C00CL2KF`, `drone-AABBCCDDEEFF` for BLE MAC, `drone-alert` for unknown OcuSync) |
-| `description` | string | yes (may be empty) | Self-reported description, e.g. `DJI O4 (Decrypted)`, `DJI Mini 2 (O2)`, operator self-ID text |
+| `description` | string | yes (may be empty) | Self-reported description, e.g. `DJI Mini 5 (O4)`, `DJI Mini 2 (O2)`, operator self-ID text |
 | `track_type` | string | yes | Always `"drone"` |
 | `lat` | float | yes | Latitude (degrees). `0.0` when no fix |
 | `lon` | float | yes | Longitude (degrees) |
@@ -160,7 +160,7 @@ Both topics carry **identical JSON**. The aggregate topic (`wardragon/drones`) e
 ```json
 {
   "id": "drone-F6Q8D244C00CL2KF",
-  "description": "DJI O4 (Decrypted)",
+  "description": "DJI Mini 5 (O4)",
   "track_type": "drone",
   "lat": 27.8002846,
   "lon": -82.6686196,
@@ -733,7 +733,7 @@ DragonSync uses async MQTT connect with automatic retry. If the broker is tempor
 
 ### Drone shown but no description / transport / RID metadata
 
-- For OcuSync drones: `transport` is intentionally empty (the receiver doesn't tag link layer for OcuSync). `description` should be populated with `DJI O4 (Decrypted)`, `DJI Mini 2 (O2)`, etc. If empty, your `dji-receiver` may be on an older version — pull the latest from `alphafox02/antsdr_dji_droneid`.
+- For OcuSync drones: `transport` is intentionally empty (the receiver doesn't tag link layer for OcuSync). `description` should be populated with the detected DJI model and OcuSync generation (e.g. `DJI Mini 2 (O2)`, `DJI Mavic 3 (O3)`, `DJI Mini 5`). If empty, your `dji-receiver` may be on an older version — pull the latest from `alphafox02/antsdr_dji_droneid`.
 - For BLE / WiFi RID drones: `description` carries the operator's self-ID text and may be empty if they didn't set one.
 - `rid_make` / `rid_model` / `rid_status` only populate when FAA RID lookup succeeds (requires `rid_enabled = true` and a working RID database / API).
 

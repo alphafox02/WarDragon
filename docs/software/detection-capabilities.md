@@ -1,27 +1,39 @@
 # Detection Capabilities
 
-This document details the drone detection capabilities of the WarDragon Pro v3, including supported protocols, hardware requirements, and expected performance.
+This document details the drone detection capabilities of the WarDragon platform across all current kits — Pro v3, Pro v5 Mobile Detection Kit (ARM64 / x86_64), and v1 Drop-In Detection Kit (ARM64 / x86_64).
 
 ## Detection Overview
 
 WarDragon detects drones through multiple complementary technologies:
 
-| Technology | Protocol | Hardware | Range | Best For |
-|------------|----------|----------|-------|----------|
-| DJI DroneID | Ocusync 2/3/4 | DragonSDR | 1-5+ km | DJI drones |
-| WiFi Remote ID | IEEE 802.11 | Panda Wireless | 100-500m | Compliant drones |
-| Bluetooth Remote ID | BT5 LR | DragonTooth | 500m-1+ km | Compliant drones |
-| FPV Detection | Analog video | Optional SDR | Varies | Racing/custom drones |
+| Technology | Protocol | Hardware | Available On |
+|------------|----------|----------|--------------|
+| DJI DroneID | OcuSync 2 / 3 / 4+ | DragonSDR | All kits |
+| WiFi Remote ID | IEEE 802.11 | WiFi dongle | All kits |
+| Bluetooth Remote ID | BT5 LR | Bluetooth dongle | All kits |
+| Analog FPV video | 5.x GHz analog | Built-in wideband 2nd SDR + [DragonSig](dragonsig.md) | Pro v5 / Drop-In **x86_64** variant |
+| RFD900 / 900 MHz telemetry | 900 MHz | Built-in wideband 2nd SDR + [DragonSig](dragonsig.md) | Pro v5 / Drop-In **x86_64** variant |
 
 ## DJI DroneID Detection
 
 ### Supported Protocols
 
-| Protocol | DJI Models | Frequency | Status |
-|----------|------------|-----------|--------|
-| Ocusync 2 | Mavic Air 2, Mini 2, etc. | 2.4/5.8 GHz | Full support |
-| Ocusync 3 | Mavic 3, Mini 3/Pro, Air 3 | 2.4/5.8 GHz | Full support |
-| Ocusync 4 | Recent DJI models | 2.4/5.8 GHz | Activity detection |
+| Protocol | DJI Models | Frequency | Coverage |
+|----------|------------|-----------|----------|
+| OcuSync 2 | Mavic Air 2, Mini 2, Air 2S | 2.4 / 5.8 GHz | Full telemetry |
+| OcuSync 3 (standard) | Mavic 3, Mini 3 / 3 Pro, Air 3 | 2.4 / 5.8 GHz | Full telemetry |
+| OcuSync 3 Pro / OcuSync 4+ | Mini 5, current generation | 2.4 / 5.8 GHz | Activity detection out of the box; full telemetry with [DragonScope](dragonscope.md) |
+
+### Coverage Tiers (Current OcuSync Generations)
+
+| Coverage Tier | What You Get | Requirements |
+|---------------|--------------|--------------|
+| **Detection only** | Hash ID (e.g. `drone-alert-{hash}`), detection frequency, RSSI | Standard DragonSDR (default; included with all kits) |
+| **Full telemetry** | Serial, drone GPS, pilot GPS, home point, altitude, speed, RSSI | [DragonScope Drone ID Service](dragonscope.md) ($2,500 / yr, requires data connectivity) |
+
+OcuSync 2 / 3 standard detection is **unaffected** by DragonScope state and continues to work fully offline.
+
+> DJI drones only broadcast DroneID while motors are spinning. Power-on alone activates the OcuSync control link but does not start the DroneID broadcast.
 
 ### Data Extracted
 
@@ -126,19 +138,24 @@ Bluetooth 5 Long Range significantly extends detection:
 | LE Coded S2 | 300-500m | 2x range vs 1M |
 | LE Coded S8 | 500m-1+ km | 4x range, slower |
 
-## FPV Analog Detection (Experimental)
+## DragonSig — FPV / 900 MHz Detection
 
-**Repository**: [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect)
+[DragonSig](dragonsig.md) is the wideband signal-detection service that runs on the **wideband 70 MHz – 6 GHz 2nd SDR** built into the **x86_64 variant** of the Pro v5 / Drop-In kits. The ARM64 variant doesn't include the 2nd SDR, so DragonSig isn't available on those kits.
 
-### Overview
+Because the 2nd SDR is wideband, DragonSig **retunes it via software** to whichever mission you've configured. Today's mission set:
 
-Detects analog FPV video transmitters commonly used on racing and custom-built drones. This is an optional capability requiring additional SDR hardware and software.
+- **Analog FPV video** — 5.x GHz
+- **RFD900 / 900 MHz monitoring** — 900 MHz
 
-> **Note**: The `suscli fpvdet` detector plugin used for signal confirmation is **not open source** and is not included in the public repository. WarDragon kits ship with it installed; other systems need their own licensed build. Energy detection works without it, but confirmation is skipped.
+Additional missions can be added over time without hardware changes — the SDR already covers the necessary band.
 
-### Supported Frequencies
+The SDR is dedicated to whichever mission you've configured at any given time — DragonSig isn't sweeping multiple bands simultaneously on a single radio. If you need persistent multi-band coverage, contact us about a kit configuration with multiple 2nd SDRs.
 
-The scanner covers standard FPV race bands in the 5 GHz range:
+DragonSig runs on the dedicated 2nd SDR, so DJI DroneID detection on the DragonSDR continues uninterrupted.
+
+### FPV Analog — Frequency Coverage
+
+The DragonSig sweep covers the standard 5 GHz FPV race bands and adjacent channels:
 
 | Band | Frequency Range | Channels |
 |------|-----------------|----------|
@@ -150,45 +167,46 @@ The scanner covers standard FPV race bands in the 5 GHz range:
 | L | 5333-5613 MHz | 8 |
 | X | 4990-5200 MHz | 8 |
 
-### Requirements
-
-- GNU Radio 3.10.x with gr-inspector and gr-osmosdr
-- SDR hardware (Pluto SDR default, HackRF/RTL-SDR supported)
-- Appropriate 5 GHz antenna
-- Optional: `suscli fpvdet` for PAL/NTSC video confirmation
-
 ### Detection Method
 
-1. Tunes across known FPV center frequencies using gr-inspector energy detector
-2. Detects signals wider than minimum bandwidth threshold (~4 MHz for typical FPV)
-3. Optionally confirms with `suscli fpvdet` for PAL/NTSC confidence scoring
-4. Publishes alerts via ZMQ (port 4226) in DroneID-compatible format
+1. Wideband FFT energy detector with adaptive thresholding
+2. FM envelope check filters out WiFi / OFDM signals
+3. PAL / NTSC comb-filter classifier confirms analog video
+4. ML-assisted classification (YOLO / ONNX) extends to additional signal types over time
+5. Alerts publish on ZMQ port `4226` in the same JSON envelope as the legacy detector — DragonSync ingests without changes
 
 ### Limitations
 
-- **No position data** - Analog FPV doesn't broadcast location (uses WarDragon GPS)
-- **Detection only** - Cannot identify specific drone, only presence of transmission
-- **Shares SDR with DJI detection** - Service wrapper stops DJI receiver during FPV scan
+- **FPV analog** — no native position data (uses WarDragon GPS as the location)
+- **RFD900 / 900 MHz** — position is included when telemetry from the link is decoded; otherwise WarDragon GPS is used
+- **Requires the x86_64 variant** of Pro v5 or Drop-In — the wideband 2nd SDR isn't present on the ARM64 variant or on Pro v3 / older kits
+
+### Legacy FPV Flow (Pro v3)
+
+The earlier `wardragon-fpv-detect` flow ([repo](https://github.com/alphafox02/wardragon-fpv-detect)) used GNU Radio with gr-inspector and the `suscli fpvdet` plugin. It remains documented for Pro v3 and other single-SDR deployments — see the upstream repository.
 
 ## Multi-Protocol Detection
 
 WarDragon detects drones across multiple protocols simultaneously. Each detection source feeds into DragonSync:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                  Detection Sources                          │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  DJI DroneID ─────┐                                        │
-│  (DragonSDR)       │                                        │
-│                   ├──► DragonSync ──► TAK / MQTT / Lattice │
-│  WiFi Remote ID ──┤                                        │
-│  (Panda/ESP32)    │                                        │
-│                   │                                        │
-│  BT5 Remote ID ───┘                                        │
-│  (DragonTooth)                                             │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                       Detection Sources                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  DJI DroneID ─────┐                                                │
+│  (DragonSDR)      │  ◄── DragonScope (optional subscription)       │
+│                   │      decodes O3 Pro / O4+                      │
+│  WiFi Remote ID ──┤                                                 │
+│  (WiFi dongle)    ├──► DragonSync ──► TAK / MQTT / Lattice / API   │
+│                   │                                                 │
+│  BT5 Remote ID ───┤                                                 │
+│  (BT dongle)      │                                                 │
+│                   │                                                 │
+│  FPV  OR  900MHz ─┘  ◄── DragonSig (one mission per 2nd SDR)       │
+│  (2nd SDR add-on)                                                  │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 **Note**: DragonSync tracks drones by their serial number (ID). If a DJI drone broadcasts both DJI DroneID and standard Remote ID using the **same serial number**, they will be merged into a single track. However, if the serial numbers differ between protocols (which can happen), they will appear as separate tracks.
