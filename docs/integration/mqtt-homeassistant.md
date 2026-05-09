@@ -1,13 +1,10 @@
 # MQTT & Home Assistant Integration
 
-This guide documents every MQTT topic DragonSync publishes, the exact JSON schema on each topic, and how Home Assistant auto-discovery maps those payloads to entities.
+This guide covers operator-facing MQTT setup: broker configuration, Home Assistant auto-discovery, dashboards, automations, and troubleshooting.
 
-There are two distinct audiences for this document:
+> **Looking for the JSON schema or full topic list?** See the canonical reference: [DragonSync MQTT Payload Schema](https://github.com/alphafox02/DragonSync/blob/main/docs/mqtt-schema.md). It documents every topic and field and is updated alongside the code. This guide covers everything *around* the wire format — config, HA, broker setup, automations.
 
-- **Plain MQTT consumers** (Node-RED, custom dashboards, scripts, third-party apps): use the [Topic Reference](#topic-reference) and [Payload Reference](#payload-reference) sections — you only need the JSON schemas.
-- **Home Assistant users**: use the [Home Assistant Reference](#home-assistant-reference) section — covers what discovery publishes, which entities appear, and how JSON fields back each sensor.
-
-The two are independent. HA discovery is opt-in (`mqtt_ha_enabled`), and the underlying JSON payloads are the same regardless of whether HA is involved.
+HA discovery is opt-in (`mqtt_ha_enabled`); the underlying JSON payloads are the same regardless of whether HA is involved.
 
 ---
 
@@ -63,293 +60,41 @@ mqtt_retain = true
 
 ---
 
-## Topic Reference
+## Topics & Payloads at a Glance
 
-Every topic DragonSync may publish to. `<id>` is the drone serial / MAC / ID (e.g. `drone-F6Q8D244C00CL2KF`). `<seen_by>` is the WarDragon kit ID, slugified.
+Most useful topics for operators:
 
-| Topic | Direction | Retained | Description |
-|-------|-----------|----------|-------------|
-| `wardragon/service/availability` | publish | yes | LWT — `online` while DragonSync is running, `offline` if it dies or shuts down cleanly |
-| `wardragon/drones` | publish | configurable | Aggregate drone state (all detected drones, one JSON message per update) |
-| `wardragon/drone/<id>` | publish | configurable | Per-drone state — full JSON, same schema as aggregate |
-| `wardragon/drone/<id>/availability` | publish | yes | `online` when drone has a real position, `offline` when aged out or unknown |
-| `wardragon/drone/<id>/state` | publish | yes | HA device_tracker textual state (`None` initially) |
-| `wardragon/drone/<id>/pilot_attrs` | publish | yes | Pilot location attributes (`latitude`, `longitude`, `gps_accuracy`) for HA pilot tracker |
-| `wardragon/drone/<id>/pilot_state` | publish | yes | HA pilot tracker textual state |
-| `wardragon/drone/<id>/pilot_availability` | publish | yes | `online` when pilot location is known, `offline` otherwise |
-| `wardragon/drone/<id>/home_attrs` | publish | yes | Home location attributes for HA home tracker |
-| `wardragon/drone/<id>/home_state` | publish | yes | HA home tracker textual state |
-| `wardragon/drone/<id>/home_availability` | publish | yes | `online` when home location is known, `offline` otherwise |
-| `wardragon/aircraft` | publish | no | ADS-B aircraft state (one message per update; not retained — too high-volume) |
-| `wardragon/signals` | publish | configurable | Aggregate FPV/RF signal alerts |
-| `wardragon/signals/<seen_by>` | publish | configurable | Per-sensor signal feed (only when `mqtt_ha_signal_tracker = true`) |
-| `wardragon/signals/<seen_by>/state` | publish | configurable | HA signal tracker textual state |
-| `wardragon/signals/<seen_by>/availability` | publish | yes | `online` whenever a signal arrives |
-| `wardragon/signals/availability` | publish | yes | Marks signals offline at shutdown |
-| `wardragon/system/attrs` | publish | no | WarDragon kit telemetry (CPU, mem, GPS, SDR temps) |
-| `wardragon/system/state` | publish | no | Kit textual state (`online` while publishing) |
-| `wardragon/system/availability` | publish | yes | `online` while DragonSync publishes status, `offline` at shutdown |
-| `homeassistant/sensor/<unique_id>/config` | publish | yes | HA sensor discovery configs (only when `mqtt_ha_enabled = true`) |
-| `homeassistant/device_tracker/<unique_id>/config` | publish | yes | HA device_tracker discovery configs |
+| Topic | Purpose |
+|-------|---------|
+| `wardragon/drones` | Aggregate drone stream — every drone update lands here |
+| `wardragon/drone/<id>` | Per-drone state (required for HA discovery) |
+| `wardragon/system/attrs` | Kit telemetry (CPU, mem, GPS, SDR temps) |
+| `wardragon/aircraft` | ADS-B aircraft (when enabled) |
+| `wardragon/signals` | FPV/RF signal alerts (when enabled) |
+| `wardragon/service/availability` | DragonSync online/offline (LWT) |
+| `homeassistant/...` | HA auto-discovery configs (when `mqtt_ha_enabled`) |
 
----
-
-## Payload Reference
-
-### Drone payload — `wardragon/drones` and `wardragon/drone/<id>`
-
-Both topics carry **identical JSON**. The aggregate topic (`wardragon/drones`) emits one message per drone update; the per-drone topic carries only that drone's most recent state. Both are produced by `_drone_to_state` in `sinks/mqtt_sink.py`.
-
-| Field | Type | Always present | Notes |
-|-------|------|-----------------|-------|
-| `id` | string | yes | Drone identifier (e.g. `drone-F6Q8D244C00CL2KF`, `drone-AABBCCDDEEFF` for BLE MAC, `drone-alert` for unknown OcuSync) |
-| `description` | string | yes (may be empty) | Self-reported description, e.g. `DJI Mini 5 (O4)`, `DJI Mini 2 (O2)`, operator self-ID text |
-| `track_type` | string | yes | Always `"drone"` |
-| `lat` | float | yes | Latitude (degrees). `0.0` when no fix |
-| `lon` | float | yes | Longitude (degrees) |
-| `latitude` | float | yes | Mirror of `lat` (for HA `device_tracker` compatibility) |
-| `longitude` | float | yes | Mirror of `lon` |
-| `gps_accuracy` | float | yes | HA-style accuracy (meters); sourced from `horizontal_accuracy` |
-| `alt` | float | yes | Altitude HAE / geodetic (meters) |
-| `height` | float | yes | Altitude AGL (meters) |
-| `pressure_altitude` | float \| null | no | Pressure altitude (when present in RID) |
-| `speed` | float | yes | Ground speed (m/s) |
-| `vspeed` | float | yes | Vertical speed (m/s) |
-| `speed_multiplier` | float \| null | no | RID speed multiplier flag |
-| `direction` | float | yes | Heading / course (degrees, 0–360) |
-| `rssi` | float | yes | Received signal strength (dBm) |
-| `pilot_lat` | float | yes | Pilot latitude. `0.0` when not detected |
-| `pilot_lon` | float | yes | Pilot longitude |
-| `home_lat` | float | yes | Home point latitude. `0.0` when not detected |
-| `home_lon` | float | yes | Home point longitude |
-| `mac` | string | yes (may be empty) | BLE/WiFi MAC address. Empty for OcuSync (RF-only) |
-| `id_type` | string | yes (may be empty) | RID ID type, e.g. `Serial Number (ANSI/CTA-2063-A)`, `CAA Assigned Registration ID` |
-| `ua_type` | int \| null | no | Numeric UA category (0–15 per ASTM F3411) |
-| `ua_type_name` | string | yes (may be empty) | Human-readable UA category, e.g. `Helicopter or Multirotor` |
-| `caa_id` | string | yes (may be empty) | CAA Assigned Registration ID, when present in a separate Basic ID |
-| `operator_id_type` | string | yes (may be empty) | Operator ID type from RID Operator ID Message |
-| `operator_id` | string | yes (may be empty) | Operator ID value |
-| `op_status` | string | yes (may be empty) | RID operational status flag |
-| `height_type` | string | yes (may be empty) | RID height reference type |
-| `ew_dir` | string | yes (may be empty) | RID E/W direction segment flag |
-| `timestamp` | string | yes (may be empty) | RID timestamp (typically seconds past hour) |
-| `rid_timestamp` | string | yes | Mirrors `timestamp` if no separate value |
-| `observed_at` | float \| null | no | Unix epoch seconds when DragonSync first received this update |
-| `index` | int | yes | RID page index (BT/WiFi only) |
-| `runtime` | int | yes | RID runtime counter |
-| `seen_by` | string \| null | no | WarDragon kit ID that observed this drone |
-| `last_update_time` | float \| null | no | Internal timestamp (seconds since epoch) of most recent update |
-| `horizontal_accuracy` | string | yes (may be empty) | RID-spec accuracy string |
-| `vertical_accuracy` | string | yes (may be empty) | RID-spec accuracy string |
-| `baro_accuracy` | string | yes (may be empty) | RID-spec accuracy string |
-| `speed_accuracy` | string | yes (may be empty) | RID-spec accuracy string |
-| `timestamp_accuracy` | string | yes (may be empty) | RID-spec accuracy string |
-| `freq` | float \| null | no | Detection frequency. May be Hz or MHz depending on source |
-| `freq_mhz` | float \| null | no | Always MHz, normalised from `freq` |
-| `transport` | string | yes (may be empty) | Link layer (`BT5`, `WiFi-NAN`, `ISM-FHSS`, etc.). Empty for OcuSync — receiver doesn't tag link layer |
-| `rid_make` | string \| null | no | FAA RID lookup result: manufacturer |
-| `rid_model` | string \| null | no | FAA RID lookup result: model |
-| `rid_status` | string \| null | no | FAA RID lookup result: registration status |
-| `rid_tracking` | string \| null | no | FAA RID lookup result: tracking ID |
-| `rid_source` | string \| null | no | FAA RID lookup result: source (e.g. `local-cache`, `faa-api`) |
-| `rid_lookup_attempted` | bool | yes | Whether FAA RID lookup was attempted |
-| `rid_lookup_success` | bool | yes | Whether FAA RID lookup succeeded |
-
-**Example payload** (DJI O4 detected by dji-receiver):
+A drone payload looks like:
 
 ```json
 {
   "id": "drone-F6Q8D244C00CL2KF",
-  "description": "DJI Mini 5 (O4)",
-  "track_type": "drone",
+  "description": "DJI O4 (Decrypted)",
   "lat": 27.8002846,
   "lon": -82.6686196,
-  "latitude": 27.8002846,
-  "longitude": -82.6686196,
-  "gps_accuracy": 0.0,
   "alt": 65531.0,
-  "height": 0.0,
   "speed": 0.0,
-  "vspeed": 0.0,
   "direction": 270.0,
   "rssi": -117.0,
-  "pilot_lat": 27.8003992,
-  "pilot_lon": -82.668568,
-  "home_lat": 27.8002961,
-  "home_lon": -82.6685738,
-  "mac": "",
   "id_type": "Serial Number (ANSI/CTA-2063-A)",
-  "ua_type": 0,
-  "ua_type_name": "",
-  "caa_id": "",
-  "operator_id_type": "",
-  "operator_id": "",
-  "freq": 5756.5,
   "freq_mhz": 5756.5,
   "transport": "",
   "seen_by": "wardragon-G6PA14100J63",
-  "rid_lookup_attempted": false,
-  "rid_lookup_success": false
+  "track_type": "drone"
 }
 ```
 
----
-
-### Pilot location — `wardragon/drone/<id>/pilot_attrs`
-
-Smaller JSON, only published when a pilot location is known. Used by HA's pilot device_tracker.
-
-```json
-{
-  "latitude": 27.8003992,
-  "longitude": -82.668568,
-  "gps_accuracy": 0.0
-}
-```
-
-### Home location — `wardragon/drone/<id>/home_attrs`
-
-Same shape as pilot_attrs.
-
-```json
-{
-  "latitude": 27.8002961,
-  "longitude": -82.6685738,
-  "gps_accuracy": 0.0
-}
-```
-
----
-
-### System payload — `wardragon/system/attrs`
-
-WarDragon kit telemetry. Produced by `publish_system` in `sinks/mqtt_sink.py`.
-
-| Field | Type | Notes |
-|-------|------|-------|
-| `id` | string | Kit ID, e.g. `wardragon-G6PA14100J63` |
-| `latitude` | float | Kit GPS latitude |
-| `longitude` | float | Kit GPS longitude |
-| `hae` | float | Kit altitude HAE (meters) |
-| `cpu_usage` | float | CPU percent |
-| `memory_total_mb` | float | Total RAM (MB) |
-| `memory_available_mb` | float | Available RAM (MB) |
-| `disk_total_mb` | float | Total disk (MB) |
-| `disk_used_mb` | float | Used disk (MB) |
-| `temperature_c` | float | Mainboard temperature (°C) |
-| `uptime_s` | float | System uptime (seconds) |
-| `pluto_temp_c` | float \| null | DragonSDR PlutoSDR temperature (°C) |
-| `zynq_temp_c` | float \| null | DragonSDR Zynq SoC temperature (°C) |
-| `speed_mps` | float | Kit ground speed (GPS) |
-| `track_deg` | float | Kit course (degrees) |
-| `gps_fix` | bool | GPS fix valid |
-| `time_source` | string \| null | e.g. `gpsd`, `system` |
-| `gpsd_time_utc` | string \| null | UTC time from gpsd |
-| `updated` | int | Unix epoch seconds when published |
-
-**Example:**
-
-```json
-{
-  "id": "wardragon-G6PA14100J63",
-  "latitude": 27.8003,
-  "longitude": -82.6686,
-  "hae": 5.2,
-  "cpu_usage": 12.4,
-  "memory_total_mb": 16384.0,
-  "memory_available_mb": 9821.5,
-  "disk_total_mb": 953869.7,
-  "disk_used_mb": 142051.2,
-  "temperature_c": 51.0,
-  "uptime_s": 432189.0,
-  "pluto_temp_c": 47.5,
-  "zynq_temp_c": 53.0,
-  "speed_mps": 0.0,
-  "track_deg": 0.0,
-  "gps_fix": true,
-  "time_source": "gpsd",
-  "gpsd_time_utc": "2026-04-30T19:38:55.000Z",
-  "updated": 1746040735
-}
-```
-
----
-
-### Aircraft payload — `wardragon/aircraft`
-
-ADS-B aircraft. Produced by `_aircraft_to_state` in `sinks/mqtt_sink.py`. **Not retained** (aircraft turn over rapidly; one message per update).
-
-| Field | Type | Notes |
-|-------|------|-------|
-| `icao` | string | ICAO 24-bit hex address |
-| `callsign` | string | Flight number / callsign (may be empty) |
-| `registration` | string | Tail / registration (may be empty) |
-| `lat` | float | Latitude |
-| `lon` | float | Longitude |
-| `latitude` | float | Mirror of `lat` |
-| `longitude` | float | Mirror of `lon` |
-| `alt` | float | Altitude (feet, geometric preferred, falls back to barometric) |
-| `altitude_ft` | float | Mirror of `alt` |
-| `speed` | float | Ground speed (knots) |
-| `speed_kt` | float | Mirror of `speed` |
-| `track` | float | True track (degrees) |
-| `heading` | float | Mirror of `track` |
-| `vertical_rate` | float \| null | Barometric vertical rate (ft/min) |
-| `squawk` | string | Mode A squawk code |
-| `category` | string | ADS-B emitter category |
-| `on_ground` | bool | Ground state |
-| `nac_p` | float \| null | NACp (positional accuracy) |
-| `nac_v` | float \| null | NACv (velocity accuracy) |
-| `rssi` | float \| null | Receiver signal strength (dBFS) |
-| `seen_by` | string \| null | WarDragon kit ID |
-| `track_type` | string | Always `"aircraft"` |
-
----
-
-### Signal payload — `wardragon/signals`
-
-FPV / RF signal detections. Produced by `_signal_to_state`.
-
-| Field | Type | Notes |
-|-------|------|-------|
-| `uid` | string | Stable detection UID |
-| `signal_type` | string | e.g. `fpv`, `analog-video`, `digital-fhss` |
-| `source` | string \| null | Source identifier (e.g. SDR name) |
-| `callsign` | string \| null | Display name |
-| `description` | string \| null | Free-text description |
-| `center_hz` | float \| null | Centre frequency (Hz) |
-| `bandwidth_hz` | float \| null | Bandwidth (Hz) |
-| `pal` | float \| null | PAL detection confidence |
-| `ntsc` | float \| null | NTSC detection confidence |
-| `rssi` | float \| null | Signal strength (dBm) |
-| `sensor_lat` | float \| null | Sensor latitude |
-| `sensor_lon` | float \| null | Sensor longitude |
-| `sensor_alt` | float \| null | Sensor altitude |
-| `lat` | float | Detection latitude (sensor by default) |
-| `lon` | float | Detection longitude |
-| `latitude` | float | Mirror of `lat` |
-| `longitude` | float | Mirror of `lon` |
-| `alt` | float | Detection altitude |
-| `gps_accuracy` | float | Detection radius (meters) — used as HA accuracy |
-| `radius_m` | float | Mirror of `gps_accuracy` |
-| `seen_by` | string \| null | WarDragon kit ID |
-| `observed_at` | float \| null | Unix epoch seconds |
-
----
-
-### Availability topics
-
-All availability topics carry the literal string `online` or `offline` (no JSON). They use MQTT's retain flag so subscribers see the current state immediately on connect.
-
-| Topic | Meaning |
-|-------|---------|
-| `wardragon/service/availability` | DragonSync process is running |
-| `wardragon/system/availability` | Kit telemetry is being published |
-| `wardragon/drone/<id>/availability` | Drone has a real (non-zero) position |
-| `wardragon/drone/<id>/pilot_availability` | Pilot location known |
-| `wardragon/drone/<id>/home_availability` | Home location known |
-| `wardragon/signals/availability` | Signal feed active |
-| `wardragon/signals/<seen_by>/availability` | Per-sensor signal feed active |
+> **Full schema reference:** every topic, every field, types, always-present vs. conditional notes, plus signal/aircraft/system payloads — see [DragonSync MQTT Payload Schema](https://github.com/alphafox02/DragonSync/blob/main/docs/mqtt-schema.md). That doc lives alongside the code that produces these payloads and is the source of truth.
 
 ---
 
@@ -741,6 +486,7 @@ DragonSync uses async MQTT connect with automatic retry. If the broker is tempor
 
 ## Related Documentation
 
+- [DragonSync MQTT Payload Schema](https://github.com/alphafox02/DragonSync/blob/main/docs/mqtt-schema.md) — canonical wire-format reference (every topic, every field)
 - [DragonSync Configuration](../software/dragonsync.md)
 - [WarDragonAnalytics](analytics.md)
 - [TAK Integration](tak-integration.md)
