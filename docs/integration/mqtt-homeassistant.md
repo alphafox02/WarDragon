@@ -62,17 +62,53 @@ mqtt_retain = true
 
 ## Topics & Payloads at a Glance
 
+> **Breaking change for MQTT subscribers (DragonSync v2.0+):** kit-level
+> system and service topics are now **kit-scoped** so multiple kits can
+> share one broker without colliding. The unscoped legacy forms
+> (`wardragon/system/attrs`, `wardragon/service/availability`, etc.) are
+> no longer published. If you subscribe to MQTT from a custom dashboard,
+> Node-RED, scripts, or any tool, see the [Subscription Migration](#subscription-migration)
+> section below. Drone, aircraft, and signal subscribers are unaffected.
+
 Most useful topics for operators:
 
 | Topic | Purpose |
 |-------|---------|
 | `wardragon/drones` | Aggregate drone stream — every drone update lands here |
 | `wardragon/drone/<id>` | Per-drone state (required for HA discovery) |
-| `wardragon/system/attrs` | Kit telemetry (CPU, mem, GPS, SDR temps) |
+| `wardragon/system/<kit_id>/attrs` | Kit telemetry (CPU, mem, GPS, SDR temps), scoped per kit |
+| `wardragon/system/<kit_id>/availability` | `online`/`offline` per kit |
 | `wardragon/aircraft` | ADS-B aircraft (when enabled) |
 | `wardragon/signals` | FPV/RF signal alerts (when enabled) |
-| `wardragon/service/availability` | DragonSync online/offline (LWT) |
+| `wardragon/service/<kit_id>/availability` | DragonSync process online/offline (LWT), scoped per kit |
 | `homeassistant/...` | HA auto-discovery configs (when `mqtt_ha_enabled`) |
+
+`<kit_id>` is the WarDragon kit's identifier (e.g. `wardragon-G6PA14100J63`). One kit per broker → one set of these topics. Multiple kits on the same broker → one set per kit, no collisions.
+
+### Subscription Migration
+
+Three ways to subscribe to kit-level topics after the v2.0 schema change:
+
+**Wildcard (recommended for most consumers)** — works for any number of kits, today or in the future:
+
+```
+wardragon/system/+/attrs           (was: wardragon/system/attrs)
+wardragon/system/+/state           (was: wardragon/system/state)
+wardragon/system/+/availability    (was: wardragon/system/availability)
+wardragon/service/+/availability   (was: wardragon/service/availability)
+```
+
+The `+` matches any single topic segment. Single-kit operators see one stream of messages (same as before); multi-kit operators see one message per kit cleanly distinguished by the kit ID in the topic path.
+
+**Pin a specific kit** — when you only care about one:
+
+```
+wardragon/system/wardragon-G6PA14100J63/attrs
+```
+
+**Catch-all `wardragon/#`** — receives every topic the kit publishes. If your consumer was already on `wardragon/#`, **no change is needed**. Best for logging, archival, debug tools, and any consumer that already filters by topic in its own code.
+
+Drone, aircraft, and signal topics are **unchanged** from v1 — no subscription updates needed for those.
 
 A drone payload looks like:
 
