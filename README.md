@@ -51,6 +51,7 @@ WarDragon is a compact, headless, SDR-driven RF sensing and data integration app
 ### Integration
 - [TAK Integration (ATAK/iTAK/WinTAK)](docs/integration/tak-integration.md)
 - [MQTT & Home Assistant](docs/integration/mqtt-homeassistant.md)
+- [ADS-B / 978 Integration](docs/integration/adsb-setup.md)
 - [Lattice Export](docs/integration/lattice.md)
 - [Analytics Dashboard](docs/integration/analytics.md)
 
