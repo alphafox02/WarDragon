@@ -2,7 +2,7 @@
 
 The DragonSDR is the dedicated software-defined radio used in WarDragon kits for DJI DroneID detection. It runs custom firmware that detects DJI's proprietary OcuSync downlink and forwards parsed telemetry to the WarDragon software stack.
 
-**Receiver software**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) — the `dji_receiver.py` host service and supporting firmware.
+**Receiver software**: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid) — the `dji_receiver.py` host service and supporting firmware.
 
 ## What It Detects
 
@@ -33,7 +33,7 @@ The DragonSDR communicates with the WarDragon compute over a dedicated internal 
 | WarDragon (Wired connection 1) | 172.31.100.1 | Internal interface to DragonSDR |
 | DragonSDR | 172.31.100.2 | SD card mode default |
 
-If the DragonSDR's IP needs to change, both ends must be updated together — see [Network Configuration](../getting-started/network-setup.md#dragonsdr-internal-network) and the [antsdr_dji_droneid README](https://github.com/alphafox02/antsdr_dji_droneid) for the boot-env procedure.
+If the DragonSDR's IP needs to change, both ends must be updated together — see [Network Configuration](../getting-started/network-setup.md#dragonsdr-internal-network) and the [dragonsdr_dji_droneid README](https://github.com/alphafox02/dragonsdr_dji_droneid) for the boot-env procedure.
 
 ## Firmware Variants
 
@@ -103,4 +103,4 @@ The DragonSDR's RX line is on **Left Side - Port 3** (RX DragonSDR) of the Pro v
 - [DragonScope](../software/dragonscope.md) — Extended OcuSync 4 coverage
 - [Detection Capabilities](../software/detection-capabilities.md)
 - [ZMQ Data Flows](../architecture/zmq-dataflows.md)
-- Upstream: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- Upstream: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)

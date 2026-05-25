@@ -87,7 +87,7 @@ This pattern allows:
 
 All ZMQ messages are JSON-encoded. Messages follow the **ASTM F3411 Open Drone ID** structure with message blocks for different data types.
 
-> **Note**: The exact message format depends on the upstream receiver (droneid-go, antsdr_dji_droneid). Refer to those repositories for authoritative field documentation.
+> **Note**: The exact message format depends on the upstream receiver (droneid-go, dragonsdr_dji_droneid). Refer to those repositories for authoritative field documentation.
 
 ### Two Input Formats
 
@@ -383,7 +383,7 @@ while True:
 ## Repository References
 
 - **droneid-go**: [github.com/alphafox02/droneid-go](https://github.com/alphafox02/droneid-go) - WiFi/BT Remote ID receiver
-- **antsdr_dji_droneid**: [github.com/alphafox02/antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) - DJI firmware and dji_receiver
+- **dragonsdr_dji_droneid**: [github.com/alphafox02/dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid) - DJI firmware and dji_receiver
 - **DragonSync**: [github.com/alphafox02/DragonSync](https://github.com/alphafox02/DragonSync) - Main application
 - **wardragon-fpv-detect**: [github.com/alphafox02/wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) - FPV signal detection
 

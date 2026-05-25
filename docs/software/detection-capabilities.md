@@ -48,7 +48,7 @@ From DJI DroneID signals, WarDragon extracts:
 
 ### Hardware: DragonSDR
 
-**Repository**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+**Repository**: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 
 The DragonSDR runs custom firmware optimized for DJI DroneID detection:
 

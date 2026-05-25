@@ -514,7 +514,7 @@ DragonSync uses async MQTT connect with automatic retry. If the broker is tempor
 
 ### Drone shown but no description / transport / RID metadata
 
-- For OcuSync drones: `transport` is intentionally empty (the receiver doesn't tag link layer for OcuSync). `description` should be populated with the detected DJI model and OcuSync generation (e.g. `DJI Mini 2 (O2)`, `DJI Mavic 3 (O3)`, `DJI Mini 5`). If empty, your `dji-receiver` may be on an older version — pull the latest from `alphafox02/antsdr_dji_droneid`.
+- For OcuSync drones: `transport` is intentionally empty (the receiver doesn't tag link layer for OcuSync). `description` should be populated with the detected DJI model and OcuSync generation (e.g. `DJI Mini 2 (O2)`, `DJI Mavic 3 (O3)`, `DJI Mini 5`). If empty, your `dji-receiver` may be on an older version — pull the latest from `alphafox02/dragonsdr_dji_droneid`.
 - For BLE / WiFi RID drones: `description` carries the operator's self-ID text and may be empty if they didn't set one.
 - `rid_make` / `rid_model` / `rid_status` only populate when FAA RID lookup succeeds (requires `rid_enabled = true` and a working RID database / API).
 

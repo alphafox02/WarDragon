@@ -82,7 +82,7 @@ Pro v5 ships in two compute variants. **Both use the same v5 Pelican-style mobil
 |-----------|---------|:-----:|:------:|
 | DragonOS | Base operating system | Yes | Yes |
 | [droneid-go](https://github.com/alphafox02/droneid-go) | Unified Open Drone ID receiver (WiFi + BLE + UART). Runs as `zmq-decoder`. | Yes | Yes |
-| [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) | DJI DroneID receiver via DragonSDR. Runs as `dji-receiver`. | Yes | Yes |
+| [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid) | DJI DroneID receiver via DragonSDR. Runs as `dji-receiver`. | Yes | Yes |
 | [DragonSync](https://github.com/alphafox02/DragonSync) | Aggregates all detection streams → TAK / MQTT / Lattice / HTTP API | Yes | Yes |
 | [DragonScope](../software/dragonscope.md) *(optional subscription)* | Full DroneID decode for current OcuSync generations | Yes | Yes |
 | [DragonSig](../software/dragonsig.md) *(x86_64 only)* | Wideband signal detection — FPV (5 GHz) or RFD900 (900 MHz), software-switchable on the built-in 2nd SDR | — | Yes |

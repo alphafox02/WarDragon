@@ -876,7 +876,7 @@ The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data inte
 - **Hardware**: DragonSDR
 - **Protocols**: Ocusync 2, Ocusync 3, Ocusync 4 (activity detection)
 - **Frequency**: 2.4 GHz / 5.8 GHz
-- **Software**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- **Software**: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 
 ### Bluetooth Remote ID
 - **Hardware**: DragonTooth Dongle (Sonoff-based, CC2652P)
@@ -899,7 +899,7 @@ The Pro v3 comes pre-configured with:
 
 - **DragonOS** - Base operating system
 - **[droneid-go](https://github.com/alphafox02/droneid-go)** - Unified Open Drone ID receiver
-- **[antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)** - DJI DroneID receiver
+- **[dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)** - DJI DroneID receiver
 - **[DragonSync](https://github.com/alphafox02/DragonSync)** - Gateway aggregating all detection streams
 
 ## Output & Integration
@@ -1506,7 +1506,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 ### Detection Sources
 
 #### 1. DragonSDR - DJI DroneID
-- **Repository**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- **Repository**: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 - **Function**: Detects DJI proprietary DroneID signals (Ocusync 2, 3, 4)
 - **Transport**: ZMQ Publisher
 
@@ -2474,7 +2474,7 @@ Pro v5 ships in two compute variants. **Both use the same v5 Pelican-style mobil
 |-----------|---------|:-----:|:------:|
 | DragonOS | Base operating system | Yes | Yes |
 | [droneid-go](https://github.com/alphafox02/droneid-go) | Unified Open Drone ID receiver (WiFi + BLE + UART). Runs as \`zmq-decoder\`. | Yes | Yes |
-| [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) | DJI DroneID receiver via DragonSDR. Runs as \`dji-receiver\`. | Yes | Yes |
+| [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid) | DJI DroneID receiver via DragonSDR. Runs as \`dji-receiver\`. | Yes | Yes |
 | [DragonSync](https://github.com/alphafox02/DragonSync) | Aggregates all detection streams → TAK / MQTT / Lattice / HTTP API | Yes | Yes |
 | [DragonScope](../software/dragonscope.md) *(optional subscription)* | Full DroneID decode for current OcuSync generations | Yes | Yes |
 | [DragonSig](../software/dragonsig.md) *(x86_64 only)* | Wideband signal detection — FPV (5 GHz) or RFD900 (900 MHz), software-switchable on the built-in 2nd SDR | — | Yes |
@@ -2689,7 +2689,7 @@ pages['dragonsdr'] = `# DragonSDR
 
 The DragonSDR is the dedicated software-defined radio used in WarDragon kits for DJI DroneID detection. It runs custom firmware that detects DJI's proprietary OcuSync downlink and forwards parsed telemetry to the WarDragon software stack.
 
-**Receiver software**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid) — the \`dji_receiver.py\` host service and supporting firmware.
+**Receiver software**: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid) — the \`dji_receiver.py\` host service and supporting firmware.
 
 ## What It Detects
 
@@ -2720,7 +2720,7 @@ The DragonSDR communicates with the WarDragon compute over a dedicated internal 
 | WarDragon (Wired connection 1) | 172.31.100.1 | Internal interface to DragonSDR |
 | DragonSDR | 172.31.100.2 | SD card mode default |
 
-If the DragonSDR's IP needs to change, both ends must be updated together — see [Network Configuration](../getting-started/network-setup.md#dragonsdr-internal-network) and the [antsdr_dji_droneid README](https://github.com/alphafox02/antsdr_dji_droneid) for the boot-env procedure.
+If the DragonSDR's IP needs to change, both ends must be updated together — see [Network Configuration](../getting-started/network-setup.md#dragonsdr-internal-network) and the [dragonsdr_dji_droneid README](https://github.com/alphafox02/dragonsdr_dji_droneid) for the boot-env procedure.
 
 ## Firmware Variants
 
@@ -2790,7 +2790,7 @@ The DragonSDR's RX line is on **Left Side - Port 3** (RX DragonSDR) of the Pro v
 - [DragonScope](../software/dragonscope.md) — Extended OcuSync 4 coverage
 - [Detection Capabilities](../software/detection-capabilities.md)
 - [ZMQ Data Flows](../architecture/zmq-dataflows.md)
-- Upstream: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- Upstream: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 `;
 
 pages['dragonscope'] = `# DragonScope Drone ID Service
@@ -2884,7 +2884,7 @@ DragonScope contacts the resolution service over your active data connection. No
 - [Detection Capabilities](detection-capabilities.md)
 - [System Architecture](../architecture/overview.md)
 - [DragonSync Configuration](dragonsync.md)
-- Upstream receiver: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- Upstream receiver: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 `;
 
 pages['dragonsig'] = `# DragonSig
@@ -3518,7 +3518,7 @@ function renderHome() {
         <tbody>
           <tr><td><a href="https://github.com/alphafox02/DragonSync" target="_blank">DragonSync</a></td><td>Main application — merges detection streams, outputs CoT to TAK, MQTT, and Lattice</td></tr>
           <tr><td><a href="https://github.com/alphafox02/droneid-go" target="_blank">droneid-go</a></td><td>Unified Open Drone ID receiver (WiFi + BLE + UART)</td></tr>
-          <tr><td><a href="https://github.com/alphafox02/antsdr_dji_droneid" target="_blank">antsdr_dji_droneid</a></td><td>DragonSDR receiver for DJI DroneID detection</td></tr>
+          <tr><td><a href="https://github.com/alphafox02/dragonsdr_dji_droneid" target="_blank">dragonsdr_dji_droneid</a></td><td>DragonSDR receiver for DJI DroneID detection</td></tr>
           <tr><td><strong>DragonScope Drone ID Service</strong></td><td>Annual subscription ($2,500 / yr). Decodes DJI DroneID across all current OcuSync generations including O4+. Requires data connectivity.</td></tr>
           <tr><td><strong>DragonSig</strong> <em>(Coming Soon)</em></td><td>Wideband signal-detection service for the optional 2nd SDR — analog FPV (5 GHz) or RFD900 (900 MHz). One mission per radio.</td></tr>
           <tr><td><a href="https://github.com/alphafox02/WarDragon-ATAK-Plugin" target="_blank">WarDragon ATAK Plugin</a></td><td>Native ATAK plugin for WarDragon integration</td></tr>

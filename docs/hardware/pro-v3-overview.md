@@ -57,7 +57,7 @@ The WarDragon Pro v3 has antenna ports accessible from the sides of the unit. Wh
 - **Purpose**: DJI DroneID detection (Ocusync 2/3/4)
 - **Frequency Range**: ~70 MHz to 6 GHz
 - **Connection**: Internal USB, external SMA antenna port
-- **Firmware**: Custom [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- **Firmware**: Custom [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 
 #### Panda Wireless PAU0D
 - **Purpose**: WiFi Remote ID detection

@@ -68,7 +68,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 ### Detection Sources
 
 #### 1. DragonSDR — DJI DroneID
-- **Repository**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- **Repository**: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 - **Function**: Detects DJI proprietary DroneID signals (OcuSync 2, 3, 4)
 - **Output**: Decoded drone telemetry via `dji_receiver.py`
 - **Transport**: ZMQ Publisher (port 4221)

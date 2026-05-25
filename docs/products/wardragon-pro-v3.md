@@ -34,7 +34,7 @@ The WarDragon Pro v3 is a compact, headless, SDR-driven RF sensing and data inte
 - **Hardware**: DragonSDR
 - **Protocols**: Ocusync 2, Ocusync 3, Ocusync 4 (activity detection)
 - **Frequency**: 2.4 GHz / 5.8 GHz
-- **Software**: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- **Software**: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
 
 ### Bluetooth Remote ID
 - **Hardware**: DragonTooth Dongle (Sonoff-based, CC2652P)
@@ -75,7 +75,7 @@ The Pro v3 comes pre-configured with:
 
 - **DragonOS** - Base operating system
 - **[droneid-go](https://github.com/alphafox02/droneid-go)** - Unified Open Drone ID receiver (WiFi + BLE + UART, runs as `zmq-decoder` service)
-- **[antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)** - DJI DroneID receiver via DragonSDR (runs as `dji-receiver` service)
+- **[dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)** - DJI DroneID receiver via DragonSDR (runs as `dji-receiver` service)
 - **[DragonSync](https://github.com/alphafox02/DragonSync)** - Gateway aggregating all detection streams to TAK/MQTT/Lattice
 
 ## Output & Integration

@@ -89,4 +89,4 @@ DragonScope contacts the resolution service over your active data connection. No
 - [Detection Capabilities](detection-capabilities.md)
 - [System Architecture](../architecture/overview.md)
 - [DragonSync Configuration](dragonsync.md)
-- Upstream receiver: [antsdr_dji_droneid](https://github.com/alphafox02/antsdr_dji_droneid)
+- Upstream receiver: [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid)
