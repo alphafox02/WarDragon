@@ -4,8 +4,8 @@ DragonScope is an optional service that **extends DJI DroneID coverage to all cu
 
 > DragonScope **decodes** the full DroneID telemetry stream for current OcuSync generations. O2 and earlier OcuSync 3 variants are unaffected and continue to operate fully offline regardless of DragonScope state.
 
-**Purchase**: [cemaxecuter.com](https://cemaxecuter.com/?product=dragonscope-drone-id-service)
-**Price**: $2,500 / year (annual subscription)
+**Purchase**: [cemaxecuter.com](https://cemaxecuter.com)
+**Model**: Annual subscription (contact us for current pricing and availability)
 
 ## Why DragonScope
 
@@ -32,13 +32,13 @@ What "full telemetry" includes:
 
 ## Subscription & Connectivity
 
-DragonScope is delivered as an **annual subscription add-on** ($2,500 / year). It requires:
+DragonScope is delivered as an **annual subscription add-on**. It requires:
 
-1. **A compatible WarDragon system** — Pro v5 Mobile Detection Kit or Drop-In Detection Kit
+1. **A compatible WarDragon system** — Pro v5 (Mobile or Drop-In) or WarDragon Elite (Mobile or Drop-In)
 2. **Active data connectivity** — the service operates with cloud-side resolution; the WarDragon needs ongoing network access to use it
 3. **Provided activation materials** — firmware / config / key are provided with the subscription
 
-> To purchase DragonScope or check kit compatibility, **contact us** or order through the [cemaxecuter.com store](https://cemaxecuter.com/?product=dragonscope-drone-id-service).
+> To purchase DragonScope or check kit compatibility, **contact us** or order through the [cemaxecuter.com store](https://cemaxecuter.com).
 
 ## Operating Modes
 
@@ -67,9 +67,9 @@ DragonScope runs as a service on the WarDragon. The DragonSDR forwards current-g
 
 | Kit | DragonScope Support |
 |-----|---------------------|
-| WarDragon Pro v5 Mobile Detection Kit | Yes |
-| WarDragon v1 Drop-In Detection Kit | Yes |
-| Older WarDragon kits | Contact us |
+| WarDragon Pro v5 (Mobile or Drop-In) | Yes |
+| WarDragon Elite (Mobile or Drop-In) | Yes |
+| Older WarDragon kits (e.g. Pro v3) | Contact us |
 
 ## Privacy / Network
 

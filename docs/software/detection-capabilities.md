@@ -1,18 +1,19 @@
 # Detection Capabilities
 
-This document details the drone detection capabilities of the WarDragon platform across all current kits — Pro v3, Pro v5 Mobile Detection Kit (ARM64 / x86_64), and v1 Drop-In Detection Kit (ARM64 / x86_64).
+This document details the drone detection capabilities of the WarDragon platform across the current product lineup — **Pro v5** (Mobile / Drop-In), **Elite** (Mobile / Drop-In), and the legacy **Pro v3**.
 
 ## Detection Overview
 
 WarDragon detects drones through multiple complementary technologies:
 
-| Technology | Protocol | Hardware | Available On |
-|------------|----------|----------|--------------|
-| DJI DroneID | OcuSync 2 / 3 / 4+ | DragonSDR | All kits |
-| WiFi Remote ID | IEEE 802.11 | WiFi dongle | All kits |
-| Bluetooth Remote ID | BT5 LR | Bluetooth dongle | All kits |
-| Analog FPV video | 5.x GHz analog | Built-in wideband 2nd SDR + [DragonSig](dragonsig.md) | Pro v5 / Drop-In **x86_64** variant |
-| RFD900 / 900 MHz telemetry | 900 MHz | Built-in wideband 2nd SDR + [DragonSig](dragonsig.md) | Pro v5 / Drop-In **x86_64** variant |
+| Technology | Protocol | Hardware | Pro v5 | Elite | Pro v3 |
+|------------|----------|----------|:------:|:-----:|:------:|
+| DJI DroneID | OcuSync 2 / 3 / 4+ | DragonSDR | Yes | Yes | Yes |
+| WiFi Remote ID | IEEE 802.11 | Alfa dual-band card (Pro v5 / Elite), Panda + ESP32 (Pro v3) | Yes | Yes | Yes |
+| Bluetooth Remote ID | BT5 LR | TI-based board (Pro v5 / Elite), Sonoff DragonTooth (Pro v3) | Yes | Yes | Yes |
+| Analog FPV video | 5 GHz race bands | BladeRF + [DragonSig](dragonsig.md) | — | Yes | Legacy via [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) |
+| RFD900 + MAVLink decode | 900 MHz | BladeRF + DragonSig | — | Yes | — |
+| ELRS *(coming soon)* | Multi-band | BladeRF + DragonSig | — | Yes | — |
 
 ## DJI DroneID Detection
 
@@ -28,8 +29,8 @@ WarDragon detects drones through multiple complementary technologies:
 
 | Coverage Tier | What You Get | Requirements |
 |---------------|--------------|--------------|
-| **Detection only** | Hash ID (e.g. `drone-alert-{hash}`), detection frequency, RSSI | Standard DragonSDR (default; included with all kits) |
-| **Full telemetry** | Serial, drone GPS, pilot GPS, home point, altitude, speed, RSSI | [DragonScope Drone ID Service](dragonscope.md) ($2,500 / yr, requires data connectivity) |
+| **Detection only** | Hash ID (e.g. `drone-alert-{hash}`), detection frequency, RSSI | Standard DragonSDR (default; included with all current kits) |
+| **Full telemetry** | Serial, drone GPS, pilot GPS, home point, altitude, speed, RSSI | [DragonScope Drone ID Service](dragonscope.md) — annual subscription, requires data connectivity |
 
 OcuSync 2 / 3 standard detection is **unaffected** by DragonScope state and continues to work fully offline.
 
@@ -138,20 +139,21 @@ Bluetooth 5 Long Range significantly extends detection:
 | LE Coded S2 | 300-500m | 2x range vs 1M |
 | LE Coded S8 | 500m-1+ km | 4x range, slower |
 
-## DragonSig — FPV / 900 MHz Detection
+## DragonSig — FPV / RFD900 / ELRS Detection (Elite Only)
 
-[DragonSig](dragonsig.md) is the wideband signal-detection service that runs on the **wideband 70 MHz – 6 GHz 2nd SDR** built into the **x86_64 variant** of the Pro v5 / Drop-In kits. The ARM64 variant doesn't include the 2nd SDR, so DragonSig isn't available on those kits.
+[DragonSig](dragonsig.md) is the signal-detection service that runs on the **BladeRF** included with the **WarDragon Elite** kit. Pro v5 doesn't include a 2nd SDR, so DragonSig isn't available there.
 
-Because the 2nd SDR is wideband, DragonSig **retunes it via software** to whichever mission you've configured. Today's mission set:
+DragonSig retunes the BladeRF via software to whichever mission you've configured. Today's mission set:
 
-- **Analog FPV video** — 5.x GHz
-- **RFD900 / 900 MHz monitoring** — 900 MHz
+- **Analog FPV video** — 5 GHz race bands
+- **RFD900 / 900 MHz telemetry** — includes **MAVLink decode** for SiK / RFD900 links
+- **ELRS** *(coming soon)* — ExpressLRS control-link detection / characterization
 
-Additional missions can be added over time without hardware changes — the SDR already covers the necessary band.
+The BladeRF is dedicated to whichever mission DragonSig is configured for at any given time — it isn't sweeping multiple bands simultaneously on a single radio. If you need persistent multi-band coverage, contact us about kit options with multiple 2nd SDRs.
 
-The SDR is dedicated to whichever mission you've configured at any given time — DragonSig isn't sweeping multiple bands simultaneously on a single radio. If you need persistent multi-band coverage, contact us about a kit configuration with multiple 2nd SDRs.
+DragonSig runs on the BladeRF, so DJI DroneID detection on the DragonSDR continues uninterrupted regardless of which DragonSig mission is active.
 
-DragonSig runs on the dedicated 2nd SDR, so DJI DroneID detection on the DragonSDR continues uninterrupted.
+> DragonSig is proprietary — the binary ships pre-installed on Elite kits. Source is not currently open.
 
 ### FPV Analog — Frequency Coverage
 
@@ -179,7 +181,7 @@ The DragonSig sweep covers the standard 5 GHz FPV race bands and adjacent channe
 
 - **FPV analog** — no native position data (uses WarDragon GPS as the location)
 - **RFD900 / 900 MHz** — position is included when telemetry from the link is decoded; otherwise WarDragon GPS is used
-- **Requires the x86_64 variant** of Pro v5 or Drop-In — the wideband 2nd SDR isn't present on the ARM64 variant or on Pro v3 / older kits
+- **Requires WarDragon Elite** — the BladeRF and DragonSig binary ship on Elite kits only. Pro v5 and Pro v3 don't include a 2nd SDR.
 
 ### Legacy FPV Flow (Pro v3)
 
@@ -203,8 +205,8 @@ WarDragon detects drones across multiple protocols simultaneously. Each detectio
 │  BT5 Remote ID ───┤                                                 │
 │  (BT dongle)      │                                                 │
 │                   │                                                 │
-│  FPV  OR  900MHz ─┘  ◄── DragonSig (one mission per 2nd SDR)       │
-│  (2nd SDR add-on)                                                  │
+│  FPV / 900MHz / ELRS ──┘ ◄── DragonSig (Elite only, BladeRF)       │
+│  (1 mission at a time)                                             │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```

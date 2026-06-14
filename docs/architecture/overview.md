@@ -80,15 +80,16 @@ The WarDragon system is built on a modular, message-driven architecture that all
 - **Output**: JSON-formatted Remote ID data
 - **Transport**: ZMQ Publisher (port 4224 — also subscribes to dji-receiver and republishes)
 
-#### 3. DragonTooth (TI Sniffle Board)
+#### 3. TI-based Bluetooth Long Range Board
 - **Function**: Bluetooth 5 Long Range Remote ID detection
+- **Hardware**: Texas Instruments-based board (Pro v5 / Elite). Pro v3 used a Sonoff-based "DragonTooth" dongle.
 - **Firmware**: Sniffle-compatible
 - **Output**: BT5 LR Remote ID packets, ingested by droneid-go
 - **Transport**: Native BLE input to droneid-go
 
-#### 4. DragonSig — FPV / 900 MHz *(x86_64 variants of Pro v5 / Drop-In)*
-- **Function**: Analog FPV video detection (5.x GHz) **or** RFD900 / 900 MHz monitoring. Software-switchable between missions on a single SDR — additional mission profiles can be added over time.
-- **Hardware**: **Wideband 70 MHz – 6 GHz 2nd SDR built into the x86_64 variant** of Pro v5 / Drop-In kits
+#### 4. DragonSig — FPV / RFD900 / ELRS *(WarDragon Elite only)*
+- **Function**: Analog FPV video detection (5 GHz race bands), RFD900 / 900 MHz telemetry with **MAVLink decode**, and ELRS detection (coming soon). Software-switchable between missions on a single SDR — additional mission profiles can be added over time.
+- **Hardware**: **BladeRF** built into the WarDragon Elite kit
 - **Output**: ZMQ Publisher (port 4226), same JSON envelope as the legacy FPV detector
 - **See**: [DragonSig](../software/dragonsig.md)
 
@@ -96,7 +97,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 
 #### DragonScope *(optional subscription)*
 
-[DragonScope](../software/dragonscope.md) is an annual subscription service that extends DJI DroneID coverage to all current OcuSync generations including OcuSync 4+. It runs alongside dji-receiver, decodes the additional telemetry stream, and feeds resolved positions back into the same ZMQ pipeline. From DragonSync's perspective downstream, an OcuSync 4 drone is just a drone — same CoT type, same MQTT format. Requires data connectivity. $2,500 / yr.
+[DragonScope](../software/dragonscope.md) is an annual subscription service that extends DJI DroneID coverage to current OcuSync generations including OcuSync 4+. It runs alongside dji-receiver, decodes the additional telemetry stream, and feeds resolved positions back into the same ZMQ pipeline. From DragonSync's perspective downstream, an OcuSync 4 drone is just a drone — same CoT type, same MQTT format. Requires data connectivity. Eligible kits: Pro v5 (Mobile / Drop-In) and Elite (Mobile / Drop-In).
 
 #### DragonSync
 

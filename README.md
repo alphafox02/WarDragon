@@ -10,22 +10,31 @@ WarDragon is a compact, headless, SDR-driven RF sensing and data integration app
 
 ## Products
 
-| Product | Price | Description |
-|---------|------:|-------------|
-| [WarDragon Pro v5 Mobile Detection Kit](docs/products/wardragon-pro-v5.md) | $6,500 | Current-gen mobile kit, Pelican-style case with built-in maintenance screen. **ARM64** (power-efficient) or **x86_64** (additional 2nd SDR for DragonSig) compute variants. |
-| [WarDragon v1 Drop-In Detection Kit](docs/products/drop-in-kit.md) | $5,000 | Same compute variants and detection stack as Pro v5, in a DIN-rail integrator form factor (no Pelican case) |
-| [WarDragon Pro v3](docs/products/wardragon-pro-v3.md) | — | Previous-generation NUC kit, still fully supported |
+The current lineup is built around two kit lines — **Pro v5** and **Elite** — each available in **Mobile** (Pelican-style transport case) and **Drop-In** (DIN-rail / integrator) form factors. Pricing and store links change periodically; contact us or visit [cemaxecuter.com](https://cemaxecuter.com) for current availability.
+
+| Product | Compute | What's Included | Use For |
+|---------|---------|-----------------|---------|
+| [WarDragon Pro v5](docs/products/wardragon-pro-v5.md) | ARM64 | DragonSDR (DJI DroneID), TI-based BT5 LR board (Remote ID), Alfa dual-band WiFi card (Remote ID), GPS | Remote ID + DJI DroneID detection in a power-efficient ARM64 platform |
+| [WarDragon Elite](docs/products/wardragon-elite.md) | ARM64 + x86_64 NUC + BladeRF | Everything in Pro v5, **plus** an x86_64 NUC and a BladeRF running [DragonSig](docs/software/dragonsig.md) | Pro v5 capabilities **plus** analog FPV detection, RFD900 / MAVLink decode, and (coming soon) ELRS detection |
+| [WarDragon Pro v3](docs/products/wardragon-pro-v3.md) | Intel NUC | Legacy single-SDR kit (Sonoff BT, Panda WiFi, ESP32) | Still supported. New deployments should use Pro v5 or Elite. |
+
+Both Pro v5 and Elite ship in **Mobile** or **Drop-In** form factors — same detection stack, just packaged differently:
+
+| Form Factor | Enclosure | Built-in Maintenance Screen | Best For |
+|-------------|-----------|:---------------------------:|----------|
+| Mobile | Pelican-style transport case | Yes | Field / vehicle / mobile command |
+| Drop-In | DIN-rail-mountable metal enclosure | — | Integrator installs — CCTV / LPR / sensor cabinet / fixed mount |
 
 ### Optional Add-ons
 
-| Add-on | Price | Compatible With |
-|--------|------:|-----------------|
-| [DragonScope Drone ID Service](docs/software/dragonscope.md) | $2,500 / yr | Pro v5 (both variants), Drop-In (both variants) |
-| 4G Cellular Upgrade (Semtech RV55) | Contact us | Pro v5 |
-| Upgraded Antenna Packages (5 GHz / 900 MHz / etc.) | Contact us | Pro v5, Drop-In |
-| Rapid Deployment Kit | Contact us | Drop-In |
+| Add-on | Compatible With | Description |
+|--------|-----------------|-------------|
+| [DragonScope Drone ID Service](docs/software/dragonscope.md) | Pro v5, Elite (Mobile + Drop-In) | Annual subscription. Extends DJI DroneID coverage to **detect and decode** current OcuSync generations including OcuSync 4+. Requires data connectivity. |
+| 4G Cellular Upgrade | Mobile variants | Cellular WAN backhaul |
+| Upgraded Antenna Packages | Pro v5, Elite | Mission-specific antennas — including 5 GHz FPV and 900 MHz RFD900 packages for Elite's BladeRF |
+| Rapid Deployment Kit | Drop-In variants | Converts the Drop-In into a standalone field system with weatherproof housing, tripod, travel case |
 
-> **About the x86_64 variant**: the Pro v5 / Drop-In x86_64 variants ship with a **wideband 70 MHz – 6 GHz 2nd SDR built in**, running [DragonSig](docs/software/dragonsig.md). Mission selection (FPV 5 GHz, RFD900 900 MHz, future profiles) is software-configurable on that single SDR — there's no separate FPV-SDR or 900-MHz-SDR product to add. Mission-specific antennas may be sold separately.
+Contact us for current pricing and availability.
 
 ## Quick Navigation
 
@@ -35,8 +44,8 @@ WarDragon is a compact, headless, SDR-driven RF sensing and data integration app
 - [Hotspot Setup](docs/getting-started/hotspot-setup.md)
 
 ### Hardware
-- [Pro v3 Hardware Overview](docs/hardware/pro-v3-overview.md)
-- [DragonSDR](docs/hardware/dragonsdr.md) — DJI DroneID detection radio
+- [DragonSDR](docs/hardware/dragonsdr.md) — DJI DroneID detection radio (used across all current kits)
+- [Pro v3 Hardware Overview](docs/hardware/pro-v3-overview.md) — legacy reference
 - [Antenna Connections](docs/hardware/antenna-connections.md)
 - [LED Indicators & Status](docs/hardware/led-indicators.md)
 
@@ -45,7 +54,7 @@ WarDragon is a compact, headless, SDR-driven RF sensing and data integration app
 - [ZMQ Data Flows](docs/architecture/zmq-dataflows.md)
 - [DragonSync Core Application](docs/software/dragonsync.md)
 - [DragonScope](docs/software/dragonscope.md) — Optional service for full DJI DroneID decode (current OcuSync generations)
-- [DragonSig](docs/software/dragonsig.md) — Wideband signal detection (FPV / 900 MHz, runs on optional 2nd SDR)
+- [DragonSig](docs/software/dragonsig.md) — Wideband signal detection on Elite's BladeRF (FPV / RFD900 / ELRS-soon)
 - [Detection Capabilities](docs/software/detection-capabilities.md)
 
 ### Integration
@@ -62,20 +71,17 @@ WarDragon is a compact, headless, SDR-driven RF sensing and data integration app
 
 ## Detection Capabilities
 
-WarDragon detects drones through multiple protocols:
-
-| Protocol | Hardware | Frequency | Coverage |
-|----------|----------|-----------|----------|
-| DJI DroneID — OcuSync 2 / 3 | DragonSDR | 2.4 / 5.8 GHz | Full telemetry |
-| DJI DroneID — OcuSync 3 Pro / 4+ | DragonSDR | 2.4 / 5.8 GHz | Detection-only by default; **full telemetry with [DragonScope](docs/software/dragonscope.md)** |
-| Bluetooth Remote ID | Bluetooth dongle | 2.4 GHz | BT5 Long Range |
-| WiFi Remote ID | WiFi dongle | 2.4 / 5 GHz | Dual-band Remote ID |
-| Analog FPV video | Built-in 2nd SDR via [DragonSig](docs/software/dragonsig.md) | 5.x GHz | x86_64 variant of Pro v5 / Drop-In |
-| RFD900 / 900 MHz telemetry | Built-in 2nd SDR via [DragonSig](docs/software/dragonsig.md) | 900 MHz | x86_64 variant of Pro v5 / Drop-In |
+| Protocol | Hardware | Frequency | Pro v5 | Elite |
+|----------|----------|-----------|:------:|:-----:|
+| DJI DroneID — OcuSync 2 / 3 | DragonSDR | 2.4 / 5.8 GHz | Detect + decode | Detect + decode |
+| DJI DroneID — OcuSync 4 | DragonSDR | 2.4 / 5.8 GHz | Detect only (decode with [DragonScope](docs/software/dragonscope.md)) | Detect only (decode with DragonScope) |
+| WiFi Remote ID (ASTM F3411) | Alfa dual-band card | 2.4 / 5 GHz | Yes | Yes |
+| Bluetooth 5 LR Remote ID | TI-based BT board | 2.4 GHz | Yes | Yes |
+| Analog FPV video | BladeRF + [DragonSig](docs/software/dragonsig.md) | 5 GHz race bands | — | Yes |
+| RFD900 + MAVLink decode | BladeRF + DragonSig | 900 MHz | — | Yes |
+| ELRS *(coming soon)* | BladeRF + DragonSig | Multi-band | — | Yes |
 
 ## Ecosystem & Related Projects
-
-WarDragon integrates with a broader ecosystem of open-source tools:
 
 ### Core Software
 | Repository | Description |
@@ -84,11 +90,11 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 | [droneid-go](https://github.com/alphafox02/droneid-go) | Unified Open Drone ID receiver (WiFi + BLE + UART) with ZMQ output |
 | [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid) | DragonSDR receiver for DJI DroneID detection |
 
-### Extended Capabilities (provided with add-on purchase)
+### Extended Capabilities (provided with add-on purchase or Elite kit)
 | Component | Description |
 |-----------|-------------|
-| **DragonScope Drone ID Service** | Optional annual subscription that extends DJI DroneID coverage to all current OcuSync generations including OcuSync 4+. Requires data connectivity. $2,500 / yr. [Docs](docs/software/dragonscope.md) |
-| **DragonSig** *(Coming Soon, source not public)* | Wideband signal-detection service running on the **wideband 70 MHz – 6 GHz 2nd SDR built into the x86_64 variant** of Pro v5 / Drop-In kits. Software-configurable for analog FPV (5 GHz), RFD900 / 900 MHz, and additional missions over time — one mission at a time per SDR. [Docs](docs/software/dragonsig.md) |
+| **DragonScope Drone ID Service** | Optional annual subscription. Extends DJI DroneID coverage to **detect + decode** current OcuSync generations including OcuSync 4+. Requires data connectivity. [Docs](docs/software/dragonscope.md) |
+| **DragonSig** *(Elite-only, proprietary)* | Signal-detection service that drives the BladeRF on the Elite kit. Today: analog FPV (5 GHz) and RFD900 + MAVLink decode (900 MHz). Coming soon: ELRS detection. Binary ships pre-installed on Elite kits. [Docs](docs/software/dragonsig.md) |
 
 ### Mobile & Companion Apps
 | Repository | Description |
@@ -107,24 +113,24 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 ### Additional Capabilities
 | Repository | Description |
 |------------|-------------|
-| [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) | Legacy single-SDR FPV analog drone detection (Pro v3). Pro v5 / Drop-In **x86_64** variants use DragonSig on the built-in wideband 2nd SDR instead. |
+| [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) | Legacy single-SDR FPV analog drone detection (Pro v3). Elite kits use DragonSig on the BladeRF instead. |
 
 ## Data Flow Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                            WarDragon (Pro v5 / Drop-In)                 │
+│                       WarDragon Pro v5 / Elite                          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
-│  │ DragonSDR   │  │  WiFi       │  │ Bluetooth   │  │ 2nd SDR     │   │
-│  │             │  │  Dongle     │  │   Dongle    │  │ (optional)  │   │
-│  │             │  │             │  │             │  │ FPV / 900MHz│   │
+│  │ DragonSDR   │  │  Alfa WiFi  │  │ TI BT5 LR   │  │  BladeRF    │   │
+│  │             │  │  Dual-band  │  │   Board     │  │ (Elite only)│   │
+│  │             │  │             │  │             │  │             │   │
 │  │ DJI DroneID │  │ WiFi RID    │  │ BT5 LR RID  │  │ DragonSig   │   │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘   │
 │         │                │                │                │          │
 │  + DragonScope (opt)     │                │                │          │
-│  decodes O3 Pro / O4+    │                │                │          │
+│  decodes O3+/O4          │                                            │
 │         │                                                              │
 │         └────────────────┴────────────────┴────────────────┘          │
 │                                   │                                    │
@@ -158,10 +164,7 @@ WarDragon integrates with a broader ecosystem of open-source tools:
 
 ## Support & Resources
 
-- **Pro v5 Mobile Detection Kit**: [Purchase](https://cemaxecuter.com/?product=wardragon-pro-kit-v5-w-advanced-drone-detection)
-- **v1 Drop-In Detection Kit**: [Purchase](https://cemaxecuter.com/?product=wardragon-v1-drop-in-detection-kit)
-- **DragonScope Drone ID Service**: [Subscribe](https://cemaxecuter.com/?product=dragonscope-drone-id-service)
-- **All Products**: [cemaxecuter.com store](https://cemaxecuter.com/?post_type=product)
+- **Store**: [cemaxecuter.com](https://cemaxecuter.com) — current pricing, availability, and store listings
 - **DragonOS**: [DragonOS Official](https://cemaxecuter.com)
 - **Community**: Join the DragonOS Discord for support and discussion
 

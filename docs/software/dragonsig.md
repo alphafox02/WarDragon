@@ -1,48 +1,56 @@
 # DragonSig
 
-> **Status**: Coming Soon. DragonSig source is not currently public. The service ships pre-installed on **x86_64-variant** WarDragon kits — contact us for availability.
+> **Status**: Proprietary. DragonSig source is not currently open. The service ships pre-installed as a binary on **WarDragon Elite** kits — contact us for availability.
 
-DragonSig is a wideband signal-detection service that runs on the **2nd SDR built into the x86_64 variant** of the WarDragon Pro v5 and v1 Drop-In kits. It complements the base detection stack ([DragonSDR](../hardware/dragonsdr.md) for DJI DroneID, [droneid-go](https://github.com/alphafox02/droneid-go) for WiFi / BLE Remote ID) by covering signal categories that aren't broadcast as Remote ID.
+DragonSig is the wideband signal-detection service that runs on the **BladeRF (2nd SDR) built into the WarDragon Elite kit**. It complements the base detection stack ([DragonSDR](../hardware/dragonsdr.md) for DJI DroneID, [droneid-go](https://github.com/alphafox02/droneid-go) for WiFi / BLE Remote ID) by covering signal categories that aren't broadcast as Remote ID.
 
-## What the 2nd SDR Is
+## Where DragonSig Lives
 
-The x86_64 variant ships with a **wideband 70 MHz – 6 GHz SDR** dedicated to DragonSig. It's the same class of capability as the [DragonSDR](../hardware/dragonsdr.md), but reserved for signal classes outside DJI DroneID. Because it's a wideband SDR, **DragonSig retunes it via software** to whichever mission you've configured — there's no mission-specific SDR hardware to swap.
+DragonSig is **Elite-only**. The Pro v5 kit doesn't include a 2nd SDR, so DragonSig isn't available on Pro v5.
+
+| Kit | DragonSig |
+|-----|-----------|
+| WarDragon Elite (Mobile or Drop-In) | **Yes** — runs on the included BladeRF |
+| WarDragon Pro v5 (Mobile or Drop-In) | — (no 2nd SDR) |
+| WarDragon Pro v3 | — (single-SDR legacy architecture; see [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) for the older flow) |
 
 ## How It Works
 
-DragonSig is a single service. It runs on the kit's wideband 2nd SDR and **targets one mission at a time**. Today it ships with two mission profiles:
+DragonSig drives the BladeRF and **targets one mission at a time**. Mission selection is a software choice — DragonSig retunes the SDR for whichever band/protocol you've configured.
 
-| Mission | Frequency | What's Detected |
-|---------|-----------|-----------------|
-| **Analog FPV video** | 5.x GHz | Analog video transmitters used on racing / custom drones |
-| **RFD900 / 900 MHz monitoring** | 900 MHz | Telemetry from SiK / RFD900-class radios used for long-range fixed-wing / VTOL drones |
+Current mission set:
 
-> Because the SDR is wideband, **DragonSig's mission set can expand** to additional signal classes over time without replacing hardware. Switching missions is a software reconfiguration, not a hardware swap.
+| Mission | Frequency | What's Detected | Decode |
+|---------|-----------|-----------------|--------|
+| **Analog FPV video** | 5 GHz race bands | Analog video transmitters on racing / custom drones | Partial — PAL/NTSC discrimination, frame capture where signal quality permits |
+| **RFD900 / 900 MHz telemetry** | 902 – 928 MHz | SiK / RFD900-class radios used for long-range drone telemetry | **MAVLink decode** — extracts position, heading, and other fields where available |
+| **ELRS** *(coming soon)* | Multi-band | ExpressLRS control links used on FPV / racing drones | Detection and characterization |
 
-The 2nd SDR is dedicated to whichever mission you've configured at any given time — DragonSig isn't sweeping FPV and 900 MHz simultaneously on a single radio. If you need persistent coverage of multiple bands at once, contact us about a kit configuration with multiple 2nd SDRs.
+The BladeRF is dedicated to whichever mission DragonSig is configured for at any given time — DragonSig isn't sweeping multiple bands simultaneously on the same radio. The mission set is expected to grow over time without hardware changes.
 
 ## What DragonSig Detects
 
-### Analog FPV Video (5.x GHz)
+### Analog FPV Video (5 GHz)
 
 Many racing and custom-built drones use analog 5 GHz video transmitters that are invisible to Remote ID detection. DragonSig:
 
 - Sweeps the 5 GHz FPV band
 - Identifies signals matching the FM envelope characteristic of analog video
 - Classifies as PAL or NTSC where possible
+- Captures grayscale video frames from the detected signal on a separate thread when signal quality permits
 - Emits the same alert envelope as the legacy FPV detector — DragonSync ingests without changes
 
-This replaces the older `wardragon-fpv-detect` Python flow on supported kits.
+This replaces the older `wardragon-fpv-detect` Python flow on Elite kits.
 
-### RFD900 / 900 MHz Monitoring
+### RFD900 / 900 MHz Telemetry Decode
 
 For the 900 MHz mission DragonSig monitors the 902–928 MHz ISM band typically used by SiK / RFD900-class radios that carry MAVLink telemetry between long-range fixed-wing or VTOL drones and their ground stations.
 
-DragonSig **decodes telemetry from supported radio modems** when present and forwards it through the same WarDragon pipeline as everything else.
+DragonSig **detects the link and decodes MAVLink telemetry** — when MAVLink position / heading data is recovered from the link, it's forwarded as a track with real position rather than falling back to the WarDragon's own GPS.
 
-### Future Missions
+### ELRS *(Coming Soon)*
 
-Because the 2nd SDR covers 70 MHz – 6 GHz, DragonSig can be extended to additional signal classes over time as new mission profiles are added. The base architecture (wideband SDR + software-defined missions + ZMQ output to DragonSync) accommodates new missions without requiring kit changes.
+Detection and characterization of ExpressLRS control links is on the DragonSig roadmap.
 
 ## Output
 
@@ -58,7 +66,7 @@ DragonSig emits the same JSON message envelope as the legacy FPV detector — Dr
 ]
 ```
 
-When telemetry is recovered from a 900 MHz detection, position fields are populated in the `Location/Vector Message` block instead of falling back to the WarDragon's own GPS.
+When MAVLink telemetry is recovered from a 900 MHz detection, position fields are populated in the `Location/Vector Message` block instead of falling back to the WarDragon's own GPS.
 
 | Source tag | Meaning |
 |------------|---------|
@@ -68,13 +76,13 @@ When telemetry is recovered from a 900 MHz detection, position fields are popula
 ## Pipeline Position
 
 ```
-2nd SDR (wideband)  ──►  DragonSig  ──►  ZMQ port 4226  ──►  DragonSync  ──►  TAK / MQTT / Lattice
-                                                                  ▲
-                                         droneid-go (4224) ───────┤
-                                         dji-receiver (4221) ─────┘
+BladeRF (Elite 2nd SDR)  ──►  DragonSig  ──►  ZMQ port 4226  ──►  DragonSync  ──►  TAK / MQTT / Lattice
+                                                                       ▲
+                                              droneid-go (4224) ───────┤
+                                              dji-receiver (4221) ─────┘
 ```
 
-DragonSig publishes alerts on ZMQ port `4226` so DragonSync's `fpv_*` configuration applies directly:
+DragonSig publishes alerts on ZMQ port `4226`, so DragonSync's `fpv_*` configuration applies directly:
 
 ```ini
 [SETTINGS]
@@ -92,35 +100,25 @@ The same DragonSync pipeline handles output regardless of which mission DragonSi
 
 ## Switching Missions
 
-Switching DragonSig from FPV to 900 MHz monitoring (or vice versa) is a software reconfiguration on the wideband 2nd SDR — no hardware swap. The appropriate antenna for the target band needs to be connected. Contact support for the switching procedure on your kit.
+Switching DragonSig between FPV, RFD900, and (future) ELRS missions is a software reconfiguration on the BladeRF — no hardware swap. The appropriate antenna for the target band needs to be connected. Contact support for the switching procedure on your kit.
 
 ## Service Management
 
 ```bash
-# Status
 sudo systemctl status dragonsig
-
-# Logs
 journalctl -u dragonsig -f
-
-# Restart
 sudo systemctl restart dragonsig
 ```
 
 The service runs as `User=dragon` so it can access USB SDR devices.
 
-## Compatibility
+## Distribution
 
-| Kit / Variant | DragonSig Support |
-|---------------|-------------------|
-| Pro v5 Mobile **x86_64** | Yes — wideband 2nd SDR + DragonSig built in |
-| Pro v5 Mobile **ARM64** | — (no 2nd SDR slot on ARM64 variant) |
-| v1 Drop-In **x86_64** | Yes — wideband 2nd SDR + DragonSig built in |
-| v1 Drop-In **ARM64** | — (no 2nd SDR slot on ARM64 variant) |
-| Pro v3 / v4 | Contact us — older single-SDR architecture, see [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) for the legacy path |
+DragonSig is **not currently open source**. The binary is provided pre-installed on Elite kits at the factory. There's no source download or self-build path at this time — contact us if you have questions about Elite kit availability.
 
 ## Related Documentation
 
+- [WarDragon Elite](../products/wardragon-elite.md) — the only kit that ships with DragonSig + BladeRF
 - [DragonSDR](../hardware/dragonsdr.md) — DJI DroneID detection radio (separate from DragonSig's 2nd SDR)
 - [Detection Capabilities](detection-capabilities.md)
 - [System Architecture](../architecture/overview.md)
