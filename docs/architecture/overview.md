@@ -82,7 +82,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 
 #### 3. TI-based Bluetooth Long Range Board
 - **Function**: Bluetooth 5 Long Range Remote ID detection
-- **Hardware**: Texas Instruments-based board (Pro v5 / Elite). Pro v3 used a Sonoff-based "DragonTooth" dongle.
+- **Hardware**: Texas Instruments-based board (Pro / Elite). Pro v3 used a Sonoff-based "DragonTooth" dongle.
 - **Firmware**: Sniffle-compatible
 - **Output**: BT5 LR Remote ID packets, ingested by droneid-go
 - **Transport**: Native BLE input to droneid-go
@@ -97,7 +97,7 @@ The WarDragon system is built on a modular, message-driven architecture that all
 
 #### DragonScope *(optional subscription)*
 
-[DragonScope](../software/dragonscope.md) is an annual subscription service that extends DJI DroneID coverage to current OcuSync generations including OcuSync 4+. It runs alongside dji-receiver, decodes the additional telemetry stream, and feeds resolved positions back into the same ZMQ pipeline. From DragonSync's perspective downstream, an OcuSync 4 drone is just a drone — same CoT type, same MQTT format. Requires data connectivity. Eligible kits: Pro v5 (Mobile / Drop-In) and Elite (Mobile / Drop-In).
+[DragonScope](../software/dragonscope.md) is an annual subscription service that extends DJI DroneID coverage to current OcuSync generations including OcuSync 4+. It runs alongside dji-receiver, decodes the additional telemetry stream, and feeds resolved positions back into the same ZMQ pipeline. From DragonSync's perspective downstream, an OcuSync 4 drone is just a drone — same CoT type, same MQTT format. Requires data connectivity. Eligible kits: Pro (Mobile or Drop-In Kit) and Elite (Mobile / Drop-In).
 
 #### DragonSync
 

@@ -1,16 +1,20 @@
-# WarDragon Pro v5
+# WarDragon Pro
 
-The WarDragon Pro v5 is the current-generation **ARM64-based** drone detection kit. It ships in two form-factor variants — **Mobile** (Pelican-style transport case) and **Drop-In** (DIN-rail / integrator enclosure) — that share the same compute, the same detection radios, and the same software stack.
+The WarDragon Pro is the current-generation **ARM64-based** drone detection kit. It ships as two distinct SKUs that share the same compute, the same detection radios, and the same software stack — they differ only in form factor:
+
+| SKU | Form Factor | Store Link |
+|-----|-------------|-----------|
+| **WarDragon Pro Mobile Kit** | Pelican-style transport case with built-in maintenance screen | [Purchase](https://cemaxecuter.com/?product=wardragon-pro-kit-v5-w-advanced-drone-detection) |
+| **WarDragon Pro Drop-In Kit** | DIN-rail-mountable metal enclosure for integrator installs | [Purchase](https://cemaxecuter.com/?product=wardragon-v1-drop-in-detection-kit) |
 
 **Architecture**: ARM64
 **Subscription required for base kit**: No
-**Purchase**: [cemaxecuter.com](https://cemaxecuter.com)
 
-> **Headless by design**: Like all WarDragon kits, the Pro v5 is intended to run as a headless sensor. The Mobile variant includes a small built-in maintenance screen for on-the-spot configuration and status checks.
+> **Headless by design**: Like all WarDragon kits, the Pro is intended to run as a headless sensor. The Mobile Kit includes a small built-in maintenance screen for on-the-spot configuration and status checks.
 
-## Form-Factor Variants
+## SKU Comparison
 
-| | **Pro v5 Mobile** | **Pro v5 Drop-In** |
+| | **Pro Mobile Kit** | **Pro Drop-In Kit** |
 |--|------------------|---------------------|
 | Enclosure | Rugged, Pelican-style mobility case | DIN-rail-mountable metal enclosure |
 | Built-in maintenance screen | Yes | — |
@@ -20,9 +24,9 @@ The WarDragon Pro v5 is the current-generation **ARM64-based** drone detection k
 | GPS | Integrated module, external SMA antenna connection on case | Bring your own (per integration) |
 | Cooling | Integrated external cooling fans | Passive (metal enclosure) — plan for active cooling in confined installs |
 
-Both variants run identical software and produce identical CoT / MQTT / Lattice output downstream — the form factor is the only difference.
+Both SKUs run identical software and produce identical CoT / MQTT / Lattice output downstream.
 
-## Detection Hardware (Both Variants)
+## Detection Hardware (Both SKUs)
 
 | Component | Purpose |
 |-----------|---------|
@@ -43,18 +47,18 @@ Both variants run identical software and produce identical CoT / MQTT / Lattice 
 
 ### Extending Coverage with DragonScope
 
-The optional [DragonScope Drone ID Service](../software/dragonscope.md) extends DJI DroneID coverage to OcuSync 3+ generations (including OcuSync 4), adding **detect and decode** for those generations. It runs as an annual subscription on the WarDragon, requires data connectivity, and is eligible for both Pro v5 form factors.
+The optional [DragonScope Drone ID Service](../software/dragonscope.md) extends DJI DroneID coverage to OcuSync 3+ generations (including OcuSync 4), adding **detect and decode** for those generations. It runs as an annual subscription on the WarDragon, requires data connectivity, and is eligible for both Pro SKUs.
 
 ## Optional Add-ons
 
-| Add-on | Compatible Variant | What It Adds |
-|--------|-------------------|-------------|
+| Add-on | Compatible SKU | What It Adds |
+|--------|---------------|-------------|
 | [DragonScope Drone ID Service](../software/dragonscope.md) | Mobile + Drop-In | Detect + decode coverage for current OcuSync generations including OcuSync 4. Annual subscription, requires data connectivity. |
 | 4G Cellular Upgrade | Mobile | Cellular WAN backhaul |
 | Upgraded Antenna Packages | Mobile + Drop-In | Mission-specific antennas, omni-directional and directional options |
 | Rapid Deployment Kit | Drop-In | Converts the Drop-In into a standalone field system with weatherproof housing, tripod, travel case |
 
-Contact us for current pricing and availability.
+Contact us via [cemaxecuter.com](https://cemaxecuter.com) for current pricing and availability.
 
 ## Software Stack
 
@@ -83,15 +87,15 @@ All detection data outputs through DragonSync to:
 - **[DragonSync-iOS](https://github.com/Root-Down-Digital/DragonSync-iOS)** — iOS companion (third-party)
 - **[DragonSync-Android](https://github.com/lukeswitz/DragonSync-Android)** — Android companion (third-party)
 
-## When to Choose Pro v5 vs. WarDragon Elite
+## When to Choose Pro vs. Elite
 
 | If you need... | Choose |
 |---------------|--------|
-| Remote ID + DJI DroneID detection in a power-efficient ARM64 platform | Pro v5 (Mobile or Drop-In) |
-| The above **plus** FPV analog video detection | [WarDragon Elite](wardragon-elite.md) |
+| Remote ID + DJI DroneID detection in a power-efficient ARM64 platform | WarDragon Pro (Mobile or Drop-In) |
+| The above **plus** analog FPV video detection | [WarDragon Elite](wardragon-elite.md) |
 | The above **plus** RFD900 / MAVLink telemetry intelligence | [WarDragon Elite](wardragon-elite.md) |
-| Mobile / vehicle deployment | Pro v5 Mobile (or Elite Mobile) |
-| Integrator install — CCTV / LPR / sensor cabinet / panel | Pro v5 Drop-In (or Elite Drop-In) |
+| Mobile / vehicle deployment | Pro Mobile (or Elite Mobile) |
+| Integrator install — CCTV / LPR / sensor cabinet / panel | Pro Drop-In (or Elite Drop-In) |
 
 ## Getting Started
 
@@ -101,7 +105,7 @@ All detection data outputs through DragonSync to:
 
 ## Related Documentation
 
-- [WarDragon Elite](wardragon-elite.md) — Pro v5 base + x86_64 NUC + BladeRF + DragonSig
+- [WarDragon Elite](wardragon-elite.md) — Pro base + x86_64 NUC + BladeRF + DragonSig
 - [DragonSDR](../hardware/dragonsdr.md) — DJI DroneID detection radio
 - [DragonScope](../software/dragonscope.md) — Optional full-decode service
 - [System Architecture](../architecture/overview.md)

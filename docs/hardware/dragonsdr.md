@@ -92,7 +92,7 @@ The DragonSDR's RX line is on **Left Side - Port 3** (RX DragonSDR) of the Pro v
 | Kit | Included? |
 |-----|----------|
 | WarDragon Pro v3 | Yes |
-| WarDragon Pro v5 (Mobile or Drop-In) | Yes |
+| WarDragon Pro (Mobile or Drop-In Kit) | Yes |
 | WarDragon Elite (Mobile or Drop-In) | Yes |
 
 ## Related Documentation

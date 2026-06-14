@@ -1,16 +1,16 @@
 # Detection Capabilities
 
-This document details the drone detection capabilities of the WarDragon platform across the current product lineup — **Pro v5** (Mobile / Drop-In), **Elite** (Mobile / Drop-In), and the legacy **Pro v3**.
+This document details the drone detection capabilities of the WarDragon platform across the current product lineup — **WarDragon Pro** (Mobile or Drop-In Kit), **WarDragon Elite** (Mobile or Drop-In Kit), and the legacy **WarDragon Pro v3**.
 
 ## Detection Overview
 
 WarDragon detects drones through multiple complementary technologies:
 
-| Technology | Protocol | Hardware | Pro v5 | Elite | Pro v3 |
-|------------|----------|----------|:------:|:-----:|:------:|
+| Technology | Protocol | Hardware | Pro | Elite | Pro v3 |
+|------------|----------|----------|:---:|:-----:|:------:|
 | DJI DroneID | OcuSync 2 / 3 / 4+ | DragonSDR | Yes | Yes | Yes |
-| WiFi Remote ID | IEEE 802.11 | Alfa dual-band card (Pro v5 / Elite), Panda + ESP32 (Pro v3) | Yes | Yes | Yes |
-| Bluetooth Remote ID | BT5 LR | TI-based board (Pro v5 / Elite), Sonoff DragonTooth (Pro v3) | Yes | Yes | Yes |
+| WiFi Remote ID | IEEE 802.11 | Alfa dual-band card (Pro / Elite), Panda + ESP32 (Pro v3) | Yes | Yes | Yes |
+| Bluetooth Remote ID | BT5 LR | TI-based board (Pro / Elite), Sonoff DragonTooth (Pro v3) | Yes | Yes | Yes |
 | Analog FPV video | 5 GHz race bands | BladeRF + [DragonSig](dragonsig.md) | — | Yes | Legacy via [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) |
 | RFD900 + MAVLink decode | 900 MHz | BladeRF + DragonSig | — | Yes | — |
 | ELRS *(coming soon)* | Multi-band | BladeRF + DragonSig | — | Yes | — |
@@ -141,7 +141,7 @@ Bluetooth 5 Long Range significantly extends detection:
 
 ## DragonSig — FPV / RFD900 / ELRS Detection (Elite Only)
 
-[DragonSig](dragonsig.md) is the signal-detection service that runs on the **BladeRF** included with the **WarDragon Elite** kit. Pro v5 doesn't include a 2nd SDR, so DragonSig isn't available there.
+[DragonSig](dragonsig.md) is the signal-detection service that runs on the **BladeRF** included with the **WarDragon Elite** kit. Pro doesn't include a 2nd SDR, so DragonSig isn't available there.
 
 DragonSig retunes the BladeRF via software to whichever mission you've configured. Today's mission set:
 
@@ -181,7 +181,7 @@ The DragonSig sweep covers the standard 5 GHz FPV race bands and adjacent channe
 
 - **FPV analog** — no native position data (uses WarDragon GPS as the location)
 - **RFD900 / 900 MHz** — position is included when telemetry from the link is decoded; otherwise WarDragon GPS is used
-- **Requires WarDragon Elite** — the BladeRF and DragonSig binary ship on Elite kits only. Pro v5 and Pro v3 don't include a 2nd SDR.
+- **Requires WarDragon Elite** — the BladeRF and DragonSig binary ship on Elite kits only. Pro and Pro v3 don't include a 2nd SDR.
 
 ### Legacy FPV Flow (Pro v3)
 

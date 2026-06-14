@@ -6,12 +6,12 @@ DragonSig is the wideband signal-detection service that runs on the **BladeRF (2
 
 ## Where DragonSig Lives
 
-DragonSig is **Elite-only**. The Pro v5 kit doesn't include a 2nd SDR, so DragonSig isn't available on Pro v5.
+DragonSig is **Elite-only**. The WarDragon Pro kit doesn't include a 2nd SDR, so DragonSig isn't available on Pro.
 
 | Kit | DragonSig |
 |-----|-----------|
 | WarDragon Elite (Mobile or Drop-In) | **Yes** — runs on the included BladeRF |
-| WarDragon Pro v5 (Mobile or Drop-In) | — (no 2nd SDR) |
+| WarDragon Pro (Mobile or Drop-In Kit) | — (no 2nd SDR) |
 | WarDragon Pro v3 | — (single-SDR legacy architecture; see [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) for the older flow) |
 
 ## How It Works
