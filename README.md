@@ -55,6 +55,7 @@ Visit the [cemaxecuter.com store](https://cemaxecuter.com/?post_type=product) fo
 - [System Architecture](docs/architecture/overview.md)
 - [ZMQ Data Flows](docs/architecture/zmq-dataflows.md)
 - [DragonSync Core Application](docs/software/dragonsync.md)
+- [WarDragon Console](docs/software/wardragon-console.md) — On-kit local web UI for health, live detections, and curated config editing
 - [DragonScope](docs/software/dragonscope.md) — Optional service for full DJI DroneID decode (current OcuSync generations)
 - [DragonSig](docs/software/dragonsig.md) — Wideband signal detection on Elite's BladeRF (FPV / RFD900 / ELRS-soon)
 - [Detection Capabilities](docs/software/detection-capabilities.md)
@@ -91,6 +92,7 @@ Visit the [cemaxecuter.com store](https://cemaxecuter.com/?post_type=product) fo
 | [DragonSync](https://github.com/alphafox02/DragonSync) | Main application — merges detection streams, outputs CoT to TAK, MQTT, and Lattice |
 | [droneid-go](https://github.com/alphafox02/droneid-go) | Unified Open Drone ID receiver (WiFi + BLE + UART) with ZMQ output |
 | [dragonsdr_dji_droneid](https://github.com/alphafox02/dragonsdr_dji_droneid) | DragonSDR receiver for DJI DroneID detection |
+| [wardragon-console](https://github.com/alphafox02/wardragon-console) | Local on-kit web UI for health, live detections, and curated DragonSync/DragonScope config editing |
 
 ### Extended Capabilities (provided with add-on purchase or Elite kit)
 | Component | Description |
