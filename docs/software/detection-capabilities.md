@@ -13,7 +13,8 @@ WarDragon detects drones through multiple complementary technologies:
 | Bluetooth Remote ID | BT5 LR | TI-based board (Pro / Elite), Sonoff DragonTooth (Pro v3) | Yes | Yes | Yes |
 | Analog FPV video | 5 GHz race bands | BladeRF + [DragonSig](dragonsig.md) | — | Yes | Legacy via [wardragon-fpv-detect](https://github.com/alphafox02/wardragon-fpv-detect) |
 | RFD900 + MAVLink decode | 900 MHz | BladeRF + DragonSig | — | Yes | — |
-| ELRS *(coming soon)* | Multi-band | BladeRF + DragonSig | — | Yes | — |
+| mLRS + MAVLink extraction *(active work)* | Multi-band | BladeRF + DragonSig | — | Yes | — |
+| ELRS *(planned)* | Multi-band | BladeRF + DragonSig | — | Yes | — |
 
 ## DJI DroneID Detection
 
@@ -35,6 +36,25 @@ WarDragon detects drones through multiple complementary technologies:
 OcuSync 2 / 3 standard detection is **unaffected** by DragonScope state and continues to work fully offline.
 
 > DJI drones only broadcast DroneID while motors are spinning. Power-on alone activates the OcuSync control link but does not start the DroneID broadcast.
+
+### Range Expectations
+
+Real-world detection distances with the DragonSDR:
+
+| Configuration | Typical Range | Notes |
+|---------------|---------------|-------|
+| Stock kit antenna, obstructed / urban | Several hundred meters | Depends heavily on obstacles and noise floor |
+| Stock kit antenna, clear line of sight | **1 – 2 km** | Common outdoor field-test result |
+| With external LNA and directional antenna | **Up to ~10 km** | Reported in favorable RF environments with elevated / directional install |
+
+These are field observations, not spec-sheet claims — actual range depends on antenna choice, elevation, obstructions, and the specific drone's transmit power.
+
+### Field Observations
+
+- **DJI O4 Air units**: activity detection has been confirmed on newer O4-based Air airframes with the standard DragonSDR firmware.
+- **DJI Neo 2 (with add-on)**: full DroneID decode has been confirmed in the field on the Neo 2 when paired with the appropriate add-on configuration.
+
+More field-confirmed models are added as we validate them. Detection support for a specific model isn't a fixed spec — the DragonSDR firmware and DragonScope service both continue to expand coverage.
 
 ### Data Extracted
 
@@ -62,10 +82,11 @@ The DragonSDR runs custom firmware optimized for DJI DroneID detection:
 
 | Factor | Impact | Optimization |
 |--------|--------|--------------|
-| Antenna gain | Higher gain = longer range | Use 6+ dBi directional |
-| Line of sight | Clear LoS dramatically improves range | Elevate antenna |
-| RF environment | Urban noise reduces range | Use filtering |
-| Drone altitude | Higher drones detected further | N/A |
+| Antenna gain / directionality | Higher gain and directional pattern extend range substantially | Panel or Yagi antennas for fixed installs |
+| **External LNA** | Adds several dB of usable link budget — this is the single biggest range multiplier we've seen in the field | Optional add-on for extended-range deployments |
+| Line of sight | Clear LoS dramatically improves range | Elevate the receive antenna |
+| RF environment | Urban / congested spectrum shortens usable range | Filtering, siting away from noise sources |
+| Drone altitude | Higher drones stay in LoS longer | N/A |
 
 ## WiFi Remote ID Detection
 
@@ -84,25 +105,30 @@ Per ASTM F3411 specification:
 - **Operator**: Operator ID and location
 - **System**: Timestamp, area count, category/class
 
-### Hardware: Panda Wireless + ESP32
+### Hardware
 
-**Panda Wireless PAU0D**:
-- Dual-band 2.4/5 GHz
-- Monitor mode capable
-- External antenna support
+**Current — WarDragon Pro and Elite**:
+- **Alfa dual-band WiFi card** — 2.4 / 5 GHz, monitor mode, external antenna
+- Fed into `droneid-go` (native WiFi Remote ID support, `-g`)
 
-**ESP32 Module**:
-- Dedicated WiFi Remote ID scanning
-- Low-power continuous monitoring
-- May be removed in future versions
+**Legacy — WarDragon Pro v3**:
+- **Panda Wireless PAU0D** — dual-band 2.4 / 5 GHz, monitor mode capable, external antenna
+- **ESP32 module** — separate low-power WiFi Remote ID scanner over UART
+- Both fed into `droneid-go`
+
+Current Pro and Elite kits do **not** ship the ESP32 or the Panda card — the Alfa card handles WiFi Remote ID on its own.
 
 ### Range Expectations
 
-| Environment | Typical Range |
-|-------------|---------------|
-| Open field | 300-500m |
-| Suburban | 150-300m |
-| Urban | 50-150m |
+Real-world detection distances with the stock kit antenna on Pro / Elite:
+
+| Environment | Typical Range | Notes |
+|-------------|---------------|-------|
+| Open / rural field, clear LoS | **700 m+** | Field-confirmed on stock kit antennas |
+| Busy / mixed environment, some obstructions | Several hundred meters | Depends on noise floor and obstacles |
+| Dense urban with heavy 2.4 / 5 GHz congestion | Reduced | RF congestion is the dominant factor here |
+
+Range scales further with upgraded antennas and elevated / directional installs — these numbers are baseline observations with what ships in the kit.
 
 ## Bluetooth 5 Long Range Remote ID
 
@@ -139,15 +165,16 @@ Bluetooth 5 Long Range significantly extends detection:
 | LE Coded S2 | 300-500m | 2x range vs 1M |
 | LE Coded S8 | 500m-1+ km | 4x range, slower |
 
-## DragonSig — FPV / RFD900 / ELRS Detection (Elite Only)
+## DragonSig — FPV / RFD900 / mLRS / ELRS Detection (Elite Only)
 
 [DragonSig](dragonsig.md) is the signal-detection service that runs on the **BladeRF** included with the **WarDragon Elite** kit. Pro doesn't include a 2nd SDR, so DragonSig isn't available there.
 
-DragonSig retunes the BladeRF via software to whichever mission you've configured. Today's mission set:
+DragonSig retunes the BladeRF via software to whichever mission you've configured. Mission set:
 
 - **Analog FPV video** — 5 GHz race bands
-- **RFD900 / 900 MHz telemetry** — includes **MAVLink decode** for SiK / RFD900 links
-- **ELRS** *(coming soon)* — ExpressLRS control-link detection / characterization
+- **RFD900 / 900 MHz telemetry** — link detection **plus MAVLink decode** for SiK / RFD900 links (extracts GPS / heading etc. from decoded MAVLink)
+- **mLRS** *(active work)* — link detection **plus MAVLink extraction from the mLRS link** to obtain GPS and other telemetry, same way as RFD900
+- **ELRS** *(planned / on roadmap)* — ExpressLRS control-link detection / characterization
 
 The BladeRF is dedicated to whichever mission DragonSig is configured for at any given time — it isn't sweeping multiple bands simultaneously on a single radio. If you need persistent multi-band coverage, contact us about kit options with multiple 2nd SDRs.
 
@@ -205,7 +232,7 @@ WarDragon detects drones across multiple protocols simultaneously. Each detectio
 │  BT5 Remote ID ───┤                                                 │
 │  (BT dongle)      │                                                 │
 │                   │                                                 │
-│  FPV / 900MHz / ELRS ──┘ ◄── DragonSig (Elite only, BladeRF)       │
+│  FPV / 900MHz / mLRS / ELRS ─┘ ◄── DragonSig (Elite only, BladeRF) │
 │  (1 mission at a time)                                             │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘

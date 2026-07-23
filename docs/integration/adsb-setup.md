@@ -21,7 +21,7 @@ The base WarDragon kits include a single dedicated SDR — the [DragonSDR](../ha
 | **Repurpose the DragonSDR for ADS-B temporarily** | You lose DJI DroneID detection while it's tuned to 1090/978 MHz. Useful for demos, lab work, or environments where DJI detection isn't required. |
 | **Add a dedicated ADS-B SDR (recommended)** | Plug an additional USB SDR (RTL-SDR is the common choice for 1090 / 978 MHz) into the WarDragon. DJI detection on the DragonSDR continues uninterrupted. |
 
-> **Note for WarDragon Elite kits**: the BladeRF is used by [DragonSig](../software/dragonsig.md) for FPV / RFD900 / ELRS monitoring — so even on Elite, ADS-B requires a separate USB SDR (an RTL-SDR is the common choice).
+> **Note for WarDragon Elite kits**: the BladeRF is used by [DragonSig](../software/dragonsig.md) for FPV / RFD900 / mLRS / ELRS missions — so even on Elite, ADS-B requires a separate USB SDR (an RTL-SDR is the common choice).
 
 A purpose-built ADS-B antenna helps a lot. The stock dual-band antennas will pick up the strongest 1090 MHz returns but range is limited.
 

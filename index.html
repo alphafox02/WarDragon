@@ -2507,7 +2507,7 @@ All detection data outputs through DragonSync to:
 
 pages['wardragon-elite'] = `# WarDragon Elite
 
-The WarDragon Elite is the top-tier kit. It uses the same detection radio stack as the [WarDragon Pro](wardragon-pro-v5.md) (DragonSDR, TI-based Bluetooth board, Alfa dual-band WiFi card) but pairs it with **x86_64 NUC-class compute** and adds a **second SDR — a BladeRF — running [DragonSig](../software/dragonsig.md)** for analog FPV, RFD900 / MAVLink decode, and (coming soon) ELRS detection.
+The WarDragon Elite is the top-tier kit. It uses the same detection radio stack as the [WarDragon Pro](wardragon-pro-v5.md) (DragonSDR, TI-based Bluetooth board, Alfa dual-band WiFi card) but pairs it with **x86_64 NUC-class compute** and adds a **second SDR — a BladeRF — running [DragonSig](../software/dragonsig.md)** for analog FPV, RFD900 + MAVLink decode, mLRS + MAVLink extraction (active work), and ELRS detection (planned).
 
 It ships as two distinct SKUs that share the same compute and detection stack — they differ only in form factor:
 
@@ -2559,7 +2559,7 @@ Both SKUs run identical software and produce identical output downstream.
 | **TI-based Bluetooth Long Range board** | Bluetooth 5 LR Remote ID detection. Sniffle-compatible firmware. |
 | **Alfa dual-band WiFi card** | WiFi Remote ID detection — 2.4 GHz and 5 GHz. |
 | **GPS module** | Position and timing. Integrated on Mobile; bring-your-own on Drop-In. |
-| **BladeRF (2nd SDR)** | Wideband SDR dedicated to [DragonSig](../software/dragonsig.md) — analog FPV, RFD900 / MAVLink, ELRS (soon). |
+| **BladeRF (2nd SDR)** | Wideband SDR dedicated to [DragonSig](../software/dragonsig.md) — analog FPV, RFD900 + MAVLink, mLRS + MAVLink (active), ELRS (planned). |
 | **WD x86_64 NUC compute** | DragonOS preloaded. Higher processing headroom for the BladeRF pipeline and analytics workloads. |
 
 ## Detection Capabilities
@@ -2581,7 +2581,8 @@ The BladeRF on the Elite runs [DragonSig](../software/dragonsig.md). DragonSig t
 |---------|-----------|--------------|
 | **Analog FPV video** | 5 GHz race bands | Detect analog FPV transmitters; partial decoding capability |
 | **RFD900 telemetry** | 900 MHz | Detect SiK / RFD900-class radios and **decode MAVLink** telemetry |
-| **ELRS** *(coming soon)* | Multi-band | Detect and characterize ExpressLRS control links |
+| **mLRS** *(active work)* | Multi-band | Detect the mLRS link and **extract MAVLink telemetry** (GPS / heading) from it |
+| **ELRS** *(planned / on roadmap)* | Multi-band | Detect and characterize ExpressLRS control links |
 
 > DragonSig is proprietary — the binary ships pre-installed on the Elite kit. Source is not currently open.
 
@@ -2622,7 +2623,8 @@ All detections — DJI DroneID, WiFi RID, Bluetooth RID, FPV alerts, RFD900 tele
 | Remote ID + DJI DroneID only — power-efficient ARM platform | [WarDragon Pro](wardragon-pro-v5.md) |
 | Above plus analog FPV detection | Elite |
 | Above plus RFD900 + MAVLink decode | Elite |
-| ELRS detection when available | Elite |
+| mLRS link detection + MAVLink extraction (active) | Elite |
+| ELRS detection when available (planned) | Elite |
 | Most compute headroom for analytics / future signals | Elite |
 
 ## Getting Started
@@ -3170,7 +3172,8 @@ Current mission set:
 |---------|-----------|-----------------|--------|
 | **Analog FPV video** | 5 GHz race bands | Analog video transmitters on racing / custom drones | Partial — PAL/NTSC discrimination, frame capture where signal quality permits |
 | **RFD900 / 900 MHz telemetry** | 902 – 928 MHz | SiK / RFD900-class radios used for long-range drone telemetry | **MAVLink decode** — extracts position, heading, and other fields where available |
-| **ELRS** *(coming soon)* | Multi-band | ExpressLRS control links used on FPV / racing drones | Detection and characterization |
+| **mLRS** *(active work)* | Multi-band | mLRS control links used on long-range drones | **Detection + MAVLink extraction** from the mLRS link (GPS, heading, telemetry) |
+| **ELRS** *(planned / on roadmap)* | Multi-band | ExpressLRS control links used on FPV / racing drones | Detection and characterization |
 
 The BladeRF is dedicated to whichever mission DragonSig is configured for at any given time — DragonSig isn't sweeping multiple bands simultaneously on the same radio. The mission set is expected to grow over time without hardware changes.
 
@@ -3194,7 +3197,11 @@ For the 900 MHz mission DragonSig monitors the 902–928 MHz ISM band typically 
 
 DragonSig **detects the link and decodes MAVLink telemetry** — when MAVLink position / heading data is recovered from the link, it's forwarded as a track with real position rather than falling back to the WarDragon's own GPS.
 
-### ELRS *(Coming Soon)*
+### mLRS *(Active Work)*
+
+**mLRS** is an open long-range control-link protocol widely used on custom / long-range drones. DragonSig's mLRS work goes beyond just detecting the link — it **extracts MAVLink telemetry directly from the mLRS link**, same way it does for RFD900 / SiK. When MAVLink position and heading data are recovered, they populate the track's \`Location/Vector Message\` block instead of falling back to the WarDragon's own GPS.
+
+### ELRS *(Planned)*
 
 Detection and characterization of ExpressLRS control links is on the DragonSig roadmap.
 
@@ -3246,7 +3253,7 @@ The same DragonSync pipeline handles output regardless of which mission DragonSi
 
 ## Switching Missions
 
-Switching DragonSig between FPV, RFD900, and (future) ELRS missions is a software reconfiguration on the BladeRF — no hardware swap. The appropriate antenna for the target band needs to be connected. Contact support for the switching procedure on your kit.
+Switching DragonSig between FPV, RFD900, mLRS, and (future) ELRS missions is a software reconfiguration on the BladeRF — no hardware swap. The appropriate antenna for the target band needs to be connected. Contact support for the switching procedure on your kit.
 
 ## Service Management
 
@@ -3295,7 +3302,7 @@ The base WarDragon kits include a single dedicated SDR — the [DragonSDR](../ha
 | **Repurpose the DragonSDR for ADS-B temporarily** | You lose DJI DroneID detection while it's tuned to 1090/978 MHz. Useful for demos, lab work, or environments where DJI detection isn't required. |
 | **Add a dedicated ADS-B SDR (recommended)** | Plug an additional USB SDR (RTL-SDR is the common choice for 1090 / 978 MHz) into the WarDragon. DJI detection on the DragonSDR continues uninterrupted. |
 
-> **Note for WarDragon Elite kits**: the BladeRF is used by [DragonSig](../software/dragonsig.md) for FPV / RFD900 / ELRS monitoring — so even on Elite, ADS-B requires a separate USB SDR (an RTL-SDR is the common choice).
+> **Note for WarDragon Elite kits**: the BladeRF is used by [DragonSig](../software/dragonsig.md) for FPV / RFD900 / mLRS / ELRS missions — so even on Elite, ADS-B requires a separate USB SDR (an RTL-SDR is the common choice).
 
 A purpose-built ADS-B antenna helps a lot. The stock dual-band antennas will pick up the strongest 1090 MHz returns but range is limited.
 
@@ -3668,7 +3675,7 @@ function renderHome() {
       <div class="home-card" onclick="navigate('wardragon-elite')">
         <div class="card-icon">&#128293;</div>
         <h3>WarDragon Elite</h3>
-        <p>x86_64 NUC compute with same detection stack as Pro **plus** a BladeRF running DragonSig — adds analog FPV, RFD900 + MAVLink, ELRS (soon).</p>
+        <p>x86_64 NUC compute with same detection stack as Pro <strong>plus</strong> a BladeRF running DragonSig — adds analog FPV, RFD900 + MAVLink, mLRS + MAVLink (active), ELRS (planned).</p>
       </div>
       <div class="home-card" onclick="navigate('wardragon-pro-v3')">
         <div class="card-icon">&#128295;</div>
@@ -3692,7 +3699,7 @@ function renderHome() {
       <div class="home-card" onclick="navigate('dragonsig')">
         <div class="card-icon">&#128293;</div>
         <h3>DragonSig <span style="color:var(--accent);font-size:11px">(Elite-only)</span></h3>
-        <p>Runs on the Elite's BladeRF — analog FPV (5 GHz), RFD900 + MAVLink (900 MHz), ELRS (coming soon). Proprietary.</p>
+        <p>Runs on the Elite's BladeRF — analog FPV (5 GHz), RFD900 + MAVLink (900 MHz), mLRS + MAVLink (active), ELRS (planned). Proprietary.</p>
       </div>
       <div class="home-card" onclick="navigate('dragonsync')">
         <div class="card-icon">&#128257;</div>
@@ -3731,7 +3738,7 @@ function renderHome() {
       <div class="home-card" onclick="navigate('detection-capabilities')">
         <div class="card-icon">&#128225;</div>
         <h3>Detection Capabilities</h3>
-        <p>DJI DroneID, WiFi RID, BT5 LR, plus FPV / RFD900 / ELRS on Elite kits</p>
+        <p>DJI DroneID, WiFi RID, BT5 LR, plus FPV / RFD900 / mLRS / ELRS on Elite kits</p>
       </div>
       <div class="home-card" onclick="navigate('tak-integration')">
         <div class="card-icon">&#127919;</div>
@@ -3768,7 +3775,8 @@ function renderHome() {
           <tr><td>WiFi Remote ID</td><td>Alfa dual-band card</td><td>2.4 / 5 GHz</td><td>Dual-band Remote ID</td></tr>
           <tr><td>Analog FPV video</td><td>BladeRF + <strong>DragonSig</strong></td><td>5 GHz race bands</td><td><strong>Elite</strong> kits</td></tr>
           <tr><td>RFD900 + MAVLink decode</td><td>BladeRF + <strong>DragonSig</strong></td><td>900 MHz</td><td><strong>Elite</strong> kits</td></tr>
-          <tr><td>ELRS <em>(coming soon)</em></td><td>BladeRF + <strong>DragonSig</strong></td><td>Multi-band</td><td><strong>Elite</strong> kits</td></tr>
+          <tr><td>mLRS + MAVLink extraction <em>(active work)</em></td><td>BladeRF + <strong>DragonSig</strong></td><td>Multi-band</td><td><strong>Elite</strong> kits</td></tr>
+          <tr><td>ELRS <em>(planned)</em></td><td>BladeRF + <strong>DragonSig</strong></td><td>Multi-band</td><td><strong>Elite</strong> kits</td></tr>
         </tbody>
       </table>
     </div>
@@ -3783,7 +3791,7 @@ function renderHome() {
           <tr><td><a href="https://github.com/alphafox02/dragonsdr_dji_droneid" target="_blank">dragonsdr_dji_droneid</a></td><td>DragonSDR receiver for DJI DroneID detection</td></tr>
           <tr><td><a href="https://github.com/alphafox02/wardragon-console" target="_blank">wardragon-console</a></td><td>Local on-kit web UI for health, live detections, and curated DragonSync/DragonScope config editing</td></tr>
           <tr><td><strong>DragonScope Drone ID Service</strong></td><td>Annual subscription. Decodes DJI DroneID across current OcuSync generations including O4+. Requires data connectivity.</td></tr>
-          <tr><td><strong>DragonSig</strong> <em>(Elite-only, proprietary)</em></td><td>Signal-detection service driving the BladeRF on Elite kits — analog FPV (5 GHz), RFD900 + MAVLink (900 MHz), ELRS (coming soon). One mission per radio.</td></tr>
+          <tr><td><strong>DragonSig</strong> <em>(Elite-only, proprietary)</em></td><td>Signal-detection service driving the BladeRF on Elite kits — analog FPV (5 GHz), RFD900 + MAVLink (900 MHz), mLRS + MAVLink extraction (active), ELRS (planned). One mission per radio.</td></tr>
           <tr><td><a href="https://github.com/alphafox02/WarDragon-ATAK-Plugin" target="_blank">WarDragon ATAK Plugin</a></td><td>Native ATAK plugin for WarDragon integration</td></tr>
           <tr><td><a href="https://github.com/alphafox02/WarDragonAnalytics" target="_blank">WarDragonAnalytics</a></td><td>Analytics dashboard and visualization stack</td></tr>
         </tbody>

@@ -87,8 +87,8 @@ The WarDragon system is built on a modular, message-driven architecture that all
 - **Output**: BT5 LR Remote ID packets, ingested by droneid-go
 - **Transport**: Native BLE input to droneid-go
 
-#### 4. DragonSig — FPV / RFD900 / ELRS *(WarDragon Elite only)*
-- **Function**: Analog FPV video detection (5 GHz race bands), RFD900 / 900 MHz telemetry with **MAVLink decode**, and ELRS detection (coming soon). Software-switchable between missions on a single SDR — additional mission profiles can be added over time.
+#### 4. DragonSig — FPV / RFD900 / mLRS / ELRS *(WarDragon Elite only)*
+- **Function**: Analog FPV video detection (5 GHz race bands), RFD900 / 900 MHz telemetry with **MAVLink decode**, mLRS with **MAVLink extraction from the link** (active work), and ELRS detection (planned). Software-switchable between missions on a single SDR — additional mission profiles can be added over time.
 - **Hardware**: **BladeRF** built into the WarDragon Elite kit
 - **Output**: ZMQ Publisher (port 4226), same JSON envelope as the legacy FPV detector
 - **See**: [DragonSig](../software/dragonsig.md)

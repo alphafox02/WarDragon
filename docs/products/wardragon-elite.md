@@ -1,6 +1,6 @@
 # WarDragon Elite
 
-The WarDragon Elite is the top-tier kit. It uses the same detection radio stack as the [WarDragon Pro](wardragon-pro-v5.md) (DragonSDR, TI-based Bluetooth board, Alfa dual-band WiFi card) but pairs it with **x86_64 NUC-class compute** and adds a **second SDR — a BladeRF — running [DragonSig](../software/dragonsig.md)** for analog FPV, RFD900 / MAVLink decode, and (coming soon) ELRS detection.
+The WarDragon Elite is the top-tier kit. It uses the same detection radio stack as the [WarDragon Pro](wardragon-pro-v5.md) (DragonSDR, TI-based Bluetooth board, Alfa dual-band WiFi card) but pairs it with **x86_64 NUC-class compute** and adds a **second SDR — a BladeRF — running [DragonSig](../software/dragonsig.md)** for analog FPV, RFD900 + MAVLink decode, mLRS + MAVLink extraction (active work), and ELRS detection (planned).
 
 It ships as two distinct SKUs that share the same compute and detection stack — they differ only in form factor:
 
@@ -52,7 +52,7 @@ Both SKUs run identical software and produce identical output downstream.
 | **TI-based Bluetooth Long Range board** | Bluetooth 5 LR Remote ID detection. Sniffle-compatible firmware. |
 | **Alfa dual-band WiFi card** | WiFi Remote ID detection — 2.4 GHz and 5 GHz. |
 | **GPS module** | Position and timing. Integrated on Mobile; bring-your-own on Drop-In. |
-| **BladeRF (2nd SDR)** | Wideband SDR dedicated to [DragonSig](../software/dragonsig.md) — analog FPV, RFD900 / MAVLink, ELRS (soon). |
+| **BladeRF (2nd SDR)** | Wideband SDR dedicated to [DragonSig](../software/dragonsig.md) — analog FPV, RFD900 + MAVLink, mLRS + MAVLink (active), ELRS (planned). |
 | **WD x86_64 NUC compute** | DragonOS preloaded. Higher processing headroom for the BladeRF pipeline and analytics workloads. |
 
 ## Detection Capabilities
@@ -74,7 +74,8 @@ The BladeRF on the Elite runs [DragonSig](../software/dragonsig.md). DragonSig t
 |---------|-----------|--------------|
 | **Analog FPV video** | 5 GHz race bands | Detect analog FPV transmitters; partial decoding capability |
 | **RFD900 telemetry** | 900 MHz | Detect SiK / RFD900-class radios and **decode MAVLink** telemetry |
-| **ELRS** *(coming soon)* | Multi-band | Detect and characterize ExpressLRS control links |
+| **mLRS** *(active work)* | Multi-band | Detect the mLRS link and **extract MAVLink telemetry** (GPS / heading) from it |
+| **ELRS** *(planned / on roadmap)* | Multi-band | Detect and characterize ExpressLRS control links |
 
 > DragonSig is proprietary — the binary ships pre-installed on the Elite kit. Source is not currently open.
 
@@ -115,7 +116,8 @@ All detections — DJI DroneID, WiFi RID, Bluetooth RID, FPV alerts, RFD900 tele
 | Remote ID + DJI DroneID only — power-efficient ARM platform | [WarDragon Pro](wardragon-pro-v5.md) |
 | Above plus analog FPV detection | Elite |
 | Above plus RFD900 + MAVLink decode | Elite |
-| ELRS detection when available | Elite |
+| mLRS link detection + MAVLink extraction (active) | Elite |
+| ELRS detection when available (planned) | Elite |
 | Most compute headroom for analytics / future signals | Elite |
 
 ## Getting Started

@@ -24,7 +24,8 @@ Current mission set:
 |---------|-----------|-----------------|--------|
 | **Analog FPV video** | 5 GHz race bands | Analog video transmitters on racing / custom drones | Partial — PAL/NTSC discrimination, frame capture where signal quality permits |
 | **RFD900 / 900 MHz telemetry** | 902 – 928 MHz | SiK / RFD900-class radios used for long-range drone telemetry | **MAVLink decode** — extracts position, heading, and other fields where available |
-| **ELRS** *(coming soon)* | Multi-band | ExpressLRS control links used on FPV / racing drones | Detection and characterization |
+| **mLRS** *(active work)* | Multi-band | mLRS control links used on long-range drones | **Detection + MAVLink extraction** from the mLRS link (GPS, heading, telemetry) |
+| **ELRS** *(planned / on roadmap)* | Multi-band | ExpressLRS control links used on FPV / racing drones | Detection and characterization |
 
 The BladeRF is dedicated to whichever mission DragonSig is configured for at any given time — DragonSig isn't sweeping multiple bands simultaneously on the same radio. The mission set is expected to grow over time without hardware changes.
 
@@ -48,7 +49,11 @@ For the 900 MHz mission DragonSig monitors the 902–928 MHz ISM band typically 
 
 DragonSig **detects the link and decodes MAVLink telemetry** — when MAVLink position / heading data is recovered from the link, it's forwarded as a track with real position rather than falling back to the WarDragon's own GPS.
 
-### ELRS *(Coming Soon)*
+### mLRS *(Active Work)*
+
+**mLRS** is an open long-range control-link protocol widely used on custom / long-range drones. DragonSig's mLRS work goes beyond just detecting the link — it **extracts MAVLink telemetry directly from the mLRS link**, same way it does for RFD900 / SiK. When MAVLink position and heading data are recovered, they populate the track's `Location/Vector Message` block instead of falling back to the WarDragon's own GPS.
+
+### ELRS *(Planned)*
 
 Detection and characterization of ExpressLRS control links is on the DragonSig roadmap.
 
@@ -100,7 +105,7 @@ The same DragonSync pipeline handles output regardless of which mission DragonSi
 
 ## Switching Missions
 
-Switching DragonSig between FPV, RFD900, and (future) ELRS missions is a software reconfiguration on the BladeRF — no hardware swap. The appropriate antenna for the target band needs to be connected. Contact support for the switching procedure on your kit.
+Switching DragonSig between FPV, RFD900, mLRS, and (future) ELRS missions is a software reconfiguration on the BladeRF — no hardware swap. The appropriate antenna for the target band needs to be connected. Contact support for the switching procedure on your kit.
 
 ## Service Management
 

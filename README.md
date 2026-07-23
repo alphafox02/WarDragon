@@ -15,7 +15,7 @@ The current lineup is built around two kit lines — **WarDragon Pro** (ARM64) a
 | Product Line | Compute | Detection Stack | Use For |
 |--------------|---------|-----------------|---------|
 | [WarDragon Pro](docs/products/wardragon-pro-v5.md) | ARM64 | DragonSDR (DJI DroneID) + TI-based BT5 LR board + Alfa dual-band WiFi card + GPS | Remote ID + DJI DroneID detection in a power-efficient ARM64 platform |
-| [WarDragon Elite](docs/products/wardragon-elite.md) | x86_64 NUC | Same as Pro **plus** a BladeRF running [DragonSig](docs/software/dragonsig.md) | Pro detection coverage **plus** analog FPV, RFD900 + MAVLink decode, and (coming soon) ELRS detection |
+| [WarDragon Elite](docs/products/wardragon-elite.md) | x86_64 NUC | Same as Pro **plus** a BladeRF running [DragonSig](docs/software/dragonsig.md) | Pro detection coverage **plus** analog FPV, RFD900 + MAVLink decode, mLRS + MAVLink extraction (active), and ELRS detection (planned) |
 | [WarDragon Pro v3](docs/products/wardragon-pro-v3.md) *(legacy)* | Intel NUC | Single-SDR (Sonoff BT, Panda WiFi, ESP32) | Still supported. New deployments should use the current Pro or Elite. |
 
 ### Current SKUs
@@ -57,7 +57,7 @@ Visit the [cemaxecuter.com store](https://cemaxecuter.com/?post_type=product) fo
 - [DragonSync Core Application](docs/software/dragonsync.md)
 - [WarDragon Console](docs/software/wardragon-console.md) — On-kit local web UI for health, live detections, and curated config editing
 - [DragonScope](docs/software/dragonscope.md) — Optional service for full DJI DroneID decode (current OcuSync generations)
-- [DragonSig](docs/software/dragonsig.md) — Wideband signal detection on Elite's BladeRF (FPV / RFD900 / ELRS-soon)
+- [DragonSig](docs/software/dragonsig.md) — Wideband signal detection on Elite's BladeRF (FPV / RFD900 / mLRS-active / ELRS-planned)
 - [Detection Capabilities](docs/software/detection-capabilities.md)
 
 ### Integration
@@ -82,7 +82,8 @@ Visit the [cemaxecuter.com store](https://cemaxecuter.com/?post_type=product) fo
 | Bluetooth 5 LR Remote ID | TI-based BT board | 2.4 GHz | Yes | Yes |
 | Analog FPV video | BladeRF + [DragonSig](docs/software/dragonsig.md) | 5 GHz race bands | — | Yes |
 | RFD900 + MAVLink decode | BladeRF + DragonSig | 900 MHz | — | Yes |
-| ELRS *(coming soon)* | BladeRF + DragonSig | Multi-band | — | Yes |
+| mLRS + MAVLink extraction *(active work)* | BladeRF + DragonSig | Multi-band | — | Yes |
+| ELRS *(planned)* | BladeRF + DragonSig | Multi-band | — | Yes |
 
 ## Ecosystem & Related Projects
 
@@ -98,7 +99,7 @@ Visit the [cemaxecuter.com store](https://cemaxecuter.com/?post_type=product) fo
 | Component | Description |
 |-----------|-------------|
 | **DragonScope Drone ID Service** | Optional annual subscription. Extends DJI DroneID coverage to **detect + decode** current OcuSync generations including OcuSync 4+. Requires data connectivity. [Docs](docs/software/dragonscope.md) · [Store](https://cemaxecuter.com/?product=dragonscope-drone-id-service) |
-| **DragonSig** *(Elite-only, proprietary)* | Signal-detection service that drives the BladeRF on the Elite kit. Today: analog FPV (5 GHz) and RFD900 + MAVLink decode (900 MHz). Coming soon: ELRS detection. Binary ships pre-installed on Elite kits. [Docs](docs/software/dragonsig.md) |
+| **DragonSig** *(Elite-only, proprietary)* | Signal-detection service that drives the BladeRF on the Elite kit. Today: analog FPV (5 GHz), RFD900 + MAVLink decode (900 MHz), and mLRS + MAVLink extraction (active work). Planned: ELRS detection. Binary ships pre-installed on Elite kits. [Docs](docs/software/dragonsig.md) |
 
 ### Mobile & Companion Apps
 | Repository | Description |
