@@ -115,7 +115,7 @@ A drone payload looks like:
 ```json
 {
   "id": "drone-F6Q8D244C00CL2KF",
-  "description": "DJI O4 (Decrypted)",
+  "description": "DJI Mini 5 (O4)",
   "lat": 27.8002846,
   "lon": -82.6686196,
   "alt": 65531.0,
@@ -130,7 +130,75 @@ A drone payload looks like:
 }
 ```
 
-> **Full schema reference:** every topic, every field, types, always-present vs. conditional notes, plus signal/aircraft/system payloads — see [DragonSync MQTT Payload Schema](https://github.com/alphafox02/DragonSync/blob/main/docs/mqtt-schema.md). That doc lives alongside the code that produces these payloads and is the source of truth.
+### Signal payloads (`wardragon/signals`)
+
+Published on the signals topic when `mqtt_signals_enabled = true`. These come from RF-only detectors — FPV analog on 5 GHz, SiK / RFD900 on 900 MHz, and (Elite kits with DragonSig) mLRS on 868 / 915 MHz. Each source uses the same JSON envelope; the identifying and mission-specific fields differ.
+
+**FPV analog signal (no verified position — uses kit GPS as location):**
+
+```json
+{
+  "id": "fpv-alert-5945.200MHz",
+  "description": "FPV Signal",
+  "lat": 27.8003,
+  "lon": -82.6686,
+  "alt": 12.0,
+  "rssi": -90.5,
+  "freq_mhz": 5945.2,
+  "signal_type": "fpv",
+  "source": "confirm",
+  "seen_by": "wardragon-G6PA14100J63",
+  "track_type": "signal"
+}
+```
+
+**mLRS link — RF confirmation only (`mlrs_confirm`)**:
+
+```json
+{
+  "id": "MLRS-LINK-7C85",
+  "description": "MAVLink drone Link 7C85 on mLRS FHSS",
+  "lat": 27.8003,
+  "lon": -82.6686,
+  "alt": 12.0,
+  "rssi": 15.0,
+  "freq_mhz": 920,
+  "signal_type": "lora_css",
+  "source": "mlrs_confirm",
+  "has_mavlink": false,
+  "link_id": 31877,
+  "transport": "LoRa-FHSS",
+  "seen_by": "wardragon-G6PA14100J63",
+  "track_type": "signal"
+}
+```
+
+**mLRS link — CRC-clean MAVLink position (`mlrs_reasm`)**. This is the version that elevates to a **tracked drone** on the drone topic in addition to appearing on signals:
+
+```json
+{
+  "id": "MLRS-LINK-7C85",
+  "description": "MAVLink drone Link 7C85 on mLRS FHSS",
+  "lat": 40.712800,
+  "lon": -74.006000,
+  "alt": 100.0,
+  "rssi": 15.0,
+  "freq_mhz": 920,
+  "signal_type": "lora_css",
+  "source": "mlrs_reasm",
+  "has_mavlink": true,
+  "link_id": 31877,
+  "transport": "LoRa-FHSS",
+  "seen_by": "wardragon-G6PA14100J63",
+  "track_type": "signal"
+}
+```
+
+The `id` (e.g. `MLRS-LINK-7C85`) is **stable across every frequency hop** and every reassembly cycle — one hopping mLRS link produces one persistent record, not one-per-channel. See [DragonSig](../software/dragonsig.md) for the full mLRS alert model.
+
+SiK / RFD900 signal payloads follow the same shape, identified by the SiK Net ID rather than a link ID (`drone-900FHSS-NETID-<n>`).
+
+> **Full schema reference:** every topic, every field, types, always-present vs. conditional notes, plus the complete signal / aircraft / system payloads — see [DragonSync MQTT Payload Schema](https://github.com/alphafox02/DragonSync/blob/main/docs/mqtt-schema.md). That doc lives alongside the code that produces these payloads and is the source of truth.
 
 ---
 

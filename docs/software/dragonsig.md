@@ -51,7 +51,22 @@ DragonSig **detects the link and decodes MAVLink telemetry** — when MAVLink po
 
 ### mLRS *(Active Work)*
 
-**mLRS** is an open long-range control-link protocol widely used on custom / long-range drones. DragonSig's mLRS work goes beyond just detecting the link — it **extracts MAVLink telemetry directly from the mLRS link**, same way it does for RFD900 / SiK. When MAVLink position and heading data are recovered, they populate the track's `Location/Vector Message` block instead of falling back to the WarDragon's own GPS.
+**mLRS** is an open long-range LoRa-based control-link protocol used on custom and long-range drones (Matek mR900 and similar). Unlike SiK / RFD900, mLRS is a frequency-hopping LoRa link, so it requires a purpose-built detector — that's the mLRS piece of DragonSig.
+
+DragonSig's mLRS work goes beyond just detecting the link — it **extracts MAVLink telemetry directly from the mLRS link** and forwards it through the same alert pipeline used for RFD900. When MAVLink position and heading data are recovered, they populate the track's `Location/Vector Message` block instead of falling back to the WarDragon's own GPS.
+
+**Bands**: EU868 and FCC915 are both supported. On the shipping profile the mLRS phase runs at **915 MHz**, so it shares the same 900 MHz antenna as the RFD900 mission — no retune when switching between them.
+
+**Two alert sources**. DragonSig separates link presence from verified position:
+
+| Source | Meaning | Position included? |
+|--------|---------|-------------------|
+| `mlrs_confirm` | RF / link confirmed — a specific mLRS link is present in range | No (RF contact only) |
+| `mlrs_reasm` | Reassembled MAVLink packet where all CRC checks pass **and** GPS coordinates pass sanity checks | **Yes** — full drone position |
+
+Only `mlrs_reasm` events elevate an mLRS contact to a tracked drone in DragonSync (with a real lat / lon on the map). `mlrs_confirm` stays visible as an RF contact — you know something is there, just not where.
+
+**Identity**. Each mLRS link is identified by a stable per-link 16-bit identifier that stays the same across every frequency hop, so one hopping aircraft produces one ATAK marker rather than one per channel. In DragonSync output the drone shows up as **`MLRS-LINK-<XXXX>`** where `<XXXX>` is the hex link ID.
 
 ### ELRS *(Planned)*
 
@@ -59,7 +74,9 @@ Detection and characterization of ExpressLRS control links is on the DragonSig r
 
 ## Output
 
-DragonSig emits the same JSON message envelope as the legacy FPV detector — DragonSync subscribes without changes:
+DragonSig emits the same ASTM F3411-shaped JSON envelope for every mission — DragonSync subscribes on port `4226` and ingests without changes. The specific field values differ by mission.
+
+### FPV alert envelope
 
 ```json
 [
@@ -71,12 +88,58 @@ DragonSig emits the same JSON message envelope as the legacy FPV detector — Dr
 ]
 ```
 
-When MAVLink telemetry is recovered from a 900 MHz detection, position fields are populated in the `Location/Vector Message` block instead of falling back to the WarDragon's own GPS.
+Source tags for FPV:
 
 | Source tag | Meaning |
 |------------|---------|
 | `energy` | Initial energy-based detection (lower confidence) |
 | `confirm` | Confirmed via classifier (higher confidence) |
+
+### mLRS alert envelope
+
+For an mLRS link with a verified MAVLink-derived GPS position:
+
+```json
+[
+  {"Basic ID": {
+    "id_type": "Signal",
+    "id": "MLRS-LINK-7C85",
+    "transport": "LoRa-FHSS",
+    "frequency_mhz": 920,
+    "RSSI": 15
+  }},
+  {"Location/Vector Message": {
+    "op_status": "Airborne",
+    "latitude": "40.712800",
+    "longitude": "-74.006000",
+    "geodetic_altitude": "100.000000 m"
+  }},
+  {"Self-ID Message": {"text": "MAVLink drone Link 7C85 on mLRS FHSS"}},
+  {"Signal Info": {
+    "source": "mlrs_reasm",
+    "signal_type": "lora_css",
+    "has_mavlink": true,
+    "center_hz": 920000000,
+    "link_id": 31877,
+    "rssi": 15.0
+  }}
+]
+```
+
+For a link that's been detected but has not yet produced a verified position, the shape is the same but `source` is `mlrs_confirm`, `has_mavlink` is `false`, and the `Location/Vector Message` is absent (the alert stays an RF contact rather than becoming a tracked drone).
+
+Source tags for mLRS:
+
+| Source tag | Meaning | Elevates to tracked drone? |
+|------------|---------|:---:|
+| `mlrs_confirm` | Link presence confirmed, no verified position yet | No — RF contact only |
+| `mlrs_reasm` | CRC-clean MAVLink packet, GPS coordinates sanity-checked | **Yes** — track with real lat/lon |
+
+DragonSync sees the `MLRS-LINK-<XXXX>` identity as the drone ID, so one hopping link produces one persistent track / one ATAK marker across every frequency hop and every reassembly cycle.
+
+### RFD900 / SiK
+
+The SiK / RFD900 mission uses the same envelope shape with a `signal_type` reflecting the SiK link and a stable `NETID`-based identity — see the mLRS layout above for the general structure.
 
 ## Pipeline Position
 

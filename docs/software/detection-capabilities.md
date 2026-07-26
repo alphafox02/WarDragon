@@ -204,10 +204,26 @@ The DragonSig sweep covers the standard 5 GHz FPV race bands and adjacent channe
 4. ML-assisted classification (YOLO / ONNX) extends to additional signal types over time
 5. Alerts publish on ZMQ port `4226` in the same JSON envelope as the legacy detector — DragonSync ingests without changes
 
-### Limitations
+### mLRS — Long-Range LoRa Control Link *(Active Work)*
+
+**mLRS** is an open LoRa-based long-range RC control link (Matek mR900 and similar) used on custom and long-range drones. Unlike SiK / RFD900 it's frequency-hopping LoRa, so DragonSig runs a purpose-built LoRa detector for it. Bands supported: **EU868** and **FCC915**.
+
+DragonSig separates the mLRS output into two alert tiers:
+
+| Source | What It Means | Track type |
+|--------|---------------|------------|
+| `mlrs_confirm` | The mLRS link is confirmed present in range | RF contact — no verified position |
+| `mlrs_reasm` | A MAVLink packet from inside the link has passed all CRC checks and its GPS coordinates pass sanity checks | **Tracked drone** with real lat / lon |
+
+**Identity**. Each mLRS link carries a stable per-link 16-bit identifier that survives every hop. Drones show up as **`MLRS-LINK-<XXXX>`** in DragonSync / MQTT / TAK — one hopping link = one persistent marker.
+
+See [DragonSig](dragonsig.md) for the full mLRS envelope and alert structure.
+
+### Notes
 
 - **FPV analog** — no native position data (uses WarDragon GPS as the location)
-- **RFD900 / 900 MHz** — position is included when telemetry from the link is decoded; otherwise WarDragon GPS is used
+- **RFD900 / 900 MHz** — position is included when MAVLink from the link decodes cleanly; otherwise WarDragon GPS is used
+- **mLRS** — position is included when MAVLink from the link decodes cleanly; otherwise the alert stays an RF contact
 - **Requires WarDragon Elite** — the BladeRF and DragonSig binary ship on Elite kits only. Pro and Pro v3 don't include a 2nd SDR.
 
 ### Legacy FPV Flow (Pro v3)
