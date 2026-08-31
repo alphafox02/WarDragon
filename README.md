@@ -1,5 +1,15 @@
 # WarDragon Documentation Hub
 
+## A note
+
+I built and maintain the open-source components covered in these docs. The WarDragon Pro and Elite commercial kits include additional in-house capabilities that are not detailed here and are not covered by the license of the underlying open-source repositories.
+
+For production evaluation or procurement, please contact [cemaxecuter.com](https://cemaxecuter.com). The open-source work referenced here remains open, and contributions are welcome.
+
+— Aaron
+
+---
+
 > **Work in Progress**: This documentation is actively being developed. Some information may be incomplete, outdated, or contain errors. If you find mistakes, please open an issue or submit a pull request. We appreciate your patience as we continue to improve these docs.
 
 The official documentation and user manual for WarDragon drone detection systems.
