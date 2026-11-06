@@ -85,6 +85,13 @@ Most useful topics for operators:
 
 `<kit_id>` is the WarDragon kit's identifier (e.g. `wardragon-G6PA14100J63`). One kit per broker → one set of these topics. Multiple kits on the same broker → one set per kit, no collisions.
 
+The kit telemetry on `wardragon/system/<kit_id>/attrs` carries both:
+
+- `id`: the Kit ID. It never changes, so use it to identify a kit.
+- `callsign`: the kit's display name, from DragonSync's `kit_callsign` setting. When no callsign is set it is the Kit ID. Don't key on it; it can be changed by the operator.
+
+Setting a callsign never changes topics, so retained state and existing subscriptions are unaffected.
+
 ### Subscription Migration
 
 Three ways to subscribe to kit-level topics after the v2.0 schema change:
@@ -252,7 +259,7 @@ For each detected drone, HA creates a single device with these entities:
 
 ### WarDragon kit entities created
 
-A single device named "WarDragon System" with these entities:
+One device per kit. It is named after the kit's `callsign` when one is set, otherwise `WarDragon <kit_id>`. The device identifiers and entity unique IDs come from the Kit ID, so changing the callsign renames the same device in Home Assistant rather than creating a new one, and existing entity IDs stay as they are. The device has these entities:
 
 | Entity | Class | Source field |
 |--------|-------|--------------|
